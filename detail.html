@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <title>รายละเอียดห้องพัก</title>
+  <!-- Tailwind CSS via CDN -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/tailwindcss@3.2.7/dist/tailwind.min.css"
+    rel="stylesheet"
+  />
+</head>
+<body class="bg-gray-100">
+  <div class="max-w-md mx-auto p-4">
+    <!-- ปุ่มกลับ -->
+    <a href="index.html" class="text-blue-500 underline mb-4 inline-block">กลับ</a>
+
+    <!-- ส่วนแสดงรายละเอียดห้อง -->
+    <div id="roomDetail" class="bg-white rounded shadow p-3">
+      <!-- จะแทรกข้อมูลด้วย JS -->
+    </div>
+  </div>
+
+  <script>
+    const apiUrl = "https://script.google.com/macros/s/AKfycbxu7WHS2auKFROs9m6Dmep6DWOflEtCEkdsZZbIJ-fGGqQ1BJBxn5g18A3HTkObmg9f/exec";
+
+    // อ่านค่า id จาก query string
+    const params = new URLSearchParams(window.location.search);
+    const roomId = params.get("id"); // เช่น A1, A2, ...
+
+    async function fetchRoomDetail() {
+      try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        // หา room ที่ตรงกับ roomId
+        const room = data.find((r) => r["ไอดี"] === roomId);
+        if (room) {
+          renderRoomDetail(room);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderRoomDetail(room) {
+      const container = document.getElementById("roomDetail");
+      container.innerHTML = "";
+
+      // รูปหลัก
+      const mainImg = document.createElement("img");
+      mainImg.src = room["รูปภาพ"];
+      mainImg.alt = room["ชื่อ"];
+      mainImg.className = "w-full h-48 object-cover rounded mb-3";
+
+      // ชื่อห้อง + ราคา
+      const title = document.createElement("h2");
+      title.className = "text-xl font-bold";
+      title.textContent = room["ชื่อ"] + " (" + room["หมวดหมู่"] + ")";
+
+      const price = document.createElement("p");
+      price.className = "text-red-500";
+      price.textContent = `ราคา ${room["ราคา"]} บาท (ราคาลด ${room["ราคาลด"]} บาท)`; 
+
+      // รายละเอียด
+      const detail = document.createElement("p");
+      detail.className = "mt-2 text-gray-700";
+      detail.textContent = room["รายละเอียด"];
+
+      const detail2 = document.createElement("p");
+      detail2.className = "mt-2 text-gray-700";
+      detail2.textContent = room["รายละเอียด-2"];
+
+      // ตัวอย่างการแสดงรูปประกอบ
+      const galleryContainer = document.createElement("div");
+      galleryContainer.className = "mt-4 flex space-x-2 overflow-x-auto";
+      for (let i = 1; i <= 4; i++) {
+        const imgKey = `รูปประกอบ-${i}`;
+        if (room[imgKey]) {
+          const gImg = document.createElement("img");
+          gImg.src = room[imgKey];
+          gImg.className = "w-24 h-24 object-cover rounded";
+          galleryContainer.appendChild(gImg);
+        }
+      }
+
+      // ประกอบเข้าด้วยกัน
+      container.appendChild(mainImg);
+      container.appendChild(title);
+      container.appendChild(price);
+      container.appendChild(detail);
+      container.appendChild(detail2);
+      container.appendChild(galleryContainer);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchRoomDetail();
+    });
+  </script>
+</body>
+</html>
