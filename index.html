@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <title>จองห้องพัก - หน้าแรก</title>
+  <!-- Tailwind CSS via CDN -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/tailwindcss@3.2.7/dist/tailwind.min.css"
+    rel="stylesheet"
+  />
+  <!-- LIFF SDK (กรณีต้องการใช้) -->
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+<body class="bg-gray-100">
+  <div class="max-w-md mx-auto p-4">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-xl font-bold">โอมสเตย์ ยินดีต้อนรับ</h1>
+      <div>
+        <!-- วันที่เข้าพัก (ตัวอย่าง) -->
+        <input
+          type="date"
+          class="border rounded px-2 py-1 text-sm"
+          id="checkInDate"
+        />
+      </div>
+    </div>
+
+    <!-- ส่วนรายการห้องพัก -->
+    <div id="roomList" class="space-y-4">
+      <!-- จะใส่ข้อมูลห้องแบบไดนามิกด้วย JS -->
+    </div>
+  </div>
+
+  <script>
+    const apiUrl = "https://script.google.com/macros/s/AKfycbxu7WHS2auKFROs9m6Dmep6DWOflEtCEkdsZZbIJ-fGGqQ1BJBxn5g18A3HTkObmg9f/exec"; // ใส่ URL ที่ได้จากการ Deploy
+
+    // ตัวอย่างฟังก์ชันเรียก API
+    async function fetchRooms() {
+      try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        // data จะเป็น Array ของ Object ห้องพัก
+        renderRoomList(data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    // สร้าง UI รายการห้อง
+    function renderRoomList(rooms) {
+      const container = document.getElementById("roomList");
+      container.innerHTML = ""; // เคลียร์ก่อน
+
+      rooms.forEach((room) => {
+        // ตัวอย่าง room: {
+        //   ไอดี: "A1",
+        //   ชื่อ: "ห้อง A",
+        //   หมวดหมู่: "VIP",
+        //   แอร์: TRUE,
+        //   ...
+        // }
+
+        // สร้าง card
+        const card = document.createElement("div");
+        card.className = "bg-white rounded shadow p-3 flex";
+
+        // รูปภาพ
+        const img = document.createElement("img");
+        img.src = room["รูปภาพ"];
+        img.alt = room["ชื่อ"];
+        img.className = "w-24 h-24 object-cover rounded mr-3";
+
+        // ส่วนรายละเอียด
+        const info = document.createElement("div");
+        info.className = "flex-1";
+
+        const title = document.createElement("h2");
+        title.className = "font-bold";
+        title.textContent = room["ชื่อ"] + " (" + room["หมวดหมู่"] + ")";
+
+        const price = document.createElement("p");
+        price.className = "text-red-500";
+        price.textContent = "ราคา " + room["ราคา"] + " บาท";
+
+        // ปุ่มจอง / ปุ่มดูรายละเอียด
+        const button = document.createElement("a");
+        button.href = `detail.html?id=${room["ไอดี"]}`; // ส่งไอดีไปหน้า detail
+        button.className = "inline-block bg-blue-500 text-white px-4 py-1 rounded mt-2 text-sm";
+        button.textContent = "ดูรายละเอียด";
+
+        // ประกอบเข้าด้วยกัน
+        info.appendChild(title);
+        info.appendChild(price);
+        info.appendChild(button);
+
+        card.appendChild(img);
+        card.appendChild(info);
+
+        container.appendChild(card);
+      });
+    }
+
+    // เริ่มต้นเรียกข้อมูลเมื่อโหลดหน้า
+    document.addEventListener("DOMContentLoaded", () => {
+      // ถ้าจะใช้ LIFF:
+      // initLiff();
+
+      fetchRooms();
+    });
+
+    // async function initLiff() {
+    //   await liff.init({ liffId: "YOUR_LIFF_ID" });
+    //   if (!liff.isLoggedIn()) {
+    //     liff.login();
+    //   }
+    // }
+  </script>
+</body>
+</html>
