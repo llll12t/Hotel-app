@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard - ข้อมูลการจอง</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- config.js ควรมีการกำหนดค่า DAPI_URL -->
+  <script src="config.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div class="max-w-7xl mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-4">Admin Dashboard - ข้อมูลการจอง</h1>
+    <!-- ตารางแสดงข้อมูลการจอง -->
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white border">
+        <thead>
+          <tr>
+            <th class="py-2 px-4 border">ID</th>
+            <th class="py-2 px-4 border">ชื่อห้องพัก</th>
+            <th class="py-2 px-4 border">หมวดหมู่</th>
+            <th class="py-2 px-4 border">ราคา</th>
+            <th class="py-2 px-4 border">วันที่เข้าพัก</th>
+            <th class="py-2 px-4 border">วันที่ออก</th>
+            <th class="py-2 px-4 border">จำนวนคนพัก</th>
+            <th class="py-2 px-4 border">ชื่อผู้เช่า</th>
+            <th class="py-2 px-4 border">เบอร์ติดต่อ</th>
+            <th class="py-2 px-4 border">อีเมล</th>
+            <th class="py-2 px-4 border">หมายเหตุ</th>
+            <th class="py-2 px-4 border">สถานะ</th>
+            <th class="py-2 px-4 border">ชำระเงิน</th>
+            <th class="py-2 px-4 border">เชคอิน</th>
+            <th class="py-2 px-4 border">เชคเอาต์</th>
+            <th class="py-2 px-4 border">บันทึกเพิ่มเติม</th>
+            <th class="py-2 px-4 border">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="bookingTableBody">
+          <!-- แถวของข้อมูลการจองจะถูกสร้างโดย JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal สำหรับแก้ไขข้อมูลการจอง -->
+  <div id="editModal" class="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 hidden">
+    <div class="bg-white rounded-lg p-6 w-full max-w-md">
+      <h2 class="text-xl font-bold mb-4">แก้ไขข้อมูลการจอง</h2>
+      <form id="editForm" class="space-y-4">
+        <!-- เก็บ Booking ID ไว้แบบซ่อน -->
+        <input type="hidden" id="bookingId">
+        <div>
+          <label class="block text-sm font-semibold mb-1">สถานะ</label>
+          <select id="editStatus" class="w-full border rounded px-2 py-1">
+            <option value="รอการตรวจสอบ">รอการตรวจสอบ</option>
+            <option value="ยืนยัน">ยืนยัน</option>
+            <option value="ยกเลิก">ยกเลิก</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1">ชำระเงิน</label>
+          <select id="editPaymentStatus" class="w-full border rounded px-2 py-1">
+            <option value="รอการชำระเงิน">รอการชำระเงิน</option>
+            <option value="ชำระเงินแล้ว">ชำระเงินแล้ว</option>
+            <option value="ยกเลิก">ยกเลิก</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1">เชคอิน</label>
+          <input type="date" id="editCheckIn" class="w-full border rounded px-2 py-1">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1">เชคเอาต์</label>
+          <input type="date" id="editCheckOut" class="w-full border rounded px-2 py-1">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-1">บันทึกเพิ่มเติม</label>
+          <textarea id="editAdditionalNote" class="w-full border rounded px-2 py-1" rows="3"></textarea>
+        </div>
+        <div class="flex justify-end space-x-2">
+          <button type="button" id="cancelBtn" class="bg-gray-300 text-gray-800 px-4 py-2 rounded">ยกเลิก</button>
+          <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">บันทึก</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ฟังก์ชันแปลงวันที่ให้เป็นรูปแบบ dd/mm/yyyy HH:mm
+    function formatDateTime(dateStr) {
+      if (!dateStr) return "";
+      var date = new Date(dateStr);
+      if (isNaN(date)) return dateStr;
+      var day = ("0" + date.getDate()).slice(-2);
+      var month = ("0" + (date.getMonth() + 1)).slice(-2);
+      var year = date.getFullYear();
+      var hours = ("0" + date.getHours()).slice(-2);
+      var minutes = ("0" + date.getMinutes()).slice(-2);
+      return `${day}/${month}/${year} ${hours}:${minutes}`;
+    }
+
+    // ดึงข้อมูลการจองจาก GAS (mode=admin)
+    async function fetchBookings() {
+      try {
+        const response = await fetch(`${DAPI_URL}?mode=admin`);
+        const bookings = await response.json();
+        renderBookings(bookings);
+      } catch (err) {
+        console.error("Error fetching bookings:", err);
+      }
+    }
+
+    // แสดงข้อมูลการจองในตาราง พร้อมจัดรูปแบบวันที่
+    function renderBookings(bookings) {
+      const tbody = document.getElementById("bookingTableBody");
+      tbody.innerHTML = "";
+      if (!bookings || bookings.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="17" class="text-center py-4">ไม่มีข้อมูลการจอง</td></tr>';
+        return;
+      }
+      bookings.forEach(booking => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="py-2 px-4 border">${booking["ไอดี"] || ""}</td>
+          <td class="py-2 px-4 border">${booking["ชื่อห้องพัก"] || ""}</td>
+          <td class="py-2 px-4 border">${booking["หมวดหมู่"] || ""}</td>
+          <td class="py-2 px-4 border">${booking["ราคา"] || ""}</td>
+          <td class="py-2 px-4 border">${formatDateTime(booking["วันที่เข้าพัก"])}</td>
+          <td class="py-2 px-4 border">${formatDateTime(booking["วันที่ออก"])}</td>
+          <td class="py-2 px-4 border">${booking["จำนวนคนพัก"] || ""}</td>
+          <td class="py-2 px-4 border">${booking["ชื่อผู้เช่า"] || ""}</td>
+          <td class="py-2 px-4 border">${booking["เบอร์ติดต่อ"] || ""}</td>
+          <td class="py-2 px-4 border">${booking["อีเมล"] || ""}</td>
+          <td class="py-2 px-4 border">${booking["หมายเหตุ"] || ""}</td>
+          <td class="py-2 px-4 border">${booking["สถานะ"] || ""}</td>
+          <td class="py-2 px-4 border">${booking["ชำระเงิน"] || ""}</td>
+          <td class="py-2 px-4 border">${formatDateTime(booking["เชคอิน"])}</td>
+          <td class="py-2 px-4 border">${formatDateTime(booking["เชคเอาต์"])}</td>
+          <td class="py-2 px-4 border">${booking["บันทึกเพิ่มเติม"] || ""}</td>
+          <td class="py-2 px-4 border">
+            <button class="bg-green-500 text-white px-2 py-1 rounded text-sm" onclick='openEditModal(${JSON.stringify(booking)})'>แก้ไข</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // เปิด modal สำหรับแก้ไขข้อมูล และกำหนดค่าเริ่มต้นจาก booking object
+    function openEditModal(booking) {
+      document.getElementById("bookingId").value = booking["ไอดี"] || "";
+      document.getElementById("editStatus").value = booking["สถานะ"] || "รอการตรวจสอบ";
+      document.getElementById("editPaymentStatus").value = booking["ชำระเงิน"] || "รอการชำระเงิน";
+      // สำหรับ input type="date" ใช้รูปแบบ yyyy-mm-dd
+      if (booking["เชคอิน"]) {
+        const dtIn = new Date(booking["เชคอิน"]);
+        document.getElementById("editCheckIn").value = dtIn.toISOString().split("T")[0];
+      } else {
+        document.getElementById("editCheckIn").value = "";
+      }
+      if (booking["เชคเอาต์"]) {
+        const dtOut = new Date(booking["เชคเอาต์"]);
+        document.getElementById("editCheckOut").value = dtOut.toISOString().split("T")[0];
+      } else {
+        document.getElementById("editCheckOut").value = "";
+      }
+      document.getElementById("editAdditionalNote").value = booking["บันทึกเพิ่มเติม"] || "";
+      document.getElementById("editModal").classList.remove("hidden");
+    }
+
+    // ปิด modal
+    function closeEditModal() {
+      document.getElementById("editModal").classList.add("hidden");
+    }
+
+    // จัดการส่งข้อมูลอัปเดทไปยัง GAS (mode=update)
+    document.getElementById("editForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const bookingId = document.getElementById("bookingId").value;
+      const status = document.getElementById("editStatus").value;
+      const paymentStatus = document.getElementById("editPaymentStatus").value;
+      const checkIn = document.getElementById("editCheckIn").value;
+      const checkOut = document.getElementById("editCheckOut").value;
+      const additionalNote = document.getElementById("editAdditionalNote").value;
+
+      // เตรียมข้อมูลสำหรับอัปเดท
+      const updateData = {
+        bookingId,
+        status,
+        paymentStatus,
+        checkIn,
+        checkOut,
+        additionalNote
+      };
+
+      try {
+        const res = await fetch(`${DAPI_URL}?mode=update`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updateData)
+        });
+        const result = await res.text();
+        console.log("Update result:", result);
+        // รีเฟรชข้อมูลการจองหลังอัปเดท
+        fetchBookings();
+        closeEditModal();
+      } catch (err) {
+        console.error("Error updating booking:", err);
+      }
+    });
+
+    document.getElementById("cancelBtn").addEventListener("click", function() {
+      closeEditModal();
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+      fetchBookings();
+    });
+  </script>
+</body>
+</html>

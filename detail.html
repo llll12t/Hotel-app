@@ -19,12 +19,12 @@
 
       <!-- ราคาและปุ่มจอง -->
       <div class="flex items-center justify-between bg-white rounded-lg p-3 shadow mb-4">
-        <div class="flex items-center space-x-2">
-          <div id="priceCircle" class="w-20 h-20 flex items-center justify-center rounded-full border-2 border-gray-300">
-            <span id="roomPrice" class="text-xl font-bold text-red-500"></span>
-          </div>
+        <div id="priceCircle" class="w-20 h-20 flex items-center justify-center rounded-full border-2 border-gray-300">
+          <span id="roomPrice" class="text-xl font-bold text-red-500"></span>
         </div>
-        <button id="bookButton" class="bg-gray-800 text-white px-6 py-2 rounded-full text-sm">จองห้อง</button>
+        <button id="bookButton" class="bg-gray-800 text-white px-6 py-2 rounded-full text-sm">
+          จองห้อง
+        </button>
       </div>
 
       <!-- Gallery -->
@@ -48,9 +48,11 @@
     </div>
 
     <script>
-      // อ่าน roomId จาก query string
+      // อ่านค่าจาก query string: roomId, checkIn และ checkOut
       const params = new URLSearchParams(window.location.search);
       const roomId = params.get("id");
+      const checkInParam = params.get("checkIn");
+      const checkOutParam = params.get("checkOut");
 
       document.addEventListener("DOMContentLoaded", () => {
         fetchRoomDetail();
@@ -59,13 +61,18 @@
       async function fetchRoomDetail() {
         try {
           const response = await fetch(API_URL);
-          const data = await response.json();
-          const room = data.find((r) => r["ไอดี"] === roomId);
+          let data = await response.json();
+          if (!Array.isArray(data)) {
+            data = [data];
+          }
+          const room = data.find((r) => String(r["ไอดี"]).trim() === roomId.trim());
           if (room) {
             renderRoomDetail(room);
+          } else {
+            console.error("ไม่พบห้องที่มีไอดีตรงกับ:", roomId);
           }
         } catch (err) {
-          console.error(err);
+          console.error("Error fetching room detail:", err);
         }
       }
 
@@ -91,7 +98,6 @@
             gImg.src = room[imgKey];
             gImg.alt = `รูปประกอบ-${i}`;
             gImg.className = "w-20 h-20 object-cover rounded-md cursor-pointer";
-            // คลิกที่รูปย่อยให้เปลี่ยนรูปหลัก
             gImg.addEventListener("click", () => {
               mainImg.src = room[imgKey];
               mainImg.alt = `รูปประกอบ-${i}`;
@@ -100,11 +106,24 @@
           }
         }
 
-        // เมื่อคลิกปุ่มจอง ให้เปลี่ยนหน้าไปที่ booking.html พร้อมส่ง roomId
+        // จัดการปุ่มจองห้อง
         const bookButton = document.getElementById("bookButton");
-        bookButton.addEventListener("click", () => {
-          window.location.href = `booking.html?id=${roomId}`;
-        });
+        if (!checkInParam) {
+          // หากยังไม่มี checkIn ให้ disable ปุ่มจองและเปลี่ยนข้อความแจ้งเตือน
+          bookButton.disabled = true;
+          bookButton.classList.add("opacity-50", "cursor-not-allowed");
+          bookButton.textContent = "กรุณาเลือกวันที่เข้าพัก";
+        } else {
+          // เมื่อมี checkIn (และอาจมี checkOut) ให้เปิดใช้งานปุ่มจอง
+          bookButton.addEventListener("click", () => {
+            let url = `booking.html?id=${roomId}`;
+            url += `&checkIn=${checkInParam}`;
+            if (checkOutParam) {
+              url += `&checkOut=${checkOutParam}`;
+            }
+            window.location.href = url;
+          });
+        }
       }
     </script>
   </body>

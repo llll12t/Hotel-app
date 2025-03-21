@@ -16,59 +16,63 @@
 
       <div class="bg-white p-4 rounded shadow">
         <!-- ข้อมูลห้อง (read-only) -->
-        <div class="mb-4">
-          <label class="block text-sm font-semibold">ชื่อห้องพัก</label>
-          <input type="text" id="roomName" class="w-full border rounded px-2 py-1 text-sm bg-gray-100" readonly>
-        </div>
-        <div class="mb-4">
-          <label class="block text-sm font-semibold">หมวดหมู่</label>
-          <input type="text" id="roomCategory" class="w-full border rounded px-2 py-1 text-sm bg-gray-100" readonly>
-        </div>
-        <div class="mb-4">
-          <label class="block text-sm font-semibold">ราคา</label>
-          <input type="text" id="roomPrice" class="w-full border rounded px-2 py-1 text-sm bg-gray-100" readonly>
-        </div>
-
-        <!-- ฟิลด์กรอกข้อมูลการจอง -->
-        <div class="mb-4">
-          <label class="block text-sm font-semibold">วันที่เข้าพัก</label>
-          <input type="date" id="checkIn" class="w-full border rounded px-2 py-1 text-sm">
-        </div>
-        <div class="mb-4">
-          <label class="block text-sm font-semibold">วันที่ออก</label>
-          <input type="date" id="checkOut" class="w-full border rounded px-2 py-1 text-sm">
-        </div>
-        <div class="mb-4">
-          <label class="block text-sm font-semibold">จำนวนคนเข้าพัก</label>
-          <input type="number" id="numGuests" class="w-full border rounded px-2 py-1 text-sm" min="1" value="1">
-        </div>
-        <div class="mb-4">
-          <label class="block text-sm font-semibold">ชื่อผู้เช่า</label>
-          <input type="text" id="renterName" class="w-full border rounded px-2 py-1 text-sm" placeholder="เช่น สมชาย ใจดี">
-        </div>
-        <div class="mb-4">
-          <label class="block text-sm font-semibold">เบอร์ติดต่อ</label>
-          <input type="tel" id="phone" class="w-full border rounded px-2 py-1 text-sm" placeholder="เช่น 0812345678">
-        </div>
-        <div class="mb-4">
-          <label class="block text-sm font-semibold">อีเมล</label>
-          <input type="email" id="email" class="w-full border rounded px-2 py-1 text-sm" placeholder="example@gmail.com">
-        </div>
-        <div class="mb-4">
-          <label class="block text-sm font-semibold">หมายเหตุ</label>
-          <textarea id="note" class="w-full border rounded px-2 py-1 text-sm" rows="3"></textarea>
-        </div>
-
-        <!-- ปุ่มจอง -->
-        <button class="w-full bg-black text-white py-2 rounded text-sm font-semibold" onclick="submitBooking()">จองห้องนี้</button>
+        <form>
+          <!-- ข้อมูลห้อง (Read-only) -->
+          <div class="mb-4">
+            <label class="block text-sm font-semibold">ชื่อห้องพัก</label>
+            <input type="text" id="roomName" class="w-full border rounded px-2 py-1 text-sm bg-gray-100" readonly>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-semibold">หมวดหมู่</label>
+            <input type="text" id="roomCategory" class="w-full border rounded px-2 py-1 text-sm bg-gray-100" readonly>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-semibold">ราคา</label>
+            <input type="text" id="roomPrice" class="w-full border rounded px-2 py-1 text-sm bg-gray-100" readonly>
+          </div>
+    
+          <!-- ฟิลด์กรอกข้อมูลการจอง -->
+          <div class="mb-4">
+            <label class="block text-sm font-semibold">วันที่เข้าพัก</label>
+            <input type="date" id="checkIn" class="w-full border rounded px-2 py-1 text-sm" readonly>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-semibold">วันที่ออก</label>
+            <input type="date" id="checkOut" class="w-full border rounded px-2 py-1 text-sm" readonly>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-semibold">จำนวนคนเข้าพัก</label>
+            <input type="number" id="numGuests" class="w-full border rounded px-2 py-1 text-sm" min="1" value="1">
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-semibold">ชื่อผู้เช่า</label>
+            <input type="text" id="renterName" class="w-full border rounded px-2 py-1 text-sm" placeholder="เช่น สมชาย ใจดี">
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-semibold">เบอร์ติดต่อ</label>
+            <input type="tel" id="phone" class="w-full border rounded px-2 py-1 text-sm" placeholder="เช่น 0812345678">
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-semibold">อีเมล</label>
+            <input type="email" id="email" class="w-full border rounded px-2 py-1 text-sm" placeholder="example@gmail.com">
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-semibold">หมายเหตุ</label>
+            <textarea id="note" class="w-full border rounded px-2 py-1 text-sm" rows="3"></textarea>
+          </div>
+          <button type="button" id="submitBtn" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700">Submit</button>
+        </form>
       </div>
     </div>
 
     <script>
-      // อ่าน roomId จาก query string
+      // อ่าน roomId, checkIn และ checkOut จาก query string
       const params = new URLSearchParams(window.location.search);
       const roomId = params.get("id");
+      const checkInParam = params.get("checkIn");
+      const checkOutParam = params.get("checkOut");
 
+      // ดึงข้อมูลห้องจาก API เพื่อนำไปแสดงในฟอร์ม (read-only)
       document.addEventListener("DOMContentLoaded", async () => {
         if (!roomId) return;
         try {
@@ -80,55 +84,55 @@
             document.getElementById("roomCategory").value = room["หมวดหมู่"] || "";
             document.getElementById("roomPrice").value = room["ราคา"] || "";
           }
+          // ถ้ามีการส่งค่า checkIn, checkOut จาก query string ให้แสดงในฟิลด์
+          if (checkInParam) {
+            document.getElementById("checkIn").value = checkInParam;
+          }
+          if (checkOutParam) {
+            document.getElementById("checkOut").value = checkOutParam;
+          }
         } catch (err) {
           console.error(err);
         }
       });
 
-      async function submitBooking() {
-        const roomName = document.getElementById("roomName").value;
-        const category = document.getElementById("roomCategory").value;
-        const price = document.getElementById("roomPrice").value;
-        const checkIn = document.getElementById("checkIn").value;
-        const checkOut = document.getElementById("checkOut").value;
-        const numGuests = document.getElementById("numGuests").value;
-        const renterName = document.getElementById("renterName").value;
-        const phone = document.getElementById("phone").value;
-        const email = document.getElementById("email").value;
-        const note = document.getElementById("note").value;
+      // อ้างอิงองค์ประกอบในฟอร์ม
+      const roomName    = document.getElementById("roomName");
+      const roomCategory= document.getElementById("roomCategory");
+      const roomPrice   = document.getElementById("roomPrice");
+      const checkIn     = document.getElementById("checkIn");
+      const checkOut    = document.getElementById("checkOut");
+      const numGuests   = document.getElementById("numGuests");
+      const renterName  = document.getElementById("renterName");
+      const phone       = document.getElementById("phone");
+      const email       = document.getElementById("email");
+      const note        = document.getElementById("note");
+      const submitBtn   = document.getElementById("submitBtn");
 
-        const payload = {
-          roomId,
-          roomName,
-          category,
-          price,
-          checkIn,
-          checkOut,
-          numGuests,
-          renterName,
-          phone,
-          email,
-          note
+      submitBtn.addEventListener('click', () => {
+        // สร้างอ็อบเจ็กต์ข้อมูลสำหรับส่งไปบันทึก
+        let obj = {
+          roomName: roomName.value,
+          roomCategory: roomCategory.value,
+          roomPrice: roomPrice.value,
+          checkIn: checkIn.value,
+          checkOut: checkOut.value,
+          numGuests: numGuests.value,
+          renterName: renterName.value,
+          phone: phone.value,
+          email: email.value,
+          note: note.value
         };
 
-        try {
-          const res = await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-          });
-          const result = await res.json();
-          if (result.status === "ok") {
-            alert("บันทึกข้อมูลการจองสำเร็จ!");
-            window.location.href = "index.html";
-          } else {
-            alert("เกิดข้อผิดพลาดในการบันทึก: " + result.message);
-          }
-        } catch (error) {
-          console.error(error);
-          alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
-        }
-      }
+        // ส่งข้อมูลไปยัง Google Apps Script
+        fetch(API_URL, {
+          method: "POST",
+          body: JSON.stringify(obj)
+        })
+        .then(response => response.text())
+        .then(data => console.log(data))
+        .catch(error => console.error('Error:', error));
+      });
     </script>
   </body>
 </html>
