@@ -1,10 +1,7 @@
 <!DOCTYPE html>
 <html lang="th">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <head>
+    <meta charset="UTF-8" />
     <title>โอมสเตย์ ยินดีต้อนรับ</title>
     <!-- Tailwind CSS ผ่าน CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -31,38 +28,36 @@
         </div>
       </div>
 
-      <!-- หัวข้อแสดงผลห้องที่มีสถานะ -->
-      <h2 class="mb-3 font-semibold text-gray-700">ห้องที่มีสถานะ</h2>
-
-      <!-- รายการห้อง (แสดงเป็นกริด 2 คอลัม) -->
-      <div id="roomList" class="grid grid-cols-2 gap-4"></div>
+      <!-- รายการห้อง (คอลัมน์เดียว) -->
+      <div id="roomList" class="flex flex-col"></div>
     </div>
 
     <script>
-      // ฟังก์ชันดึงข้อมูลห้องทั้งหมดจาก API (ไม่ส่งค่าวันที่)
+      // ดึงข้อมูลห้องทั้งหมด (ไม่ส่งวันที่)
       async function fetchAllRooms() {
         try {
           const response = await fetch(API_URL);
           const data = await response.json();
-          renderRoomList(data);
+          renderRoomList(data, false); // false = ยังไม่คำนวณสถานะ
         } catch (err) {
           console.error("Error fetching rooms:", err);
         }
       }
 
-      // ฟังก์ชันดึงข้อมูลห้องจาก API โดยส่งค่าวันที่เข้าพักและวันที่ออก
+      // ดึงข้อมูลห้อง (ส่ง checkIn + checkOut เพื่อคำนวณสถานะ)
       async function fetchRooms(checkIn, checkOut) {
         try {
           const response = await fetch(`${API_URL}?checkIn=${checkIn}&checkOut=${checkOut}`);
           const data = await response.json();
-          renderRoomList(data);
+          renderRoomList(data, true); // true = คำนวณสถานะแล้ว
         } catch (err) {
           console.error("Error fetching rooms:", err);
         }
       }
 
-      // ฟังก์ชันแสดงรายการห้องในรูปแบบการ์ด 2 คอลัม
-      function renderRoomList(rooms) {
+      // ฟังก์ชันสร้างรายการห้อง (การ์ด)
+      // isStatusCalculated = true/false บอกว่าได้คำนวณสถานะ (ว่าง/ไม่ว่าง) แล้วหรือยัง
+      function renderRoomList(rooms, isStatusCalculated) {
         const container = document.getElementById("roomList");
         container.innerHTML = "";
 
@@ -71,83 +66,138 @@
           return;
         }
 
-        // อ่านค่าวันที่เข้าพักและวันที่ออกที่เลือกไว้
+        // หากคำนวณสถานะแล้ว ให้เรียงลำดับห้อง "ว่าง" ขึ้นก่อน
+        if (isStatusCalculated) {
+          rooms.sort((a, b) => {
+            const statusA = a["สถานะ"] ? a["สถานะ"].toLowerCase() : "";
+            const statusB = b["สถานะ"] ? b["สถานะ"].toLowerCase() : "";
+            // "ว่าง" < "ไม่ว่าง"
+            if (statusA === "ว่าง" && statusB === "ไม่ว่าง") return -1;
+            if (statusA === "ไม่ว่าง" && statusB === "ว่าง") return 1;
+            return 0;
+          });
+        }
+
+        // อ่านวันที่ (ถ้าเลือกแล้ว)
         const checkInDateValue = document.getElementById("checkInDate").value;
         const checkOutDateValue = document.getElementById("checkOutDate").value;
 
-        rooms.forEach((room) => {
-          const card = document.createElement("div");
-          card.className = "bg-white rounded-lg p-3 shadow flex flex-col";
+        // สร้างการ์ดแนวนอน (คอลัมน์เดียว)
+        rooms.forEach(room => {
+          // ตรวจสอบสถานะ (ถ้า isStatusCalculated == true)
+          let statusText = "";
+          let statusColorClass = "";
+          if (isStatusCalculated) {
+            if (room["สถานะ"] && room["สถานะ"].toLowerCase() === "ไม่ว่าง") {
+              statusText = "ไม่ว่าง";
+              statusColorClass = "bg-red-500";
+            } else {
+              statusText = "ว่าง";
+              statusColorClass = "bg-green-500";
+            }
+          }
 
-          // รูปห้อง
+          // การ์ดหลัก
+          const card = document.createElement("div");
+          card.className = "bg-white rounded-lg shadow p-3 flex items-center mb-4";
+
+          // รูปห้อง (ซ้าย)
+          const imgWrapper = document.createElement("div");
+          imgWrapper.className = "w-28 h-20 flex-shrink-0 overflow-hidden rounded mr-3 relative";
           const img = document.createElement("img");
           img.src = room["รูปภาพ"];
           img.alt = room["ชื่อ"];
-          img.className = "w-full h-32 object-cover rounded-md mb-2";
+          img.className = "w-full h-full object-cover";
+          imgWrapper.appendChild(img);
+          card.appendChild(imgWrapper);
 
-          // ข้อมูลห้อง
-          const info = document.createElement("div");
-          info.className = "flex-1";
-          const title = document.createElement("div");
-          title.className = "font-semibold text-sm mb-1";
-          title.textContent = room["ชื่อ"];
+          // ส่วนกลาง (ชื่อห้อง + ฟีเจอร์)
+          const middleDiv = document.createElement("div");
+          middleDiv.className = "flex-1";
 
-          // สร้าง label สำหรับแสดงสถานะ (เฉพาะเมื่อมีการเลือกวันที่แล้ว)
-          const statusLabel = document.createElement("div");
-          statusLabel.className = "text-xs text-center px-2 py-1 rounded-full mb-1";
-          if (checkInDateValue && checkOutDateValue) {
-            if (room["สถานะ"] && room["สถานะ"].toLowerCase() === "ไม่ว่าง") {
-              statusLabel.textContent = "ไม่ว่าง";
-              statusLabel.classList.add("bg-red-200", "text-red-700");
-            } else {
-              statusLabel.textContent = "ว่าง";
-              statusLabel.classList.add("bg-green-200", "text-green-700");
-            }
-          } else {
-            statusLabel.textContent = "";
+          // แถวแรก: สถานะ + ชื่อห้อง (หมวดหมู่)
+          const topRow = document.createElement("div");
+          topRow.className = "flex items-center space-x-2 mb-1";
+
+          // Badge สถานะ (ถ้ามีการคำนวณสถานะแล้ว)
+          if (isStatusCalculated) {
+            const statusBadge = document.createElement("span");
+            statusBadge.className = `rounded px-2 py-0.5 text-white text-xs ${statusColorClass}`;
+            statusBadge.textContent = statusText;
+            topRow.appendChild(statusBadge);
           }
 
-          // ฟีเจอร์เพิ่มเติม (เช่น แอร์, ที่จอดรถ, สระน้ำ, วิว)
+          // ชื่อห้อง + หมวดหมู่
+          const roomTitle = document.createElement("h2");
+          roomTitle.className = "font-bold text-sm";
+          // แสดงเป็น "ห้อง A (VIP)" เช่น
+          roomTitle.textContent = `${room["ชื่อ"]} (${room["หมวดหมู่"]})`;
+          topRow.appendChild(roomTitle);
+
+          middleDiv.appendChild(topRow);
+
+          // ฟีเจอร์ (แบ่งเป็น 2 คอลัมน์ด้วย columns-2)
           const features = [];
           if (String(room["แอร์"]).toLowerCase() === "true") features.push("แอร์");
-          if (String(room["ที่จอดรถ"]).toLowerCase() === "true") features.push("ที่จอดรถ");
+          if (String(room["เตียง"]).toLowerCase() === "true") features.push("เตียง");
           if (String(room["สระน้ำ"]).toLowerCase() === "true") features.push("สระน้ำ");
           if (String(room["วิว"]).toLowerCase() === "true") features.push("วิว");
-          const featureElem = document.createElement("div");
-          featureElem.className = "text-xs text-gray-500 mb-2";
-          featureElem.textContent = features.join(" • ");
+          if (String(room["ที่จอดรถ"]).toLowerCase() === "true") features.push("ที่จอดรถ");
 
-          info.appendChild(title);
-          info.appendChild(statusLabel);
-          info.appendChild(featureElem);
-
-          // ราคาและปุ่มดูห้อง
-          const rightBox = document.createElement("div");
-          rightBox.className = "flex items-center justify-between";
-          const price = document.createElement("div");
-          price.className = "text-red-500 font-bold text-lg";
-          price.textContent = room["ราคา"] || "0";
-          rightBox.appendChild(price);
-
-          // สร้างปุ่ม "ดูห้อง" ที่แสดงอยู่เสมอ
-          const detailBtn = document.createElement("a");
-          if (checkInDateValue && checkOutDateValue) {
-            detailBtn.href = `detail.html?id=${room["ไอดี"]}&checkIn=${checkInDateValue}&checkOut=${checkOutDateValue}`;
-          } else {
-            detailBtn.href = `detail.html?id=${room["ไอดี"]}`;
+          if (features.length > 0) {
+            const featureList = document.createElement("ul");
+            featureList.className = "list-disc list-inside text-xs text-gray-600 columns-2";
+            features.forEach(f => {
+              const li = document.createElement("li");
+              li.textContent = f;
+              featureList.appendChild(li);
+            });
+            middleDiv.appendChild(featureList);
           }
-          detailBtn.className = "bg-pink-500 text-white text-sm px-4 py-1 rounded";
-          detailBtn.textContent = "ดูห้อง";
-          rightBox.appendChild(detailBtn);
 
-          card.appendChild(img);
-          card.appendChild(info);
-          card.appendChild(rightBox);
+          card.appendChild(middleDiv);
+
+          // ส่วนขวา (ราคา + ปุ่ม "ดูห้อง")
+          const rightDiv = document.createElement("div");
+          rightDiv.className = "flex flex-col items-end justify-center space-y-2";
+
+          // ราคาห้อง (ถ้ามีราคาลด ให้แสดง "ราคา ลด 2100" ตามตัวอย่าง)
+          // หรือจะแสดงราคาเดิมขีดทับ + ราคาลดก็ได้ ขึ้นอยู่กับดีไซน์
+          const priceWrapper = document.createElement("div");
+          if (room["ราคาลด"]) {
+            // ตัวอย่าง: "ราคา ลด 2100"
+            // หรือแสดง 2 บรรทัดก็ได้
+            const discountLabel = document.createElement("span");
+            discountLabel.className = "text-red-500 font-bold text-sm";
+            discountLabel.textContent = `ราคา ลด ${room["ราคาลด"]}`;
+            priceWrapper.appendChild(discountLabel);
+          } else {
+            // แสดงราคาเดิม
+            const normalPrice = document.createElement("span");
+            normalPrice.className = "text-red-500 font-bold text-sm";
+            normalPrice.textContent = `ราคา ${room["ราคา"] || "0"}`;
+            priceWrapper.appendChild(normalPrice);
+          }
+          rightDiv.appendChild(priceWrapper);
+
+          // ปุ่ม "ดูห้อง"
+          const detailBtn = document.createElement("a");
+          detailBtn.className = "bg-black text-white text-xs px-3 py-1 rounded";
+          detailBtn.textContent = "ดูห้อง";
+          // ส่งค่าต่างๆ ไป detail.html
+          if (checkInDateValue && checkOutDateValue) {
+            detailBtn.href = `detail.html?id=${room["ไอดี"]}&checkIn=${checkInDateValue}&checkOut=${checkOutDateValue}&status=${room["สถานะ"]}`;
+          } else {
+            detailBtn.href = `detail.html?id=${room["ไอดี"]}&status=${room["สถานะ"]}`;
+          }
+          rightDiv.appendChild(detailBtn);
+
+          card.appendChild(rightDiv);
           container.appendChild(card);
         });
       }
 
-      // ฟังก์ชันอัปเดตรายการห้องเมื่อมีการเปลี่ยนแปลงวันที่
+      // ฟังก์ชันอัปเดตการแสดงห้องเมื่อเปลี่ยนวันที่
       function updateRooms() {
         const checkInDate = document.getElementById("checkInDate").value;
         const checkOutDate = document.getElementById("checkOutDate").value;
@@ -158,12 +208,12 @@
         }
       }
 
-      // เรียกใช้งานเมื่อโหลดหน้าเพจ
+      // เมื่อโหลดหน้าเพจ ให้ดึงข้อมูลห้องทั้งหมดก่อน
       document.addEventListener("DOMContentLoaded", function() {
         fetchAllRooms();
       });
 
-      // เมื่อมีการเปลี่ยนแปลงวันที่เข้าพักหรือวันที่ออก
+      // เมื่อเปลี่ยนวันที่เข้าพักหรือวันที่ออก
       document.getElementById("checkInDate").addEventListener("change", updateRooms);
       document.getElementById("checkOutDate").addEventListener("change", updateRooms);
     </script>

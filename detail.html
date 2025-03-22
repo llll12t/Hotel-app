@@ -1,10 +1,7 @@
 <!DOCTYPE html>
 <html lang="th">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <head>
+    <meta charset="UTF-8" />
     <title>รายละเอียดห้องพัก</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="config.js"></script>
@@ -51,11 +48,12 @@
     </div>
 
     <script>
-      // อ่านค่าจาก query string: roomId, checkIn และ checkOut
+      // อ่านค่าจาก query string: roomId, checkIn, checkOut, status
       const params = new URLSearchParams(window.location.search);
       const roomId = params.get("id");
       const checkInParam = params.get("checkIn");
       const checkOutParam = params.get("checkOut");
+      const statusParam = params.get("status");
 
       document.addEventListener("DOMContentLoaded", () => {
         fetchRoomDetail();
@@ -111,19 +109,24 @@
 
         // จัดการปุ่มจองห้อง
         const bookButton = document.getElementById("bookButton");
-        if (!checkInParam) {
-          // หากยังไม่มี checkIn ให้ disable ปุ่มจองและเปลี่ยนข้อความแจ้งเตือน
+        // ถ้าไม่มีข้อมูลวันที่เข้าพักหรือวันที่ออก
+        if (!checkInParam || !checkOutParam) {
           bookButton.disabled = true;
           bookButton.classList.add("opacity-50", "cursor-not-allowed");
-          bookButton.textContent = "กรุณาเลือกวันที่เข้าพัก";
+          bookButton.textContent = "เลือกวันเข้าพักก่อน";
+        } else if (statusParam && statusParam === "ไม่ว่าง") {
+          // ถ้าสถานะส่งมาจาก indexเป็น "ไม่ว่าง"
+          bookButton.disabled = true;
+          bookButton.classList.add("opacity-50", "cursor-not-allowed");
+          bookButton.textContent = "ไม่ว่าง";
         } else {
-          // เมื่อมี checkIn (และอาจมี checkOut) ให้เปิดใช้งานปุ่มจอง
+          // หากมีข้อมูลวันที่และสถานะเป็น "ว่าง" (หรือไม่มีค่าสถานะส่งมา)
+          bookButton.disabled = false;
+          bookButton.textContent = "จองห้อง";
           bookButton.addEventListener("click", () => {
             let url = `booking.html?id=${roomId}`;
             url += `&checkIn=${checkInParam}`;
-            if (checkOutParam) {
-              url += `&checkOut=${checkOutParam}`;
-            }
+            url += `&checkOut=${checkOutParam}`;
             window.location.href = url;
           });
         }
