@@ -148,34 +148,34 @@
       const checkOutParam = params.get("checkOut");
 
       // LIFF initialization
-      document.addEventListener("DOMContentLoaded", async () => {
+    // document.addEventListener("DOMContentLoaded", async () => {
         // 1) เริ่มต้น LIFF ด้วย liffId ของคุณ
-        await liff.init({ liffId: "2007106715-87nBmwNL" })
-          .then(() => {
-            console.log("LIFF init success");
-          })
-          .catch((err) => {
-            console.error("LIFF init error:", err);
-          });
+       // await liff.init({ liffId: "2007106715-87nBmwNL" })
+          // .then(() => {
+          //   console.log("LIFF init success");
+          // })
+          // .catch((err) => {
+          //   console.error("LIFF init error:", err);
+          // });
 
         // 2) ถ้ายังไม่ได้ login ให้ login ก่อน
-        if (!liff.isLoggedIn()) {
-          liff.login();
-        } else {
-          // 3) ดึง userProfile
-          try {
-            const profile = await liff.getProfile();
-            // เก็บ userId ไว้ใน hidden field
-            document.getElementById("userLineId").value = profile.userId;
-            console.log("LINE userId:", profile.userId);
-          } catch (err) {
-            console.error("getProfile error:", err);
-          }
-        }
+        // if (!liff.isLoggedIn()) {
+        //   liff.login();
+        // } else {
+        //   // 3) ดึง userProfile
+        //   try {
+        //     const profile = await liff.getProfile();
+        //     // เก็บ userId ไว้ใน hidden field
+        //     document.getElementById("userLineId").value = profile.userId;
+        //     console.log("LINE userId:", profile.userId);
+        //   } catch (err) {
+        //     console.error("getProfile error:", err);
+        //   }
+        // }
 
-        // ดึงข้อมูลห้องจาก API
-        if (!roomId) return;
-        try {
+        // // ดึงข้อมูลห้องจาก API
+        // if (!roomId) return;
+        // try {
           const res = await fetch(API_URL);
           const rooms = await res.json();
           const room = rooms.find((r) => r["ไอดี"] === roomId);
