@@ -49,7 +49,9 @@
           <div id="detailRoomPrice" class="text-sm text-red-500 font-bold"></div>
           <div></div>
         </div>
-        <!-- เพิ่มรายละเอียดเพิ่มเติม: รายละเอียด และ รายละเอียด-2 -->
+        <!-- Gallery ของห้อง -->
+        <div id="detailGallery" class="flex space-x-2 overflow-x-auto mb-3"></div>
+        <!-- รายละเอียดเพิ่มเติม -->
         <div id="detailRoomDesc" class="mt-4 text-sm text-gray-700"></div>
         <div id="detailRoomDesc2" class="mt-2 text-sm text-gray-700"></div>
       </div>
@@ -139,7 +141,6 @@
           } else {
             const profile = await liff.getProfile();
             userLineIdGlobal = profile.userId;
-            // หากมีฟิลด์ซ่อนใน booking ให้เติมค่า
             const hiddenField = document.getElementById("bookUserLineId");
             if (hiddenField) {
               hiddenField.value = profile.userId;
@@ -149,7 +150,6 @@
           console.error("LIFF init error:", err);
         }
       }
-      // เริ่ม LIFF เมื่อโหลดหน้า
       document.addEventListener("DOMContentLoaded", initLiffGlobal);
 
       // Utility: คำนวณจำนวนคืน
@@ -297,7 +297,7 @@
           });
         }
       }
-      // STEP 2: Detail Page (3 คอลัม + รายละเอียดเพิ่มเติม)
+      // STEP 2: Detail Page (3 คอลัม + Gallery + รายละเอียดเพิ่มเติม)
       function populateDetail() {
         if (!selectedRoom) return;
         // แถว 1: ชื่อห้อง, "ราคา", ปุ่มจอง
@@ -305,7 +305,24 @@
         // แถว 2: หมวดหมู่, ราคา
         document.getElementById("detailRoomCategory").textContent = selectedRoom["หมวดหมู่"] || "";
         document.getElementById("detailRoomPrice").textContent = selectedRoom["ราคา"] || "";
-        // เพิ่มรายละเอียด: "รายละเอียด" และ "รายละเอียด-2"
+        // แสดง Gallery ใน Detail
+        const galleryContainer = document.getElementById("detailGallery");
+        galleryContainer.innerHTML = "";
+        for (let i = 1; i <= 4; i++) {
+          const key = `รูปประกอบ-${i}`;
+          if (selectedRoom[key]) {
+            const img = document.createElement("img");
+            img.src = selectedRoom[key];
+            img.alt = key;
+            img.className = "w-20 h-20 object-cover rounded cursor-pointer";
+            img.addEventListener("click", () => {
+              // สามารถอัปเดตภาพหลักหากต้องการ
+              // For example: update a main image (if implemented)
+            });
+            galleryContainer.appendChild(img);
+          }
+        }
+        // แสดงรายละเอียดเพิ่มเติม
         document.getElementById("detailRoomDesc").textContent = selectedRoom["รายละเอียด"] || "";
         document.getElementById("detailRoomDesc2").textContent = selectedRoom["รายละเอียด-2"] || "";
         // ตั้งค่าปุ่มจองใน Step 2
