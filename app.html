@@ -15,16 +15,11 @@
     <!-- STEP 1: เลือกห้อง (Index) -->
     <div id="step1" class="p-4 max-w-md mx-auto">
       <h1 class="text-lg font-bold mb-4">โอมสเตย์ ยินดีต้อนรับ</h1>
-      <!-- เลือกวันที่เข้าพักและวันที่ออก -->
-      <div class="flex flex-col sm:flex-row items-center bg-white rounded-full px-4 py-2 mb-6 shadow-sm space-y-2 sm:space-y-0 sm:space-x-4">
-        <div class="flex items-center w-full">
-          <label class="text-sm text-gray-500">วันที่เข้าพัก</label>
-          <input type="date" id="step1CheckIn" class="text-sm text-right ml-auto focus:outline-none" />
-        </div>
-        <div class="flex items-center w-full">
-          <label class="text-sm text-gray-500">วันที่ออก</label>
-          <input type="date" id="step1CheckOut" class="text-sm text-right ml-auto focus:outline-none" />
-        </div>
+      <!-- เลือกวันที่เข้าพักและวันที่ออก (input เดียว) -->
+      <div class="bg-white rounded-full px-4 py-2 mb-6 shadow-sm">
+        <label class="text-sm text-gray-500 block mb-1">เลือกวันที่เข้าพักและวันที่ออก</label>
+        <!-- ให้ผู้ใช้กรอกในรูปแบบ "YYYY-MM-DD - YYYY-MM-DD" -->
+        <input type="text" id="step1DateRange" placeholder="2025-03-20 - 2025-03-21" class="w-full text-sm text-right focus:outline-none" />
       </div>
       <!-- รายการห้อง -->
       <div id="step1RoomList" class="flex flex-col"></div>
@@ -201,8 +196,15 @@
             return 0;
           });
         }
-        const checkInDateValue = document.getElementById("step1CheckIn").value;
-        const checkOutDateValue = document.getElementById("step1CheckOut").value;
+        // อ่านค่าวันที่จาก input เดียว (รูปแบบ "YYYY-MM-DD - YYYY-MM-DD")
+        const dateRange = document.getElementById("step1DateRange").value;
+        let checkInDateValue = "";
+        let checkOutDateValue = "";
+        if (dateRange && dateRange.includes(" - ")) {
+          const parts = dateRange.split(" - ");
+          checkInDateValue = parts[0].trim();
+          checkOutDateValue = parts[1].trim();
+        }
         const groups = {};
         rooms.forEach(room => {
           const category = room["หมวดหมู่"] || "ไม่ระบุ";
@@ -369,18 +371,19 @@
       // Back buttons
       document.getElementById("backToStep1").addEventListener("click", () => { showStep("step1"); });
       document.getElementById("backToStep2").addEventListener("click", () => { showStep("step2"); });
-      // Update room list when Step 1 dates change
+      // Update room list when Step 1 date range changes
       function updateRooms() {
-        const checkIn = document.getElementById("step1CheckIn").value;
-        const checkOut = document.getElementById("step1CheckOut").value;
-        if (checkIn && checkOut) {
+        const dateRange = document.getElementById("step1DateRange").value;
+        if (dateRange && dateRange.includes(" - ")) {
+          const parts = dateRange.split(" - ");
+          const checkIn = parts[0].trim();
+          const checkOut = parts[1].trim();
           fetchRooms(checkIn, checkOut);
         } else {
           fetchAllRooms();
         }
       }
-      document.getElementById("step1CheckIn").addEventListener("change", updateRooms);
-      document.getElementById("step1CheckOut").addEventListener("change", updateRooms);
+      document.getElementById("step1DateRange").addEventListener("change", updateRooms);
       document.addEventListener("DOMContentLoaded", () => {
         fetchAllRooms();
       });
