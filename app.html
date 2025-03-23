@@ -12,7 +12,7 @@
     <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
   </head>
   <body class="bg-gray-100 min-h-screen">
-    <!-- Step 1: เลือกห้อง (Index) -->
+    <!-- STEP 1: เลือกห้อง (Index) -->
     <div id="step1" class="p-4 max-w-md mx-auto">
       <h1 class="text-lg font-bold mb-4">โอมสเตย์ ยินดีต้อนรับ</h1>
       <!-- เลือกวันที่เข้าพักและวันที่ออก -->
@@ -30,11 +30,11 @@
       <div id="step1RoomList" class="flex flex-col"></div>
     </div>
 
-    <!-- Step 2: ดูรายละเอียดห้อง (Detail) -->
+    <!-- STEP 2: ดูรายละเอียดห้อง (Detail) -->
     <div id="step2" class="hidden p-4 max-w-md mx-auto">
       <button id="backToStep1" class="text-sm text-blue-500 mb-2">&larr; กลับ</button>
       <div class="bg-white p-4 rounded shadow">
-        <!-- แสดงข้อมูลแบบ 3 คอลัม -->
+        <!-- Grid แสดงรายละเอียดแบบ 3 คอลัม -->
         <div class="grid grid-cols-3 gap-2 mb-2">
           <!-- แถวที่ 1 -->
           <div id="detailRoomName" class="font-bold text-base"></div>
@@ -49,42 +49,50 @@
           <div id="detailRoomPrice" class="text-sm text-red-500 font-bold"></div>
           <div></div>
         </div>
-        <!-- หากต้องการแสดง Gallery หรือรายละเอียดเพิ่มเติมสามารถเพิ่มได้ -->
-        <div id="detailExtra" class="mt-3"></div>
+        <!-- เพิ่มรายละเอียดเพิ่มเติม: รายละเอียด และ รายละเอียด-2 -->
+        <div id="detailRoomDesc" class="mt-4 text-sm text-gray-700"></div>
+        <div id="detailRoomDesc2" class="mt-2 text-sm text-gray-700"></div>
       </div>
     </div>
 
-    <!-- Step 3: ฟอร์มจอง (Booking) -->
+    <!-- STEP 3: ฟอร์มจอง (Booking) -->
     <div id="step3" class="hidden p-4 max-w-md mx-auto">
       <button id="backToStep2" class="text-sm text-blue-500 mb-2">&larr; กลับ</button>
       <div class="bg-white p-4 rounded shadow">
         <form id="bookingForm">
           <div class="grid grid-cols-2 gap-3 mb-4">
+            <!-- ชื่อห้อง -->
             <div>
               <label class="block text-xs text-gray-500">ชื่อห้อง</label>
               <input type="text" id="bookRoomName" class="w-full border-b border-gray-300 bg-white text-sm font-semibold py-1" readonly />
             </div>
+            <!-- หมวดหมู่ -->
             <div>
               <label class="block text-xs text-gray-500">หมวดหมู่</label>
               <input type="text" id="bookRoomCategory" class="w-full border-b border-gray-300 bg-white text-sm font-semibold py-1" readonly />
             </div>
+            <!-- ราคา -->
             <div>
               <label class="block text-xs text-gray-500">ราคา</label>
               <input type="text" id="bookRoomPrice" class="w-full border-b border-gray-300 bg-white text-sm font-semibold py-1" readonly />
             </div>
+            <!-- จำนวนคืน -->
             <div>
               <label class="block text-xs text-gray-500">จำนวนคืน</label>
               <input type="text" id="bookNightCount" class="w-full border-b border-gray-300 bg-white text-sm font-semibold py-1" readonly />
             </div>
+            <!-- วันที่เข้าพัก -->
             <div>
               <label class="block text-xs text-gray-500">เข้าพักวันที่</label>
               <input type="date" id="bookCheckIn" class="w-full border-b border-gray-300 bg-white text-sm font-semibold py-1" readonly />
             </div>
+            <!-- วันที่ออก -->
             <div>
               <label class="block text-xs text-gray-500">ออกวันที่</label>
               <input type="date" id="bookCheckOut" class="w-full border-b border-gray-300 bg-white text-sm font-semibold py-1" readonly />
             </div>
           </div>
+          <!-- ฟิลด์กรอกข้อมูลการจอง -->
           <div class="mb-4">
             <label class="block text-sm font-semibold mb-1">จำนวนคนเข้าพัก</label>
             <input type="number" id="bookNumGuests" class="w-full border rounded px-2 py-1 text-sm" min="1" value="1" />
@@ -289,16 +297,18 @@
           });
         }
       }
-      // STEP 2: Detail Page (3 คอลัม)
+      // STEP 2: Detail Page (3 คอลัม + รายละเอียดเพิ่มเติม)
       function populateDetail() {
         if (!selectedRoom) return;
-        // สร้าง grid 2 แถว 3 คอลัม สำหรับแสดงข้อมูล
-        const container = document.getElementById("step2");
-        // ใส่ข้อมูลในส่วน Detail
+        // แถว 1: ชื่อห้อง, "ราคา", ปุ่มจอง
         document.getElementById("detailRoomName").textContent = selectedRoom["ชื่อ"] || "";
+        // แถว 2: หมวดหมู่, ราคา
         document.getElementById("detailRoomCategory").textContent = selectedRoom["หมวดหมู่"] || "";
         document.getElementById("detailRoomPrice").textContent = selectedRoom["ราคา"] || "";
-        // กำหนดปุ่มจองใน step2 (ใน grid row 1 คอลัม 3)
+        // เพิ่มรายละเอียด: "รายละเอียด" และ "รายละเอียด-2"
+        document.getElementById("detailRoomDesc").textContent = selectedRoom["รายละเอียด"] || "";
+        document.getElementById("detailRoomDesc2").textContent = selectedRoom["รายละเอียด-2"] || "";
+        // ตั้งค่าปุ่มจองใน Step 2
         const bookingBtn = document.getElementById("detailBookBtn");
         if (!selectedCheckIn || !selectedCheckOut) {
           bookingBtn.disabled = true;
