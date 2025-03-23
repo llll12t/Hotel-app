@@ -34,7 +34,7 @@
     <div id="step2" class="hidden p-4 max-w-md mx-auto">
       <button id="backToStep1" class="text-sm text-blue-500 mb-2">&larr; กลับ</button>
       <div class="bg-white p-4 rounded shadow">
-        <!-- Grid แสดงรายละเอียดแบบ 3 คอลัม -->
+        <!-- Grid 3 คอลัม: แถวที่ 1 & 2 -->
         <div class="grid grid-cols-3 gap-2 mb-2">
           <!-- แถวที่ 1 -->
           <div id="detailRoomName" class="font-bold text-base"></div>
@@ -49,7 +49,9 @@
           <div id="detailRoomPrice" class="text-sm text-red-500 font-bold"></div>
           <div></div>
         </div>
-        <!-- Gallery ของห้อง -->
+        <!-- Main Image -->
+        <img id="detailMainImg" src="" alt="Room" class="w-full h-48 object-cover rounded mb-3" />
+        <!-- Gallery -->
         <div id="detailGallery" class="flex space-x-2 overflow-x-auto mb-3"></div>
         <!-- รายละเอียดเพิ่มเติม -->
         <div id="detailRoomDesc" class="mt-4 text-sm text-gray-700"></div>
@@ -300,12 +302,15 @@
       // STEP 2: Detail Page (3 คอลัม + Gallery + รายละเอียดเพิ่มเติม)
       function populateDetail() {
         if (!selectedRoom) return;
-        // แถว 1: ชื่อห้อง, "ราคา", ปุ่มจอง
+        // Grid row 1 & 2: 3 columns
         document.getElementById("detailRoomName").textContent = selectedRoom["ชื่อ"] || "";
-        // แถว 2: หมวดหมู่, ราคา
         document.getElementById("detailRoomCategory").textContent = selectedRoom["หมวดหมู่"] || "";
         document.getElementById("detailRoomPrice").textContent = selectedRoom["ราคา"] || "";
-        // แสดง Gallery ใน Detail
+        // Main image
+        const mainImgElement = document.getElementById("detailMainImg");
+        mainImgElement.src = selectedRoom["รูปภาพ"] || "";
+        mainImgElement.alt = selectedRoom["ชื่อ"] || "Room";
+        // Gallery
         const galleryContainer = document.getElementById("detailGallery");
         galleryContainer.innerHTML = "";
         for (let i = 1; i <= 4; i++) {
@@ -316,13 +321,13 @@
             img.alt = key;
             img.className = "w-20 h-20 object-cover rounded cursor-pointer";
             img.addEventListener("click", () => {
-              // สามารถอัปเดตภาพหลักหากต้องการ
-              // For example: update a main image (if implemented)
+              mainImgElement.src = selectedRoom[key];
+              mainImgElement.alt = key;
             });
             galleryContainer.appendChild(img);
           }
         }
-        // แสดงรายละเอียดเพิ่มเติม
+        // รายละเอียดเพิ่มเติม
         document.getElementById("detailRoomDesc").textContent = selectedRoom["รายละเอียด"] || "";
         document.getElementById("detailRoomDesc2").textContent = selectedRoom["รายละเอียด-2"] || "";
         // ตั้งค่าปุ่มจองใน Step 2
