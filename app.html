@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="th">
+  <head>
+    <meta charset="UTF-8" />
+    <title>โอมสเตย์ - Multi-step Booking</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Include config.js สำหรับ API_URL -->
+    <script src="config.js"></script>
+    <!-- LIFF SDK -->
+    <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen">
+    <!-- Step 1: เลือกห้อง (Index) -->
+    <div id="step1" class="p-4 max-w-md mx-auto">
+      <h1 class="text-lg font-bold mb-4">โอมสเตย์ ยินดีต้อนรับ</h1>
+      <!-- เลือกวันที่เข้าพักและวันที่ออก -->
+      <div class="flex flex-col sm:flex-row items-center bg-white rounded-full px-4 py-2 mb-6 shadow-sm space-y-2 sm:space-y-0 sm:space-x-4">
+        <div class="flex items-center w-full">
+          <label class="text-sm text-gray-500">วันที่เข้าพัก</label>
+          <input type="date" id="step1CheckIn" class="text-sm text-right ml-auto focus:outline-none" />
+        </div>
+        <div class="flex items-center w-full">
+          <label class="text-sm text-gray-500">วันที่ออก</label>
+          <input type="date" id="step1CheckOut" class="text-sm text-right ml-auto focus:outline-none" />
+        </div>
+      </div>
+      <!-- รายการห้อง -->
+      <div id="step1RoomList" class="flex flex-col"></div>
+    </div>
+
+    <!-- Step 2: ดูรายละเอียดห้อง (Detail) -->
+    <div id="step2" class="hidden p-4 max-w-md mx-auto">
+      <button id="backToStep1" class="text-sm text-blue-500 mb-2">&larr; กลับ</button>
+      <div class="bg-white p-4 rounded shadow">
+        <!-- แสดงข้อมูลแบบ 3 คอลัม -->
+        <div class="grid grid-cols-3 gap-2 mb-2">
+          <!-- แถวที่ 1 -->
+          <div id="detailRoomName" class="font-bold text-base"></div>
+          <div class="font-semibold text-base text-center">ราคา</div>
+          <div>
+            <button id="detailBookBtn" class="bg-black text-white text-sm py-1 px-2 rounded w-full">
+              จองห้องพัก
+            </button>
+          </div>
+          <!-- แถวที่ 2 -->
+          <div id="detailRoomCategory" class="text-sm text-gray-500"></div>
+          <div id="detailRoomPrice" class="text-sm text-red-500 font-bold"></div>
+          <div></div>
+        </div>
+        <!-- หากต้องการแสดง Gallery หรือรายละเอียดเพิ่มเติมสามารถเพิ่มได้ -->
+        <div id="detailExtra" class="mt-3"></div>
+      </div>
+    </div>
+
+    <!-- Step 3: ฟอร์มจอง (Booking) -->
+    <div id="step3" class="hidden p-4 max-w-md mx-auto">
+      <button id="backToStep2" class="text-sm text-blue-500 mb-2">&larr; กลับ</button>
+      <div class="bg-white p-4 rounded shadow">
+        <form id="bookingForm">
+          <div class="grid grid-cols-2 gap-3 mb-4">
+            <div>
+              <label class="block text-xs text-gray-500">ชื่อห้อง</label>
+              <input type="text" id="bookRoomName" class="w-full border-b border-gray-300 bg-white text-sm font-semibold py-1" readonly />
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500">หมวดหมู่</label>
+              <input type="text" id="bookRoomCategory" class="w-full border-b border-gray-300 bg-white text-sm font-semibold py-1" readonly />
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500">ราคา</label>
+              <input type="text" id="bookRoomPrice" class="w-full border-b border-gray-300 bg-white text-sm font-semibold py-1" readonly />
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500">จำนวนคืน</label>
+              <input type="text" id="bookNightCount" class="w-full border-b border-gray-300 bg-white text-sm font-semibold py-1" readonly />
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500">เข้าพักวันที่</label>
+              <input type="date" id="bookCheckIn" class="w-full border-b border-gray-300 bg-white text-sm font-semibold py-1" readonly />
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500">ออกวันที่</label>
+              <input type="date" id="bookCheckOut" class="w-full border-b border-gray-300 bg-white text-sm font-semibold py-1" readonly />
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-semibold mb-1">จำนวนคนเข้าพัก</label>
+            <input type="number" id="bookNumGuests" class="w-full border rounded px-2 py-1 text-sm" min="1" value="1" />
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-semibold mb-1">ชื่อผู้เช่า</label>
+            <input type="text" id="bookRenterName" class="w-full border rounded px-2 py-1 text-sm" placeholder="เช่น สมชาย ใจดี" />
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-semibold mb-1">เบอร์ติดต่อ</label>
+            <input type="tel" id="bookPhone" class="w-full border rounded px-2 py-1 text-sm" placeholder="เช่น 0812345678" />
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-semibold mb-1">อีเมล</label>
+            <input type="email" id="bookEmail" class="w-full border rounded px-2 py-1 text-sm" placeholder="example@gmail.com" />
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm font-semibold mb-1">หมายเหตุ</label>
+            <textarea id="bookNote" class="w-full border rounded px-2 py-1 text-sm" rows="3"></textarea>
+          </div>
+          <!-- ฟิลด์ซ่อนสำหรับเก็บ userLineId -->
+          <input type="hidden" id="bookUserLineId" />
+          <button type="button" id="submitBookingBtn" class="bg-black text-white w-full py-2 rounded text-sm">
+            บันทึกการจอง
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Global state
+      let roomsData = [];
+      let selectedRoom = null;
+      let selectedCheckIn = "";
+      let selectedCheckOut = "";
+      let userLineIdGlobal = "";
+
+      // LIFF initialization (เริ่มตั้งแต่แรก)
+      async function initLiffGlobal() {
+        try {
+          await liff.init({ liffId: "2007106715-87nBmwNL" });
+          if (!liff.isLoggedIn()) {
+            liff.login();
+          } else {
+            const profile = await liff.getProfile();
+            userLineIdGlobal = profile.userId;
+            // หากมีฟิลด์ซ่อนใน booking ให้เติมค่า
+            const hiddenField = document.getElementById("bookUserLineId");
+            if (hiddenField) {
+              hiddenField.value = profile.userId;
+            }
+          }
+        } catch (err) {
+          console.error("LIFF init error:", err);
+        }
+      }
+      // เริ่ม LIFF เมื่อโหลดหน้า
+      document.addEventListener("DOMContentLoaded", initLiffGlobal);
+
+      // Utility: คำนวณจำนวนคืน
+      function calculateNights(checkIn, checkOut) {
+        if (!checkIn || !checkOut) return "";
+        const start = new Date(checkIn);
+        const end = new Date(checkOut);
+        if (end <= start) return "0";
+        const diff = end - start;
+        return Math.floor(diff / (1000 * 60 * 60 * 24));
+      }
+
+      // STEP 1: Room List
+      async function fetchAllRooms() {
+        try {
+          const response = await fetch(API_URL);
+          const data = await response.json();
+          roomsData = data;
+          renderRoomList(data, false);
+        } catch (err) {
+          console.error("Error fetching rooms:", err);
+        }
+      }
+      async function fetchRooms(checkIn, checkOut) {
+        try {
+          const response = await fetch(`${API_URL}?checkIn=${checkIn}&checkOut=${checkOut}`);
+          const data = await response.json();
+          roomsData = data;
+          renderRoomList(data, true);
+        } catch (err) {
+          console.error("Error fetching rooms:", err);
+        }
+      }
+      function renderRoomList(rooms, isStatusCalculated) {
+        const container = document.getElementById("step1RoomList");
+        container.innerHTML = "";
+        if (!rooms || rooms.length === 0) {
+          container.innerHTML = "<p class='text-gray-500'>ไม่มีห้องที่ตรงกับการค้นหา</p>";
+          return;
+        }
+        if (isStatusCalculated) {
+          rooms.sort((a, b) => {
+            const sA = a["สถานะ"] ? a["สถานะ"].toLowerCase() : "";
+            const sB = b["สถานะ"] ? b["สถานะ"].toLowerCase() : "";
+            if (sA === "ว่าง" && sB === "ไม่ว่าง") return -1;
+            if (sA === "ไม่ว่าง" && sB === "ว่าง") return 1;
+            return 0;
+          });
+        }
+        const checkInDateValue = document.getElementById("step1CheckIn").value;
+        const checkOutDateValue = document.getElementById("step1CheckOut").value;
+        const groups = {};
+        rooms.forEach(room => {
+          const category = room["หมวดหมู่"] || "ไม่ระบุ";
+          if (!groups[category]) groups[category] = [];
+          groups[category].push(room);
+        });
+        for (let category in groups) {
+          const heading = document.createElement("h3");
+          heading.className = "text-lg font-bold mb-2 mt-4";
+          heading.textContent = category;
+          container.appendChild(heading);
+          groups[category].forEach(room => {
+            let statusText = "";
+            let statusColor = "";
+            if (isStatusCalculated) {
+              if (room["สถานะ"] && room["สถานะ"].toLowerCase() === "ไม่ว่าง") {
+                statusText = "ไม่ว่าง";
+                statusColor = "bg-red-500";
+              } else {
+                statusText = "ว่าง";
+                statusColor = "bg-green-500";
+              }
+            }
+            const card = document.createElement("div");
+            card.className = "relative bg-white rounded-lg shadow p-3 flex items-center mb-4";
+            if (statusText) {
+              const badge = document.createElement("div");
+              badge.className = `absolute top-0 left-0 px-2 py-1 text-white text-xs rounded-br-lg ${statusColor}`;
+              badge.textContent = statusText;
+              card.appendChild(badge);
+            }
+            const imgWrapper = document.createElement("div");
+            imgWrapper.className = "w-28 h-20 flex-shrink-0 overflow-hidden rounded mr-3";
+            const img = document.createElement("img");
+            img.src = room["รูปภาพ"];
+            img.alt = room["ชื่อ"];
+            img.className = "w-full h-full object-cover";
+            imgWrapper.appendChild(img);
+            card.appendChild(imgWrapper);
+            const infoDiv = document.createElement("div");
+            infoDiv.className = "flex-1";
+            const title = document.createElement("h2");
+            title.className = "font-bold text-sm";
+            title.textContent = `${room["ชื่อ"]} (${room["หมวดหมู่"]})`;
+            infoDiv.appendChild(title);
+            const ul = document.createElement("ul");
+            ul.className = "list-disc list-inside text-xs text-gray-600 columns-2";
+            const features = [];
+            if (String(room["แอร์"]).toLowerCase() === "true") features.push("แอร์");
+            if (String(room["เตียง"]).toLowerCase() === "true") features.push("เตียง");
+            if (String(room["สระน้ำ"]).toLowerCase() === "true") features.push("สระน้ำ");
+            if (String(room["วิว"]).toLowerCase() === "true") features.push("วิว");
+            if (String(room["ที่จอดรถ"]).toLowerCase() === "true") features.push("ที่จอดรถ");
+            features.forEach(f => {
+              const li = document.createElement("li");
+              li.textContent = f;
+              ul.appendChild(li);
+            });
+            infoDiv.appendChild(ul);
+            card.appendChild(infoDiv);
+            const rightDiv = document.createElement("div");
+            rightDiv.className = "flex flex-col items-end justify-center space-y-2";
+            const priceDiv = document.createElement("div");
+            if (room["ราคาลด"]) {
+              const oldPrice = document.createElement("span");
+              oldPrice.className = "text-sm text-gray-400 line-through";
+              oldPrice.textContent = room["ราคา"];
+              const discountPrice = document.createElement("span");
+              discountPrice.className = "text-red-500 font-bold text-sm ml-2";
+              discountPrice.textContent = room["ราคาลด"];
+              priceDiv.appendChild(oldPrice);
+              priceDiv.appendChild(discountPrice);
+            } else {
+              const normalPrice = document.createElement("span");
+              normalPrice.className = "text-red-500 font-bold text-sm";
+              normalPrice.textContent = room["ราคา"] || "0";
+              priceDiv.appendChild(normalPrice);
+            }
+            rightDiv.appendChild(priceDiv);
+            const btn = document.createElement("a");
+            btn.className = "bg-black text-white text-xs px-3 py-1 rounded";
+            btn.textContent = "ดูห้อง";
+            btn.addEventListener("click", (e) => {
+              e.preventDefault();
+              selectedRoom = room;
+              selectedCheckIn = checkInDateValue;
+              selectedCheckOut = checkOutDateValue;
+              showStep("step2");
+              populateDetail();
+            });
+            rightDiv.appendChild(btn);
+            card.appendChild(rightDiv);
+            container.appendChild(card);
+          });
+        }
+      }
+      // STEP 2: Detail Page (3 คอลัม)
+      function populateDetail() {
+        if (!selectedRoom) return;
+        // สร้าง grid 2 แถว 3 คอลัม สำหรับแสดงข้อมูล
+        const container = document.getElementById("step2");
+        // ใส่ข้อมูลในส่วน Detail
+        document.getElementById("detailRoomName").textContent = selectedRoom["ชื่อ"] || "";
+        document.getElementById("detailRoomCategory").textContent = selectedRoom["หมวดหมู่"] || "";
+        document.getElementById("detailRoomPrice").textContent = selectedRoom["ราคา"] || "";
+        // กำหนดปุ่มจองใน step2 (ใน grid row 1 คอลัม 3)
+        const bookingBtn = document.getElementById("detailBookBtn");
+        if (!selectedCheckIn || !selectedCheckOut) {
+          bookingBtn.disabled = true;
+          bookingBtn.classList.add("opacity-50", "cursor-not-allowed");
+          bookingBtn.textContent = "เลือกวันที่เข้าพักก่อน";
+        } else if (selectedRoom["สถานะ"] && selectedRoom["สถานะ"].toLowerCase() === "ไม่ว่าง") {
+          bookingBtn.disabled = true;
+          bookingBtn.classList.add("opacity-50", "cursor-not-allowed");
+          bookingBtn.textContent = "ไม่ว่าง";
+        } else {
+          bookingBtn.disabled = false;
+          bookingBtn.textContent = "จองห้อง";
+          bookingBtn.onclick = () => {
+            showStep("step3");
+            populateBookingForm();
+          };
+        }
+      }
+      // STEP 3: Booking Form
+      function populateBookingForm() {
+        document.getElementById("bookRoomName").value = selectedRoom["ชื่อ"] || "";
+        document.getElementById("bookRoomCategory").value = selectedRoom["หมวดหมู่"] || "";
+        document.getElementById("bookRoomPrice").value = selectedRoom["ราคา"] || "";
+        document.getElementById("bookCheckIn").value = selectedCheckIn;
+        document.getElementById("bookCheckOut").value = selectedCheckOut;
+        const nights = calculateNights(selectedCheckIn, selectedCheckOut);
+        document.getElementById("bookNightCount").value = nights + " คืน";
+      }
+      // Step navigation
+      function showStep(stepId) {
+        document.getElementById("step1").classList.add("hidden");
+        document.getElementById("step2").classList.add("hidden");
+        document.getElementById("step3").classList.add("hidden");
+        document.getElementById(stepId).classList.remove("hidden");
+      }
+      // Back buttons
+      document.getElementById("backToStep1").addEventListener("click", () => { showStep("step1"); });
+      document.getElementById("backToStep2").addEventListener("click", () => { showStep("step2"); });
+      // Update room list when Step 1 dates change
+      function updateRooms() {
+        const checkIn = document.getElementById("step1CheckIn").value;
+        const checkOut = document.getElementById("step1CheckOut").value;
+        if (checkIn && checkOut) {
+          fetchRooms(checkIn, checkOut);
+        } else {
+          fetchAllRooms();
+        }
+      }
+      document.getElementById("step1CheckIn").addEventListener("change", updateRooms);
+      document.getElementById("step1CheckOut").addEventListener("change", updateRooms);
+      document.addEventListener("DOMContentLoaded", () => {
+        fetchAllRooms();
+      });
+      // Submit booking form
+      document.getElementById("submitBookingBtn").addEventListener("click", () => {
+        const bookingData = {
+          roomName: document.getElementById("bookRoomName").value,
+          roomCategory: document.getElementById("bookRoomCategory").value,
+          roomPrice: document.getElementById("bookRoomPrice").value,
+          checkIn: document.getElementById("bookCheckIn").value,
+          checkOut: document.getElementById("bookCheckOut").value,
+          numGuests: document.getElementById("bookNumGuests").value,
+          renterName: document.getElementById("bookRenterName").value,
+          phone: document.getElementById("bookPhone").value,
+          email: document.getElementById("bookEmail").value,
+          note: document.getElementById("bookNote").value,
+          userLineId: document.getElementById("bookUserLineId").value
+        };
+        fetch(API_URL, {
+          method: "POST",
+          body: JSON.stringify(bookingData)
+        })
+          .then(response => response.text())
+          .then(data => {
+            console.log(data);
+            alert("บันทึกการจองเรียบร้อย");
+          })
+          .catch(error => console.error("Error:", error));
+      });
+    </script>
+  </body>
+</html>
