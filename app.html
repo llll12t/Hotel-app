@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Include Flatpickr CSS and JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <!-- Include config.js สำหรับ API_URL -->
     <script src="config.js"></script>
     <!-- LIFF SDK -->
@@ -15,11 +18,10 @@
     <!-- STEP 1: เลือกห้อง (Index) -->
     <div id="step1" class="p-4 max-w-md mx-auto">
       <h1 class="text-lg font-bold mb-4">โอมสเตย์ ยินดีต้อนรับ</h1>
-      <!-- เลือกวันที่เข้าพักและวันที่ออก (input เดียว) -->
+      <!-- ใช้ Flatpickr เป็น Date Range Picker -->
       <div class="bg-white rounded-full px-4 py-2 mb-6 shadow-sm">
         <label class="text-sm text-gray-500 block mb-1">เลือกวันที่เข้าพักและวันที่ออก</label>
-        <!-- ให้ผู้ใช้กรอกในรูปแบบ "YYYY-MM-DD - YYYY-MM-DD" -->
-        <input type="text" id="step1DateRange" placeholder="2025-03-20 - 2025-03-21" class="w-full text-sm text-right focus:outline-none" />
+        <input type="text" id="step1DateRange" placeholder="เลือกวันที่..." class="w-full text-sm focus:outline-none" />
       </div>
       <!-- รายการห้อง -->
       <div id="step1RoomList" class="flex flex-col"></div>
@@ -196,12 +198,12 @@
             return 0;
           });
         }
-        // อ่านค่าวันที่จาก input เดียว (รูปแบบ "YYYY-MM-DD - YYYY-MM-DD")
+        // ใช้ flatpickr รูปแบบ range คืนค่าเป็น "YYYY-MM-DD to YYYY-MM-DD"
         const dateRange = document.getElementById("step1DateRange").value;
         let checkInDateValue = "";
         let checkOutDateValue = "";
-        if (dateRange && dateRange.includes(" - ")) {
-          const parts = dateRange.split(" - ");
+        if (dateRange && dateRange.includes(" to ")) {
+          const parts = dateRange.split(" to ");
           checkInDateValue = parts[0].trim();
           checkOutDateValue = parts[1].trim();
         }
@@ -304,15 +306,12 @@
       // STEP 2: Detail Page (3 คอลัม + Gallery + รายละเอียดเพิ่มเติม)
       function populateDetail() {
         if (!selectedRoom) return;
-        // Grid row 1 & 2: 3 columns
         document.getElementById("detailRoomName").textContent = selectedRoom["ชื่อ"] || "";
         document.getElementById("detailRoomCategory").textContent = selectedRoom["หมวดหมู่"] || "";
         document.getElementById("detailRoomPrice").textContent = selectedRoom["ราคา"] || "";
-        // Main image
         const mainImgElement = document.getElementById("detailMainImg");
         mainImgElement.src = selectedRoom["รูปภาพ"] || "";
         mainImgElement.alt = selectedRoom["ชื่อ"] || "Room";
-        // Gallery
         const galleryContainer = document.getElementById("detailGallery");
         galleryContainer.innerHTML = "";
         for (let i = 1; i <= 4; i++) {
@@ -329,10 +328,8 @@
             galleryContainer.appendChild(img);
           }
         }
-        // รายละเอียดเพิ่มเติม
         document.getElementById("detailRoomDesc").textContent = selectedRoom["รายละเอียด"] || "";
         document.getElementById("detailRoomDesc2").textContent = selectedRoom["รายละเอียด-2"] || "";
-        // ตั้งค่าปุ่มจองใน Step 2
         const bookingBtn = document.getElementById("detailBookBtn");
         if (!selectedCheckIn || !selectedCheckOut) {
           bookingBtn.disabled = true;
@@ -371,13 +368,17 @@
       // Back buttons
       document.getElementById("backToStep1").addEventListener("click", () => { showStep("step1"); });
       document.getElementById("backToStep2").addEventListener("click", () => { showStep("step2"); });
-      // Update room list when Step 1 date range changes
+      // Update room list when Step 1 date range changes via Flatpickr
       function updateRooms() {
         const dateRange = document.getElementById("step1DateRange").value;
-        if (dateRange && dateRange.includes(" - ")) {
-          const parts = dateRange.split(" - ");
-          const checkIn = parts[0].trim();
-          const checkOut = parts[1].trim();
+        let checkIn = "";
+        let checkOut = "";
+        if (dateRange && dateRange.includes(" to ")) {
+          const parts = dateRange.split(" to ");
+          checkIn = parts[0].trim();
+          checkOut = parts[1].trim();
+        }
+        if (checkIn && checkOut) {
           fetchRooms(checkIn, checkOut);
         } else {
           fetchAllRooms();
@@ -385,6 +386,12 @@
       }
       document.getElementById("step1DateRange").addEventListener("change", updateRooms);
       document.addEventListener("DOMContentLoaded", () => {
+        // Initialize Flatpickr for date range input
+        flatpickr("#step1DateRange", {
+          mode: "range",
+          dateFormat: "Y-m-d",
+          onClose: updateRooms
+        });
         fetchAllRooms();
       });
       // Submit booking form
