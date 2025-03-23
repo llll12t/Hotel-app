@@ -28,20 +28,23 @@
     </div>
 
     <!-- STEP 2: ดูรายละเอียดห้อง (Detail) -->
-    <div id="step2" class="hidden p-4 max-w-md mx-auto">
+<div id="step2" class="hidden p-4 max-w-md mx-auto">
       <button id="backToStep1" class="text-sm text-blue-500 mb-2">&larr; กลับ</button>
       <div class="bg-white p-4 rounded shadow">
         <!-- Grid 3 คอลัม: แถวที่ 1 & 2 -->
-        <div class="grid grid-cols-2 gap-2 mb-2">
+        <div class="grid grid-cols-3 gap-2 mb-2">
           <!-- แถวที่ 1 -->
-          <div id="detailRoomName" class="font-bold text-base"> (<div id="detailRoomCategory" class="text-sm text-gray-500">)</div></div>
-          <div class="font-semibold text-base text-center">ราคา<div id="detailRoomPrice" class="text-sm text-red-500 font-bold"></div></div>
-       </div>
+          <div id="detailRoomName" class="font-bold text-base"></div>
+          <div class="font-semibold text-base text-center">ราคา</div>
           <div>
             <button id="detailBookBtn" class="bg-black text-white text-sm py-1 px-2 rounded w-full">
               จองห้องพัก
             </button>
           </div>
+          <!-- แถวที่ 2 -->
+          <div id="detailRoomCategory" class="text-sm text-gray-500"></div>
+          <div id="detailRoomPrice" class="text-sm text-red-500 font-bold"></div>
+          <div></div>
         </div>
         <!-- Main Image -->
         <img id="detailMainImg" src="" alt="Room" class="w-full h-48 object-cover rounded mb-3" />
