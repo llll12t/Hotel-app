@@ -82,15 +82,15 @@
               <label class="block text-xs text-gray-500">จำนวนคืน</label>
               <input type="text" id="bookNightCount" class="w-full border-b border-gray-300 bg-white text-sm font-semibold py-1" readonly />
             </div>
-            <!-- วันที่เข้าพัก -->
+            <!-- วันที่เข้าพัก (แยกเป็น text เพื่อแสดง DD-MM-YYYY) -->
             <div>
               <label class="block text-xs text-gray-500">เข้าพักวันที่</label>
-              <input type="date" id="bookCheckIn" class="w-full border-b border-gray-300 bg-white text-sm font-semibold py-1" readonly />
+              <input type="text" id="bookCheckIn" class="w-full border-b border-gray-300 bg-white text-sm font-semibold py-1" readonly />
             </div>
-            <!-- วันที่ออก -->
+            <!-- วันที่ออก (แยกเป็น text) -->
             <div>
               <label class="block text-xs text-gray-500">ออกวันที่</label>
-              <input type="date" id="bookCheckOut" class="w-full border-b border-gray-300 bg-white text-sm font-semibold py-1" readonly />
+              <input type="text" id="bookCheckOut" class="w-full border-b border-gray-300 bg-white text-sm font-semibold py-1" readonly />
             </div>
           </div>
           <!-- ฟิลด์กรอกข้อมูลการจอง -->
@@ -151,11 +151,16 @@
       }
       document.addEventListener("DOMContentLoaded", initLiffGlobal);
 
+      // Utility: แปลงวันที่ในรูปแบบ DD-MM-YYYY เป็น Date object
+      function parseDateDMY(dateStr) {
+        const parts = dateStr.split("-");
+        return new Date(parts[2], parts[1] - 1, parts[0]);
+      }
       // Utility: คำนวณจำนวนคืน
       function calculateNights(checkIn, checkOut) {
         if (!checkIn || !checkOut) return "";
-        const start = new Date(checkIn);
-        const end = new Date(checkOut);
+        const start = parseDateDMY(checkIn);
+        const end = parseDateDMY(checkOut);
         if (end <= start) return "0";
         const diff = end - start;
         return Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -198,7 +203,7 @@
             return 0;
           });
         }
-        // ใช้ flatpickr รูปแบบ range คืนค่าเป็น "YYYY-MM-DD to YYYY-MM-DD"
+        // ใช้ Flatpickr ให้เลือกช่วงวันที่ในรูปแบบ DD-MM-YYYY (ใช้ " to " เป็น separator)
         const dateRange = document.getElementById("step1DateRange").value;
         let checkInDateValue = "";
         let checkOutDateValue = "";
@@ -386,10 +391,10 @@
       }
       document.getElementById("step1DateRange").addEventListener("change", updateRooms);
       document.addEventListener("DOMContentLoaded", () => {
-        // Initialize Flatpickr for date range input
+        // Initialize Flatpickr for date range input with format DD-MM-YYYY
         flatpickr("#step1DateRange", {
           mode: "range",
-          dateFormat: "Y-m-d",
+          dateFormat: "d-m-Y",
           onClose: updateRooms
         });
         fetchAllRooms();
