@@ -37,12 +37,13 @@
 
   <!-- STEP 1: เลือกห้อง (Index) -->
   <div id="step1" class="p-4 max-w-md mx-auto">
-    <h1 class="text-lg font-bold mb-4 text-center">ยินดีต้อนรับ</h1>
     <!-- ใช้ Flatpickr เป็น Date Range Picker -->
+    <div class="bg-slate-200 rounded-lg p-4 my-2 shadow-sm">
     <label class="text-sm text-gray-500 block mb-1 text-center">เลือกวันที่เข้าพักและวันที่ออก</label>
-    <div class="bg-white rounded-full px-4 py-2 mb-6 shadow-sm">
+    <div class="bg-white rounded-full px-4 py-2 mb-2 shadow-sm">
       <input type="text" id="step1DateRange" placeholder="เลือกวันที่..." class="w-full text-sm text-center focus:outline-none" />
-    </div>
+    </div> </div>
+
     <!-- รายการห้อง -->
     <div id="step1RoomList" class="flex flex-col"></div>
   </div>
@@ -140,22 +141,22 @@
         </div>
         <div class="mb-4">
           <label class="block text-sm font-semibold mb-1">ชื่อผู้เช่า</label>
-          <input type="text" id="bookRenterName" class="w-full border rounded px-2 py-1 text-sm" placeholder="เช่น สมชาย ใจดี" required/>
+          <input type="text" id="bookRenterName" class="w-full border rounded px-2 py-1 text-sm" placeholder="เช่น สมชาย ใจดี" required />
         </div>
         <div class="mb-4">
           <label class="block text-sm font-semibold mb-1">เบอร์ติดต่อ</label>
-          <input type="tel" id="bookPhone" class="w-full border rounded px-2 py-1 text-sm" placeholder="เช่น 0812345678" required/>
+          <input type="tel" id="bookPhone" class="w-full border rounded px-2 py-1 text-sm" placeholder="เช่น 0812345678" required />
         </div>
         <div class="mb-4">
           <label class="block text-sm font-semibold mb-1">อีเมล</label>
-          <input type="email" id="bookEmail" class="w-full border rounded px-2 py-1 text-sm" placeholder="example@gmail.com" required/>
+          <input type="email" id="bookEmail" class="w-full border rounded px-2 py-1 text-sm" placeholder="example@gmail.com" />
         </div>
         <div class="mb-4">
           <label class="block text-sm font-semibold mb-1">หมายเหตุ</label>
           <textarea id="bookNote" class="w-full border rounded px-2 py-1 text-sm" rows="3"></textarea>
         </div>
-        <!-- ฟิลด์ซ่อนสำหรับเก็บ userLineId -->
-        <input type="hidden" id="bookUserLineId" required/>
+        <!-- ฟิลด์ซ่อนสำหรับเก็บ userLineId (required เมื่อใช้ LIFF) -->
+        <input type="hidden" id="bookUserLineId" required />
         <button type="button" id="submitBookingBtn" class="bg-black text-white w-full py-2 rounded text-sm">
           บันทึกการจอง
         </button>
@@ -547,13 +548,24 @@
       fetchAllRooms();
     });
 
-    // Submit booking form
+    // Submit booking form with required field validation
     document.getElementById("submitBookingBtn").addEventListener("click", () => {
       const btn = document.getElementById("submitBookingBtn");
+      
+      // ตรวจสอบความครบถ้วนของฟิลด์ required
+      const renterName = document.getElementById("bookRenterName").value.trim();
+      const phone = document.getElementById("bookPhone").value.trim();
+      const userLineId = document.getElementById("bookUserLineId").value.trim();
+      if (!renterName || !phone || !userLineId) {
+        alert("กรุณากรอกข้อมูล ชื่อผู้เช่า เบอร์ติดต่อ และข้อมูล LINE ให้ครบถ้วน");
+        return;
+      }
+      
       // ป้องกันการกดซ้ำ: disable ปุ่ม และเปลี่ยนข้อความ
       btn.disabled = true;
       btn.textContent = "กำลังบันทึก...";
       showLoading();
+      
       const bookingData = {
         roomName: document.getElementById("bookRoomName").value,
         roomCategory: document.getElementById("bookRoomCategory").value,
@@ -561,12 +573,13 @@
         checkIn: document.getElementById("bookCheckIn").value,
         checkOut: document.getElementById("bookCheckOut").value,
         numGuests: document.getElementById("bookNumGuests").value,
-        renterName: document.getElementById("bookRenterName").value,
-        phone: document.getElementById("bookPhone").value,
+        renterName: renterName,
+        phone: phone,
         email: document.getElementById("bookEmail").value,
         note: document.getElementById("bookNote").value,
-        userLineId: document.getElementById("bookUserLineId").value,
+        userLineId: userLineId,
       };
+      
       fetch(API_URL, {
         method: "POST",
         body: JSON.stringify(bookingData),
