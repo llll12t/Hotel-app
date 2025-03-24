@@ -13,7 +13,7 @@
   <!-- Include config.js สำหรับ API_URL -->
   <script src="config.js"></script>
   <!-- LIFF SDK (หากต้องการใช้งาน ให้ uncomment และตั้งค่า liff.init) -->
-  <!-- <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script> -->
+  <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script> 
 </head>
 
 <body class="bg-gray-100 min-h-screen">
@@ -182,7 +182,6 @@
     let userLineIdGlobal = "";
 
     // หากต้องการใช้ LIFF ให้ uncomment ฟังก์ชัน initLiffGlobal และ DOMContentLoaded ข้างล่าง
-
     async function initLiffGlobal() {
       try {
         await liff.init({ liffId: "2007106715-87nBmwNL" });
