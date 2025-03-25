@@ -40,17 +40,24 @@
 
 <body class="bg-white min-h-screen relative">
   <!-- Loading Overlay -->
-  <div id="loadingOverlay" class="fixed inset-0 flex items-center justify-center bg-[#071d4a] bg-opacity-50 z-50 hidden">
+  <div id="loadingOverlay"
+    class="fixed inset-0 flex items-center justify-center bg-[#071d4a] bg-opacity-50 z-50 hidden">
     <div class="loader"></div>
   </div>
 
   <!-- STEP 1: เลือกห้อง -->
   <div id="step1" class="p-4 max-w-md mx-auto">
     <div class="bg-[#071d4a] rounded-lg p-4 my-2 shadow-sm">
-      <label class="text-sm text-gray-100 block mb-1 text-center">เลือกวันที่เข้าพักและวันที่ออก</label>
-      <div class="bg-white rounded-full px-4 py-2 mb-2 shadow-sm">
-        <input type="text" id="step1DateRange" placeholder="เลือกวันที่..."
-          class="w-full text-sm text-center focus:outline-none" />
+      <div class="flex justify-between space-x-2">
+        <div class="w-24"> <img src="https://lh5.googleusercontent.com/d/11T_mR9juPgAqfLdtBdCE1NPz5FOSrEbH" alt="logo">
+        </div>
+        <div class="w-full px-2">
+          <label class="text-sm text-gray-100 block mb-1 text-center">เลือกวันที่เข้าพักและวันที่ออก</label>
+          <div class="bg-white rounded-full px-4 py-2 mb-2 shadow-sm">
+            <input type="text" id="step1DateRange" placeholder="เลือกวันที่..."
+              class="w-full text-sm text-center focus:outline-none" />
+          </div>
+        </div>
       </div>
     </div>
     <div id="step1RoomList" class="flex flex-col"></div>
@@ -58,7 +65,8 @@
 
   <!-- STEP 2: ดูรายละเอียดห้อง -->
   <div id="step2" class="hidden p-4 max-w-md mx-auto">
-    <button id="backToStep1" class="bg-[#071d4a] py-2 px-4 rounded-md text-sm text-white mb-2 flex items-center space-x-1">
+    <button id="backToStep1"
+      class="bg-[#071d4a] py-2 px-4 rounded-md text-sm text-white mb-2 flex items-center space-x-1">
       <span>&larr;</span><span>กลับ</span>
     </button>
     <div class="bg-white rounded">
@@ -88,7 +96,8 @@
 
   <!-- STEP 3: ฟอร์มจอง -->
   <div id="step3" class="hidden p-4 max-w-md mx-auto">
-    <button id="backToStep2" class="bg-[#071d4a] py-2 px-4 rounded-md text-sm text-white mb-2 flex items-center space-x-1">
+    <button id="backToStep2"
+      class="bg-[#071d4a] py-2 px-4 rounded-md text-sm text-white mb-2 flex items-center space-x-1">
       <span>&larr;</span><span>กลับ</span>
     </button>
     <div class="bg-white p-4 rounded ">
