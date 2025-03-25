@@ -78,7 +78,7 @@
         </div>
         <div class="text-right">
           <div id="detailRoomPrice" class="text-red-500 font-bold text-base md:text-lg"></div>
-          <button id="detailBookBtn" class="mt-2 bg-[#071d4a] text-white text-sm py-1 px-3 rounded">
+          <button id="detailBookBtn" class="mt-2 bg-[#071d4a] text-white text-sm py-2 px-3 rounded">
             จองห้องนี้
           </button>
         </div>
@@ -192,7 +192,7 @@
         console.error("LIFF init error:", err);
       }
     }
-    document.addEventListener("DOMContentLoaded", initLiffGlobal);
+     document.addEventListener("DOMContentLoaded", initLiffGlobal);
 
     // Utility functions
     function parseDateDMY(dateStr) {
@@ -474,13 +474,8 @@
         // ขวา: คะแนนรวม ในกล่องสีเหลือง ตัวหนังสือสีน้ำเงิน
         const rightPart = document.createElement("div");
         rightPart.className = "bg-yellow-300 text-blue-700 font-bold px-3 py-1 rounded text-center text-sm";
-        // คำนวณคะแนนเฉลี่ยหรือจะแสดงเป็นตัวเลขรวมก็ได้
-        // ถ้าต้องการคะแนนเฉลี่ย: เช่น (สะอาด + เสียงรบกวน + บริการ + แก้ไขปัญหา)/4
-        // สมมติใช้คะแนนรวมเป็นตัวเดียว (20 หรือ 17)
-        // ถ้าอยากได้คะแนน 4.5 หรือ 5.0 ให้เอาคะแนนรวม / 4
         const averageScore = (Number(review["คะแนนรวม"]) / 4).toFixed(1);
         rightPart.textContent = averageScore;
-        // ถ้าจะใช้คะแนนรวมตรง ๆ ก็ใช้ review["คะแนนรวม"] เลย
 
         div.appendChild(leftPart);
         div.appendChild(rightPart);
@@ -490,10 +485,8 @@
 
     // Populate detail page ของห้อง
     function populateDetail() {
-      // 1. ถ้ายังไม่ได้เลือกห้อง ให้ return ออกไป
       if (!selectedRoom) return;
 
-      // 2. แสดงชื่อห้อง, หมวดหมู่, ราคา, และรูปหลัก
       document.getElementById("detailRoomName").textContent = selectedRoom["ชื่อ"] || "";
       document.getElementById("detailRoomCategory").textContent = selectedRoom["หมวดหมู่"] ? `(${selectedRoom["หมวดหมู่"]})` : "";
       document.getElementById("detailRoomPrice").textContent = selectedRoom["ราคา"] || "0";
@@ -502,7 +495,6 @@
       mainImgElement.src = selectedRoom["รูปภาพ"] || "";
       mainImgElement.alt = selectedRoom["ชื่อ"] || "Room";
 
-      // 3. สร้าง Grid 3 คอลัมน์สำหรับแสดงฟีเจอร์ (พร้อมไอคอน SVG)
       const featuresContainer = document.getElementById("detailFeatures");
       featuresContainer.className = "grid grid-cols-3 gap-y-2 gap-x-4 text-sm text-gray-600 p-4 mb-4 bg-[#071d4a] rounded-lg shadow-sm";
       featuresContainer.innerHTML = "";
@@ -543,7 +535,6 @@
     </svg>
   `;
 
-      // กำหนด featuresData เพื่อผูก label, key, icon
       const featuresData = [
         { label: "แอร์", key: "แอร์", icon: iconAir },
         { label: "ที่จอดรถ", key: "ที่จอดรถ", icon: iconParking },
@@ -552,7 +543,6 @@
         { label: "วิว", key: "วิว", icon: iconView },
       ];
 
-      // วนลูปเพื่อสร้าง element สำหรับแต่ละฟีเจอร์
       featuresData.forEach(item => {
         const hasFeature = String(selectedRoom[item.key]).toLowerCase() === "true";
         const featureDiv = document.createElement("div");
@@ -576,7 +566,6 @@
         featuresContainer.appendChild(featureDiv);
       });
 
-      // 4. แสดงรูปประกอบใน Gallery
       const galleryContainer = document.getElementById("detailGallery");
       galleryContainer.innerHTML = "";
       for (let i = 1; i <= 4; i++) {
@@ -594,14 +583,11 @@
         }
       }
 
-      // 5. แสดงรายละเอียดข้อความ (รายละเอียด, รายละเอียด-2)
       document.getElementById("detailRoomDesc").textContent = selectedRoom["รายละเอียด"] || "";
       document.getElementById("detailRoomDesc2").textContent = selectedRoom["รายละเอียด-2"] || "";
 
-      // 6. โหลดรีวิวโดยใช้ "ชื่อ" ห้อง (เช่น "ห้อง A")
       loadReviews(selectedRoom["ชื่อ"]);
 
-      // 7. จัดการปุ่มจองห้อง
       const bookingBtn = document.getElementById("detailBookBtn");
       if (!selectedCheckIn || !selectedCheckOut) {
         bookingBtn.disabled = true;
@@ -621,7 +607,6 @@
         };
       }
     }
-
 
     // Populate booking form
     function populateBookingForm() {
@@ -653,9 +638,8 @@
     // Update rooms when date range changes
     function updateRooms() {
       const dateRange = document.getElementById("step1DateRange").value;
-      // ตรวจสอบว่ามีการเลือกทั้งวันที่เข้าพักและวันที่ออกหรือไม่
       if (!dateRange.includes(" to ")) {
-        return; // ถ้ายังไม่ครบให้หยุดทำงานที่นี่
+        return;
       }
       const parts = dateRange.split(" to ");
       const checkIn = parts[0].trim();
@@ -676,19 +660,47 @@
       fetchAllRooms();
     });
 
-    // Submit booking form
+    // Submit booking form (แสดงข้อความแจ้งข้อผิดพลาด inline)
     document.getElementById("submitBookingBtn").addEventListener("click", () => {
-      const btn = document.getElementById("submitBookingBtn");
-      const renterName = document.getElementById("bookRenterName").value.trim();
-      const phone = document.getElementById("bookPhone").value.trim();
-      const userLineId = document.getElementById("bookUserLineId").value.trim();
-      if (!renterName || !phone || !userLineId) {
-        alert("กรุณากรอกข้อมูล ชื่อผู้เช่า เบอร์ติดต่อ และข้อมูล LINE ให้ครบถ้วน");
+      // ลบข้อความแจ้งข้อผิดพลาดเดิม (ถ้ามี)
+      document.querySelectorAll('.error-message').forEach(el => el.remove());
+
+      let isValid = true;
+      const renterName = document.getElementById("bookRenterName");
+      const phone = document.getElementById("bookPhone");
+      const userLineId = document.getElementById("bookUserLineId");
+
+      if (!renterName.value.trim()) {
+        const error = document.createElement("div");
+        error.className = "error-message text-red-500 text-sm mt-1";
+        error.textContent = "กรุณากรอกชื่อผู้เช่า";
+        renterName.parentNode.appendChild(error);
+        isValid = false;
+      }
+      if (!phone.value.trim()) {
+        const error = document.createElement("div");
+        error.className = "error-message text-red-500 text-sm mt-1";
+        error.textContent = "กรุณากรอกเบอร์ติดต่อ";
+        phone.parentNode.appendChild(error);
+        isValid = false;
+      }
+      if (!userLineId.value.trim()) {
+        const error = document.createElement("div");
+        error.className = "error-message text-red-500 text-sm mt-1";
+        error.textContent = "กรุณาเข้าสู่ระบบ LINE";
+        userLineId.parentNode.appendChild(error);
+        isValid = false;
+      }
+
+      if (!isValid) {
         return;
       }
+
+      const btn = document.getElementById("submitBookingBtn");
       btn.disabled = true;
       btn.textContent = "กำลังบันทึก...";
       showLoading();
+
       const bookingData = {
         roomName: document.getElementById("bookRoomName").value,
         roomCategory: document.getElementById("bookRoomCategory").value,
@@ -696,12 +708,13 @@
         checkIn: document.getElementById("bookCheckIn").value,
         checkOut: document.getElementById("bookCheckOut").value,
         numGuests: document.getElementById("bookNumGuests").value,
-        renterName: renterName,
-        phone: phone,
+        renterName: renterName.value.trim(),
+        phone: phone.value.trim(),
         email: document.getElementById("bookEmail").value,
         note: document.getElementById("bookNote").value,
-        userLineId: userLineId,
+        userLineId: userLineId.value.trim(),
       };
+
       fetch(API_URL, {
         method: "POST",
         body: JSON.stringify(bookingData),
@@ -709,6 +722,7 @@
         .then((response) => response.text())
         .then((data) => {
           console.log(data);
+          // สามารถปรับเปลี่ยนการแสดงผลตามที่ต้องการหลังจากบันทึกเรียบร้อย
           alert("บันทึกการจองเรียบร้อย");
           hideLoading();
           if (liff && liff.close) {
