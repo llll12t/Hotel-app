@@ -644,19 +644,18 @@
     // Update rooms when date range changes
     function updateRooms() {
       const dateRange = document.getElementById("step1DateRange").value;
-      let checkIn = "";
-      let checkOut = "";
-      if (dateRange && dateRange.includes(" to ")) {
-        const parts = dateRange.split(" to ");
-        checkIn = parts[0].trim();
-        checkOut = parts[1].trim();
+      // ตรวจสอบว่ามีการเลือกทั้งวันที่เข้าพักและวันที่ออกหรือไม่
+      if (!dateRange.includes(" to ")) {
+        return; // ถ้ายังไม่ครบให้หยุดทำงานที่นี่
       }
+      const parts = dateRange.split(" to ");
+      const checkIn = parts[0].trim();
+      const checkOut = parts[1].trim();
       if (checkIn && checkOut) {
         fetchRooms(checkIn, checkOut);
-      } else {
-        fetchAllRooms();
       }
     }
+
     document.getElementById("step1DateRange").addEventListener("change", updateRooms);
 
     document.addEventListener("DOMContentLoaded", () => {
