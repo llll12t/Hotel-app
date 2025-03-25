@@ -1,207 +1,238 @@
 <!DOCTYPE html>
 <html lang="th">
-  <head>
-    <meta charset="UTF-8">
-    <title>Dashboard Appointment</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body class="bg-gray-100 min-h-screen">
-    <div class="flex">
-      <!-- Sidebar -->
-      <div class="w-64 bg-white p-4 shadow">
-        <h1 class="text-xl font-bold mb-4">Dashboard Appointment</h1>
-        <nav class="space-y-2">
-          <a href="#" class="block px-3 py-2 rounded hover:bg-gray-200">Calendar</a>
-          <a href="#" class="block px-3 py-2 rounded hover:bg-gray-200">List</a>
-          <a href="#" class="block px-3 py-2 rounded hover:bg-gray-200">Member</a>
-          <a href="#" class="block px-3 py-2 rounded hover:bg-gray-200">Setting</a>
-        </nav>
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - จัดการการจอง (Appointment)</title>
+  <base target="_top">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- สมมติว่ามีไฟล์ config.js ที่กำหนด API_URL เช่น -->
+  <script>var API_URL = "https://script.google.com/macros/s/AKfycbyUwnyIEDI8_GUl9Tj3YN3Ws8BQ8q67cy1jRVTUAFKFSKFX_NNfCavevojL4GWgy3yr/exec";</script> 
+</head>
+<body class="bg-gray-100 p-4">
+  <h1 class="text-2xl font-bold mb-4">Admin - จัดการการจอง (Appointment)</h1>
+  
+  <!-- ตารางแสดงการจอง -->
+  <div id="appointmentTable" class="mb-4"></div>
+  
+  <!-- Form สำหรับแก้ไขการจอง -->
+  <div id="editFormContainer" class="bg-white p-4 rounded shadow hidden">
+    <h2 class="text-xl font-semibold mb-2">แก้ไขการจอง</h2>
+    <form id="editForm">
+      <!-- ไอดี: read-only -->
+      <div class="mb-2">
+        <label class="block text-sm font-semibold">ไอดี</label>
+        <input type="text" id="editId" class="w-full border px-2 py-1" readonly>
       </div>
-      <!-- Main Content -->
-      <div class="flex-1 p-6">
-        <!-- Header bar -->
-        <div class="flex items-center justify-between mb-6">
-          <div class="text-xl font-bold">รายการจองห้อง</div>
-          <div class="flex items-center space-x-2">
-            <input type="text" id="searchInput" placeholder="ค้นหา..." class="border rounded px-2 py-1 text-sm">
-            <button class="bg-gray-200 text-sm px-3 py-1 rounded" id="searchBtn">ค้นหา</button>
-          </div>
-        </div>
-        <!-- Table list -->
-        <div class="bg-white p-4 rounded shadow">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="border-b">
-                <th class="text-left py-2">ลูกค้า</th>
-                <th class="text-left py-2">สถานะ</th>
-                <th class="text-left py-2">ห้อง</th>
-                <th class="text-left py-2">วันเริ่ม</th>
-                <th class="text-left py-2">วันออก</th>
-                <th class="text-right py-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="appointmentList"></tbody>
-          </table>
-        </div>
-        <!-- Edit Form (Full width) -->
-        <div class="bg-white p-4 rounded shadow mt-4 w-full" id="editForm" style="display:none;">
-          <h2 class="font-bold mb-2">แก้ไขข้อมูล</h2>
-          <div class="mb-2">
-            <label class="block text-sm">สถานะ</label>
-            <select id="editStatus" class="border rounded px-2 py-1 text-sm w-full">
-              <option value="จอง">จอง</option>
-              <option value="ชำระแล้ว">ชำระแล้ว</option>
-              <option value="ยกเลิก">ยกเลิก</option>
-              <option value="เสร็จสิ้น">เสร็จสิ้น</option>
-            </select>
-          </div>
-          <div class="mb-2">
-            <label class="block text-sm">ชำระเงิน</label>
-            <select id="editPayment" class="border rounded px-2 py-1 text-sm w-full">
-              <option value="รอการชำระเงิน">รอการชำระเงิน</option>
-              <option value="โอนธนาคาร">โอนธนาคาร</option>
-              <option value="พร้อมเพย์">พร้อมเพย์</option>
-              <option value="จ่ายหน้างาน">จ่ายหน้างาน</option>
-            </select>
-          </div>
-          <div class="mb-2">
-            <label class="block text-sm">บันทึกเพิ่มเติม</label>
-            <input type="text" id="editNote" class="border rounded px-2 py-1 text-sm w-full">
-          </div>
-          <div class="mb-2">
-            <label class="block text-sm">เชคอิน (DD-MM-YYYY HH:mm)</label>
-            <input type="datetime-local" id="editCheckIn2" class="border rounded px-2 py-1 text-sm w-full">
-          </div>
-          <div class="mb-2">
-            <label class="block text-sm">เชคเอาต์ (DD-MM-YYYY HH:mm)</label>
-            <input type="datetime-local" id="editCheckOut2" class="border rounded px-2 py-1 text-sm w-full">
-          </div>
-          <div class="flex justify-end space-x-2">
-            <button id="cancelEdit" class="bg-gray-200 px-3 py-1 rounded text-sm">ยกเลิก</button>
-            <button id="saveEdit" class="bg-blue-500 text-white px-3 py-1 rounded text-sm">บันทึก</button>
-          </div>
-        </div>
+      <!-- ชื่อห้องพัก -->
+      <div class="mb-2">
+        <label class="block text-sm font-semibold">ชื่อห้องพัก</label>
+        <input type="text" id="editRoomName" class="w-full border px-2 py-1">
       </div>
-    </div>
-
-    <script>
-      const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCXa-UgZvYdi5aTtEveDXrkun3u7lqN24iyFLRgUit6ocfhbTLF5gsrcfiOZ8mEUU9/exec"; // ใส่ URL ของ Web App (dashboard.gs)
-      let currentEditId = null;
-      let appointmentData = [];
-
-      // ฟังก์ชันช่วยแปลง ISO date string เป็น DD-MM-YYYY (ถ้า input จาก Apps Script เป็น ISO)
-      function formatISODateToDMY(isoStr) {
-        var d = new Date(isoStr);
-        if (isNaN(d)) return isoStr;
-        var dd = ("0" + d.getDate()).slice(-2);
-        var mm = ("0" + (d.getMonth() + 1)).slice(-2);
-        var yyyy = d.getFullYear();
-        return dd + "-" + mm + "-" + yyyy;
-      }
-
-      async function fetchAppointments() {
-        try {
-          let res = await fetch(`${SCRIPT_URL}?action=getAppointments`);
-          let data = await res.json();
-          appointmentData = data;
-          renderAppointments(data);
-        } catch (err) {
-          console.error(err);
-        }
-      }
-
-      function renderAppointments(list) {
-        const container = document.getElementById("appointmentList");
-        container.innerHTML = "";
-        list.forEach(item => {
-          const tr = document.createElement("tr");
-          tr.className = "border-b hover:bg-gray-50";
-          
-          const tdCustomer = document.createElement("td");
-          tdCustomer.className = "py-2";
-          tdCustomer.textContent = item["ชื่อผู้เช่า"] || "-";
-          
-          const tdStatus = document.createElement("td");
-          tdStatus.className = "py-2";
-          tdStatus.textContent = item["สถานะ"] || "";
-          
-          const tdRoom = document.createElement("td");
-          tdRoom.className = "py-2";
-          tdRoom.textContent = item["ชื่อห้องพัก"] || "";
-          
-          const tdStart = document.createElement("td");
-          tdStart.className = "py-2";
-          tdStart.textContent = formatISODateToDMY(item["วันที่เข้าพัก"] || "");
-          
-          const tdEnd = document.createElement("td");
-          tdEnd.className = "py-2";
-          tdEnd.textContent = formatISODateToDMY(item["วันที่ออก"] || "");
-          
-          const tdActions = document.createElement("td");
-          tdActions.className = "py-2 text-right";
-          const btnEdit = document.createElement("button");
-          btnEdit.textContent = "...";
-          btnEdit.className = "bg-gray-200 px-2 py-1 rounded text-sm";
-          btnEdit.addEventListener("click", () => {
-            currentEditId = item["ไอดี"];
-            document.getElementById("editStatus").value = item["สถานะ"] || "จอง";
-            document.getElementById("editPayment").value = item["ชำระเงิน"] || "รอการชำระเงิน";
-            document.getElementById("editNote").value = item["บันทึกเพิ่มเติม"] || "";
-            document.getElementById("editCheckIn2").value = item["เชคอิน"] || "";
-            document.getElementById("editCheckOut2").value = item["เชคเอาต์"] || "";
-            document.getElementById("editForm").style.display = "block";
-          });
-          tdActions.appendChild(btnEdit);
-          
-          tr.appendChild(tdCustomer);
-          tr.appendChild(tdStatus);
-          tr.appendChild(tdRoom);
-          tr.appendChild(tdStart);
-          tr.appendChild(tdEnd);
-          tr.appendChild(tdActions);
-          container.appendChild(tr);
+      <!-- หมวดหมู่ -->
+      <div class="mb-2">
+        <label class="block text-sm font-semibold">หมวดหมู่</label>
+        <input type="text" id="editRoomCategory" class="w-full border px-2 py-1">
+      </div>
+      <!-- ราคา -->
+      <div class="mb-2">
+        <label class="block text-sm font-semibold">ราคา</label>
+        <input type="text" id="editRoomPrice" class="w-full border px-2 py-1">
+      </div>
+      <!-- วันที่เข้าพัก (DD-MM-YYYY) -->
+      <div class="mb-2">
+        <label class="block text-sm font-semibold">วันที่เข้าพัก (DD-MM-YYYY)</label>
+        <input type="text" id="editCheckIn" class="w-full border px-2 py-1" placeholder="DD-MM-YYYY">
+      </div>
+      <!-- วันที่ออก (DD-MM-YYYY) -->
+      <div class="mb-2">
+        <label class="block text-sm font-semibold">วันที่ออก (DD-MM-YYYY)</label>
+        <input type="text" id="editCheckOut" class="w-full border px-2 py-1" placeholder="DD-MM-YYYY">
+      </div>
+      <!-- เชคอิน (DD-MM-YYYY HH:MM) -->
+      <div class="mb-2">
+        <label class="block text-sm font-semibold">เชคอิน (DD-MM-YYYY HH:MM)</label>
+        <input type="text" id="editCheckInDT" class="w-full border px-2 py-1" placeholder="DD-MM-YYYY HH:MM">
+      </div>
+      <!-- เชคเอาต์ (DD-MM-YYYY HH:MM) -->
+      <div class="mb-2">
+        <label class="block text-sm font-semibold">เชคเอาต์ (DD-MM-YYYY HH:MM)</label>
+        <input type="text" id="editCheckOutDT" class="w-full border px-2 py-1" placeholder="DD-MM-YYYY HH:MM">
+      </div>
+      <!-- จำนวนคนพัก -->
+      <div class="mb-2">
+        <label class="block text-sm font-semibold">จำนวนคนพัก</label>
+        <input type="text" id="editGuestCount" class="w-full border px-2 py-1">
+      </div>
+      <!-- ชื่อผู้จอง -->
+      <div class="mb-2">
+        <label class="block text-sm font-semibold">ชื่อผู้จอง</label>
+        <input type="text" id="editRenterName" class="w-full border px-2 py-1">
+      </div>
+      <!-- เบอร์ติดต่อ -->
+      <div class="mb-2">
+        <label class="block text-sm font-semibold">เบอร์ติดต่อ</label>
+        <input type="text" id="editPhone" class="w-full border px-2 py-1">
+      </div>
+      <!-- อีเมล -->
+      <div class="mb-2">
+        <label class="block text-sm font-semibold">อีเมล</label>
+        <input type="text" id="editEmail" class="w-full border px-2 py-1">
+      </div>
+      <!-- หมายเหตุ -->
+      <div class="mb-2">
+        <label class="block text-sm font-semibold">หมายเหตุ</label>
+        <textarea id="editNote" class="w-full border px-2 py-1"></textarea>
+      </div>
+      <!-- สถานะ -->
+      <div class="mb-2">
+        <label class="block text-sm font-semibold">สถานะ</label>
+        <select id="editStatus" class="w-full border px-2 py-1">
+          <option value="จอง">จอง</option>
+          <option value="รอการชำระเงิน">รอการชำระเงิน</option>
+          <option value="เสร็จสิ้น">เสร็จสิ้น</option>
+        </select>
+      </div>
+      <!-- การชำระเงิน -->
+      <div class="mb-2">
+        <label class="block text-sm font-semibold">การชำระเงิน</label>
+        <input type="text" id="editPayment" class="w-full border px-2 py-1">
+      </div>
+      <!-- บันทึกเพิ่มเติม -->
+      <div class="mb-2">
+        <label class="block text-sm font-semibold">บันทึกเพิ่มเติม</label>
+        <textarea id="editAdditional" class="w-full border px-2 py-1"></textarea>
+      </div>
+      <div class="flex space-x-2">
+        <button type="button" id="btnSave" class="px-4 py-2 bg-blue-500 text-white rounded">บันทึก</button>
+        <button type="button" id="btnCancel" class="px-4 py-2 bg-gray-500 text-white rounded">ยกเลิก</button>
+      </div>
+    </form>
+  </div>
+  
+  <script>
+    // ตรวจสอบว่า API_URL ถูกกำหนดไว้แล้วใน config.js
+    if (typeof API_URL === "undefined") {
+      console.error("API_URL is not defined in config.js");
+    }
+    
+    // โหลดข้อมูลการจองเมื่อหน้าโหลด
+    function loadAppointments() {
+      fetch(API_URL + "?mode=api&action=appointments")
+        .then(response => response.json())
+        .then(data => renderAppointmentTable(data))
+        .catch(err => console.error("Error fetching appointments:", err));
+    }
+    
+    // แสดงตารางข้อมูลการจอง (เลือกคอลัมน์หลัก)
+    function renderAppointmentTable(data) {
+      let html = '<h2 class="text-xl font-semibold mb-2">การจอง</h2>';
+      html += '<table class="min-w-full border border-gray-200">';
+      html += '<thead><tr>';
+      html += '<th class="border px-2 py-1">ไอดี</th>';
+      html += '<th class="border px-2 py-1">ชื่อห้องพัก</th>';
+      html += '<th class="border px-2 py-1">วันที่เข้าพัก</th>';
+      html += '<th class="border px-2 py-1">วันที่ออก</th>';
+      html += '<th class="border px-2 py-1">ชื่อผู้จอง</th>';
+      html += '<th class="border px-2 py-1">สถานะ</th>';
+      html += '<th class="border px-2 py-1">ดำเนินการ</th>';
+      html += '</tr></thead><tbody>';
+      data.forEach(function(row) {
+        html += `<tr>
+                    <td class="border px-2 py-1">${row["ไอดี"] || ""}</td>
+                    <td class="border px-2 py-1">${row["ชื่อห้องพัก"] || ""}</td>
+                    <td class="border px-2 py-1">${row["วันที่เข้าพัก"] || ""}</td>
+                    <td class="border px-2 py-1">${row["วันที่ออก"] || ""}</td>
+                    <td class="border px-2 py-1">${row["ชื่อผู้จอง"] || ""}</td>
+                    <td class="border px-2 py-1">${row["สถานะ"] || ""}</td>
+                    <td class="border px-2 py-1">
+                      <button class="editBtn px-2 py-1 bg-yellow-500 text-white rounded" data-id="${row["ไอดี"]}">แก้ไข</button>
+                    </td>
+                 </tr>`;
+      });
+      html += '</tbody></table>';
+      document.getElementById("appointmentTable").innerHTML = html;
+      
+      // ผูก event ให้ปุ่มแก้ไข
+      document.querySelectorAll(".editBtn").forEach(button => {
+        button.addEventListener("click", function() {
+          const id = this.getAttribute("data-id");
+          const appointment = data.find(item => String(item["ไอดี"]) === String(id));
+          if (appointment) {
+            showEditForm(appointment);
+          }
         });
-      }
-
-      document.getElementById("saveEdit").addEventListener("click", async () => {
-        if (!currentEditId) return;
-        const status = document.getElementById("editStatus").value;
-        const payment = document.getElementById("editPayment").value;
-        const note = document.getElementById("editNote").value;
-        const checkIn2 = document.getElementById("editCheckIn2").value;  // datetime-local (YYYY-MM-DDTHH:mm)
-        const checkOut2 = document.getElementById("editCheckOut2").value; // datetime-local
-        let body = {
-          action: "updateAppointment",
-          id: currentEditId,
-          status: status,
-          payment: payment,
-          note: note,
-          checkIn2: checkIn2,
-          checkOut2: checkOut2
-        };
-        try {
-          let res = await fetch(SCRIPT_URL, {
-            method: "POST",
-            body: JSON.stringify(body)
-          });
-          let text = await res.text();
-          console.log("Update response:", text);
-          document.getElementById("editForm").style.display = "none";
-          currentEditId = null;
-          fetchAppointments();
-        } catch (err) {
-          console.error(err);
+      });
+    }
+    
+    // แสดงฟอร์มแก้ไขและเติมข้อมูลจาก appointment ที่เลือก
+    function showEditForm(appointment) {
+      document.getElementById("editFormContainer").classList.remove("hidden");
+      document.getElementById("editId").value = appointment["ไอดี"] || "";
+      document.getElementById("editRoomName").value = appointment["ชื่อห้องพัก"] || "";
+      document.getElementById("editRoomCategory").value = appointment["หมวดหมู่"] || "";
+      document.getElementById("editRoomPrice").value = appointment["ราคา"] || "";
+      document.getElementById("editCheckIn").value = appointment["วันที่เข้าพัก"] || "";
+      document.getElementById("editCheckOut").value = appointment["วันที่ออก"] || "";
+      // สำหรับเชคอิน/เชคเอาต์ ให้แสดงในรูปแบบ "DD-MM-YYYY HH:MM"
+      document.getElementById("editCheckInDT").value = appointment["เชคอิน"] || "";
+      document.getElementById("editCheckOutDT").value = appointment["เชคเอาต์"] || "";
+      document.getElementById("editGuestCount").value = appointment["จำนวนคนพัก"] || "";
+      document.getElementById("editRenterName").value = appointment["ชื่อผู้จอง"] || "";
+      document.getElementById("editPhone").value = appointment["เบอร์ติดต่อ"] || "";
+      document.getElementById("editEmail").value = appointment["อีเมล"] || "";
+      document.getElementById("editNote").value = appointment["หมายเหตุ"] || "";
+      document.getElementById("editStatus").value = appointment["สถานะ"] || "";
+      document.getElementById("editPayment").value = appointment["การชำระเงิน"] || "";
+      document.getElementById("editAdditional").value = appointment["บันทึกเพิ่มเติม"] || "";
+    }
+    
+    // ซ่อนฟอร์มแก้ไข
+    function hideEditForm() {
+      document.getElementById("editFormContainer").classList.add("hidden");
+    }
+    
+    // เมื่อคลิกปุ่มยกเลิกในฟอร์มแก้ไข
+    document.getElementById("btnCancel").addEventListener("click", function(){
+      hideEditForm();
+    });
+    
+    // เมื่อคลิกปุ่ม Save ให้ส่งข้อมูลไป updateAppointment ผ่าน google.script.run
+    document.getElementById("btnSave").addEventListener("click", function(){
+      const appointmentData = {
+        "ไอดี": document.getElementById("editId").value,
+        "ชื่อห้องพัก": document.getElementById("editRoomName").value,
+        "หมวดหมู่": document.getElementById("editRoomCategory").value,
+        "ราคา": document.getElementById("editRoomPrice").value,
+        "วันที่เข้าพัก": document.getElementById("editCheckIn").value,
+        "วันที่ออก": document.getElementById("editCheckOut").value,
+        // ฟิลด์สำหรับเชคอิน/เชคเอาต์ ในรูปแบบ "DD-MM-YYYY HH:MM"
+        "เชคอิน": document.getElementById("editCheckInDT").value,
+        "เชคเอาต์": document.getElementById("editCheckOutDT").value,
+        "จำนวนคนพัก": document.getElementById("editGuestCount").value,
+        "ชื่อผู้จอง": document.getElementById("editRenterName").value,
+        "เบอร์ติดต่อ": document.getElementById("editPhone").value,
+        "อีเมล": document.getElementById("editEmail").value,
+        "หมายเหตุ": document.getElementById("editNote").value,
+        "สถานะ": document.getElementById("editStatus").value,
+        "การชำระเงิน": document.getElementById("editPayment").value,
+        "บันทึกเพิ่มเติม": document.getElementById("editAdditional").value
+      };
+      google.script.run.withSuccessHandler(function(response){
+        if(response.status === "success"){
+          alert("อัปเดตข้อมูลสำเร็จ");
+          hideEditForm();
+          loadAppointments();
+        } else {
+          alert("เกิดข้อผิดพลาด: " + response.message);
         }
-      });
-
-      document.getElementById("cancelEdit").addEventListener("click", () => {
-        document.getElementById("editForm").style.display = "none";
-        currentEditId = null;
-      });
-
-      document.addEventListener("DOMContentLoaded", () => {
-        fetchAppointments();
-      });
-    </script>
-  </body>
+      }).updateAppointment(appointmentData);
+    });
+    
+    // โหลดข้อมูลการจองเมื่อหน้าโหลด
+    document.addEventListener("DOMContentLoaded", function(){
+      loadAppointments();
+    });
+  </script>
+</body>
 </html>
