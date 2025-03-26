@@ -612,12 +612,23 @@
     function populateBookingForm() {
       document.getElementById("bookRoomName").value = selectedRoom["ชื่อ"] || "";
       document.getElementById("bookRoomCategory").value = selectedRoom["หมวดหมู่"] || "";
-      document.getElementById("bookRoomPrice").value = selectedRoom["ราคา"] || "";
       document.getElementById("bookCheckIn").value = selectedCheckIn;
       document.getElementById("bookCheckOut").value = selectedCheckOut;
+    
       const nights = calculateNights(selectedCheckIn, selectedCheckOut);
       document.getElementById("bookNightCount").value = nights + " คืน";
+      
+      // ใช้ราคาลดหากมี ไม่เช่นนั้นใช้ราคาปกติ
+      let nightlyPrice = selectedRoom["ราคาลด"] ? parseFloat(selectedRoom["ราคาลด"]) : parseFloat(selectedRoom["ราคา"]);
+      if (isNaN(nightlyPrice)) {
+        nightlyPrice = 0;
+      }
+      
+      // คำนวณราคารวมตามจำนวนคืน
+      const totalPrice = nightlyPrice * nights;
+      document.getElementById("bookRoomPrice").value = totalPrice;
     }
+
 
     // Show specific step
     function showStep(stepId) {
