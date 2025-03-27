@@ -10,6 +10,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Include Flatpickr CSS and JS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/th.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <!-- Include config.js สำหรับ API_URL -->
   <script src="config.js"></script>
@@ -134,31 +135,29 @@
               class="w-full border-b border-gray-300 bg-white text-sm font-semibold py-1" readonly />
           </div>
         </div>
-        <div class="mb-4">
+        <div class="mb-2">
           <label class="block text-sm font-semibold mb-1">จำนวนคนเข้าพัก</label>
-          <input type="number" id="bookNumGuests" class="w-full border rounded px-2 py-1 text-sm" min="1" value="1" />
+          <input type="number" id="bookNumGuests" class="w-full border rounded p-2 text-sm" min="1" value="1" />
         </div>
-        <div class="mb-4">
+        <div class="mb-2">
           <label class="block text-sm font-semibold mb-1">ชื่อผู้เช่า</label>
-          <input type="text" id="bookRenterName" class="w-full border rounded px-2 py-1 text-sm"
+          <input type="text" id="bookRenterName" class="w-full border rounded p-2 text-sm"
             placeholder="เช่น สมชาย ใจดี" required />
         </div>
-        <div class="mb-4">
+        <div class="mb-2">
           <label class="block text-sm font-semibold mb-1">เบอร์ติดต่อ</label>
-          <input type="tel" id="bookPhone" class="w-full border rounded px-2 py-1 text-sm" placeholder="เช่น 0812345678"
-            required />
+          <input type="tel" id="bookPhone" class="w-full border rounded p-2 text-sm" placeholder="เช่น 0812345678" required />
         </div>
-        <div class="mb-4">
+        <div class="mb-2">
           <label class="block text-sm font-semibold mb-1">อีเมล</label>
-          <input type="email" id="bookEmail" class="w-full border rounded px-2 py-1 text-sm"
-            placeholder="example@gmail.com" />
+          <input type="email" id="bookEmail" class="w-full border rounded p-2 text-sm" placeholder="example@gmail.com" />
         </div>
-        <div class="mb-4">
+        <div class="mb-2">
           <label class="block text-sm font-semibold mb-1">หมายเหตุ</label>
-          <textarea id="bookNote" class="w-full border rounded px-2 py-1 text-sm" rows="3"></textarea>
+          <textarea id="bookNote" class="w-full border rounded p-2 text-sm" rows="3"></textarea>
         </div>
         <!-- ฟิลด์ซ่อนสำหรับเก็บ userLineId -->
-        <input type="hidden" id="bookUserLineId" required />
+        <input type="hidden" id="bookUserLineId"  required/>
         <button type="button" id="submitBookingBtn" class="bg-[#071d4a] text-white w-full py-2 rounded text-sm">
           บันทึกการจอง
         </button>
@@ -192,7 +191,7 @@
         console.error("LIFF init error:", err);
       }
     }
-     document.addEventListener("DOMContentLoaded", initLiffGlobal);
+    document.addEventListener("DOMContentLoaded", initLiffGlobal);
 
     // Utility functions
     function parseDateDMY(dateStr) {
@@ -316,7 +315,7 @@
           card.appendChild(gradientOverlay);
           if (statusText) {
             const statusBadge = document.createElement("div");
-            statusBadge.className = `absolute top-2 right-2 px-2 py-1 text-white text-xs rounded ${statusColor}`;
+            statusBadge.className = `absolute top-2 right-2 p-2 text-white text-xs rounded ${statusColor}`;
             statusBadge.textContent = statusText;
             card.appendChild(statusBadge);
           }
@@ -485,12 +484,13 @@
 
     // Populate detail page ของห้อง
     function populateDetail() {
-      if (!selectedRoom) return;
-
+      if (selectedRoom["ราคาลด"]) {
       document.getElementById("detailRoomName").textContent = selectedRoom["ชื่อ"] || "";
       document.getElementById("detailRoomCategory").textContent = selectedRoom["หมวดหมู่"] ? `(${selectedRoom["หมวดหมู่"]})` : "";
-      document.getElementById("detailRoomPrice").textContent = selectedRoom["ราคา"] || "0";
-
+      document.getElementById("detailRoomPrice").innerHTML = `<span class="line-through text-gray-500 mr-2">${selectedRoom["ราคา"]}</span><span class="text-red-500 font-bold">${selectedRoom["ราคาลด"]}</span>`;
+      } else {
+        document.getElementById("detailRoomPrice").textContent = selectedRoom["ราคา"] || "0";
+      }
       const mainImgElement = document.getElementById("detailMainImg");
       mainImgElement.src = selectedRoom["รูปภาพ"] || "";
       mainImgElement.alt = selectedRoom["ชื่อ"] || "Room";
@@ -666,6 +666,8 @@
       flatpickr("#step1DateRange", {
         mode: "range",
         dateFormat: "d-m-Y",
+        minDate: "today", // เพิ่มบรรทัดนี้เพื่อไม่ให้เลือกวันที่ก่อนวันนี้
+        locale: "th",     // ตั้งค่าให้แสดงภาษาไทย
         onClose: updateRooms,
       });
       fetchAllRooms();
