@@ -54,7 +54,7 @@
         </div>
         <div class="w-full px-2">
           <label class="text-sm text-gray-100 block mb-1 text-center">เลือกวันที่เข้าพักและวันที่ออก</label>
-          <div class="bg-white rounded-full px-4 py-2 mb-2 shadow-sm">
+          <div class="bg-white rounded-md px-4 py-2 mb-2 shadow-sm">
             <input type="text" id="step1DateRange" placeholder="เลือกวันที่..."
               class="w-full text-sm text-center focus:outline-none" />
           </div>
@@ -191,7 +191,7 @@
         console.error("LIFF init error:", err);
       }
     }
-    document.addEventListener("DOMContentLoaded", initLiffGlobal);
+   // document.addEventListener("DOMContentLoaded", initLiffGlobal);
 
     // Utility functions
     function parseDateDMY(dateStr) {
@@ -336,7 +336,7 @@
           infoDiv.appendChild(price);
           card.appendChild(infoDiv);
           const selectBtn = document.createElement("button");
-          selectBtn.className = "absolute bottom-2 right-2 bg-blue-500 text-white text-xs px-3 py-1 rounded-full shadow";
+          selectBtn.className = "absolute bottom-2 right-2 bg-[#2E278B] text-white text-sm px-3 py-1 rounded-md shadow";
           selectBtn.textContent = "เลือก";
           selectBtn.addEventListener("click", (e) => {
             e.preventDefault();
@@ -403,13 +403,13 @@
           rightDiv.className = "flex flex-col items-end space-y-1";
           if (statusText) {
             const statusBtn = document.createElement("button");
-            statusBtn.className = "text-white text-xs px-3 py-1 rounded-full";
+            statusBtn.className = "text-white text-xs px-3 py-1 rounded-md";
             statusBtn.textContent = statusText;
             statusBtn.classList.add(statusColor);
             rightDiv.appendChild(statusBtn);
           }
           const btnSelect = document.createElement("button");
-          btnSelect.className = "bg-[#071d4a] text-white text-xs px-3 py-1 rounded-full";
+          btnSelect.className = "bg-[#071d4a] text-white text-xs px-3 py-1 rounded-md";
           btnSelect.textContent = "เลือก";
           btnSelect.addEventListener("click", (e) => {
             e.preventDefault();
