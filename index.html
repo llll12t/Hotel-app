@@ -1,224 +1,181 @@
 <!DOCTYPE html>
-<html lang="th">
-
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>โอมสเตย์ ยินดีต้อนรับ</title>
-    <!-- Tailwind CSS ผ่าน CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Include config.js สำหรับ API_URL -->
-    <script src="config.js"></script>
-  </head>
-  <body class="bg-gray-100 min-h-screen">
-    <div class="max-w-md mx-auto p-4">
-      <!-- Header -->
-      <div class="flex items-center justify-between mb-4">
-        <h1 class="text-lg font-bold">โอมสเตย์ ยินดีต้อนรับ</h1>
-        <div class="w-10 h-10 bg-gray-300 rounded-full"></div>
-      </div>
+  <meta charset="UTF-8">
+  <title>Leave Calendar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f8;
+      padding: 20px;
+    }
 
-      <!-- เลือกวันที่เข้าพัก (วันเริ่มต้นและวันสิ้นสุด) -->
-      <div class="flex flex-col sm:flex-row items-center bg-white rounded-full px-4 py-2 mb-6 shadow-sm space-y-2 sm:space-y-0 sm:space-x-4">
-        <div class="flex items-center w-full">
-          <label class="text-sm text-gray-500">วันที่เข้าพัก</label>
-          <input type="date" id="checkInDate" class="text-sm text-right ml-auto focus:outline-none" />
-        </div>
-        <div class="flex items-center w-full">
-          <label class="text-sm text-gray-500">วันที่ออก</label>
-          <input type="date" id="checkOutDate" class="text-sm text-right ml-auto focus:outline-none" />
-        </div>
-      </div>
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
 
-      <!-- รายการห้อง (คอลัมน์เดียว) -->
-      <div id="roomList" class="flex flex-col"></div>
-    </div>
+    .calendar-header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
 
-    <script>
-      // ดึงข้อมูลห้องทั้งหมด (ไม่ส่งวันที่)
-      async function fetchAllRooms() {
-        try {
-          const response = await fetch(API_URL);
-          const data = await response.json();
-          renderRoomList(data, false); // false = ยังไม่คำนวณสถานะ
-        } catch (err) {
-          console.error("Error fetching rooms:", err);
-        }
+    button {
+      padding: 5px 10px;
+      border: none;
+      background: #1d4ed8;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+
+    .day {
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 10px;
+      min-height: 80px;
+      position: relative;
+    }
+
+    .today {
+      border: 2px solid #1d4ed8;
+    }
+
+    .event {
+      font-size: 12px;
+      margin-top: 5px;
+      background: #e0f2fe;
+      padding: 3px 5px;
+      border-radius: 4px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .event::after {
+      content: attr(data-tooltip);
+      white-space: pre-line;
+      position: absolute;
+      background: #333;
+      color: #fff;
+      font-size: 12px;
+      padding: 8px;
+      border-radius: 5px;
+      bottom: 100%;
+      left: 0;
+      transform: translateY(-5px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      width: 200px;
+      z-index: 10;
+    }
+
+    .event:hover::after {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+<h1>📅 Time Off Calendar</h1>
+
+<div class="calendar-header">
+  <button onclick="changeMonth(-1)">← Previous</button>
+  <div id="monthLabel">Loading...</div>
+  <button onclick="changeMonth(1)">Next →</button>
+</div>
+
+<div class="calendar" id="calendar"></div>
+
+<script>
+  const calendarEl = document.getElementById('calendar');
+  const monthLabelEl = document.getElementById('monthLabel');
+  const apiBaseUrl = 'https://script.google.com/macros/s/AKfycbwGhqfla7JYFFijnt32vAYZfCxqLFEH2ty6VzAwYSsgvX2J4ISBVpaPf8THBBlW_ikH/exec';
+
+  let currentMonth = new Date();
+
+  function changeMonth(offset) {
+    currentMonth.setMonth(currentMonth.getMonth() + offset);
+    renderCalendar(currentMonth);
+  }
+
+  function renderCalendar(date) {
+    calendarEl.innerHTML = '';
+
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDayOfWeek = firstDay.getDay();
+    const daysInMonth = lastDay.getDate();
+
+    const startDateStr = `${year}-${String(month + 1).padStart(2, '0')}-01`;
+    const endDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`;
+
+    // แสดงชื่อเดือน
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    monthLabelEl.textContent = `${monthNames[month]} ${year}`;
+
+    // ช่องว่างก่อนวันที่ 1
+    for (let i = 0; i < startDayOfWeek; i++) {
+      const blank = document.createElement('div');
+      blank.classList.add('day');
+      calendarEl.appendChild(blank);
+    }
+
+    // แสดงวันทั้งหมด
+    const dayElements = {};
+    for (let i = 1; i <= daysInMonth; i++) {
+      const dayDiv = document.createElement('div');
+      dayDiv.classList.add('day');
+
+      const dateObj = new Date(year, month, i);
+      const dateStr = dateObj.toISOString().split('T')[0];
+      if (new Date().toDateString() === dateObj.toDateString()) {
+        dayDiv.classList.add('today');
       }
 
-      // ดึงข้อมูลห้อง (ส่ง checkIn + checkOut เพื่อคำนวณสถานะ)
-      async function fetchRooms(checkIn, checkOut) {
-        try {
-          const response = await fetch(`${API_URL}?checkIn=${checkIn}&checkOut=${checkOut}`);
-          const data = await response.json();
-          renderRoomList(data, true); // true = คำนวณสถานะแล้ว
-        } catch (err) {
-          console.error("Error fetching rooms:", err);
-        }
-      }
+      dayDiv.innerHTML = `<strong>${i}</strong>`;
+      dayDiv.setAttribute('data-date', dateStr);
+      calendarEl.appendChild(dayDiv);
+      dayElements[dateStr] = dayDiv;
+    }
 
-      // ฟังก์ชันสร้างรายการห้อง (การ์ด)
-      // isStatusCalculated = true/false บอกว่าได้คำนวณสถานะ (ว่าง/ไม่ว่าง) แล้วหรือยัง
-      function renderRoomList(rooms, isStatusCalculated) {
-        const container = document.getElementById("roomList");
-        container.innerHTML = "";
+    // ดึง event จาก Apps Script
+    fetch(`${apiBaseUrl}?start=${startDateStr}&end=${endDateStr}`)
+      .then(res => res.json())
+      .then(events => {
+        events.forEach(event => {
+          const date = new Date(event.start).toISOString().split('T')[0];
+          if (dayElements[date]) {
+            const eventEl = document.createElement('div');
+            eventEl.classList.add('event');
+            eventEl.textContent = event.title;
 
-        if (!rooms || rooms.length === 0) {
-          container.innerHTML = "<p class='text-gray-500'>ไม่มีห้องที่ตรงกับการค้นหา</p>";
-          return;
-        }
+            const start = new Date(event.start).toLocaleString();
+            const end = new Date(event.end).toLocaleString();
+            const desc = event.description || '';
+            eventEl.setAttribute('data-tooltip', `${event.title}\n${start} - ${end}\n${desc}`);
 
-        // หากคำนวณสถานะแล้ว ให้เรียงลำดับห้อง "ว่าง" ขึ้นก่อน
-        if (isStatusCalculated) {
-          rooms.sort((a, b) => {
-            const statusA = a["สถานะ"] ? a["สถานะ"].toLowerCase() : "";
-            const statusB = b["สถานะ"] ? b["สถานะ"].toLowerCase() : "";
-            // "ว่าง" < "ไม่ว่าง"
-            if (statusA === "ว่าง" && statusB === "ไม่ว่าง") return -1;
-            if (statusA === "ไม่ว่าง" && statusB === "ว่าง") return 1;
-            return 0;
-          });
-        }
-
-        // อ่านวันที่ (ถ้าเลือกแล้ว)
-        const checkInDateValue = document.getElementById("checkInDate").value;
-        const checkOutDateValue = document.getElementById("checkOutDate").value;
-
-        // สร้างการ์ดแนวนอน (คอลัมน์เดียว)
-        rooms.forEach(room => {
-          // ตรวจสอบสถานะ (ถ้า isStatusCalculated == true)
-          let statusText = "";
-          let statusColorClass = "";
-          if (isStatusCalculated) {
-            if (room["สถานะ"] && room["สถานะ"].toLowerCase() === "ไม่ว่าง") {
-              statusText = "ไม่ว่าง";
-              statusColorClass = "bg-red-500";
-            } else {
-              statusText = "ว่าง";
-              statusColorClass = "bg-green-500";
-            }
+            dayElements[date].appendChild(eventEl);
           }
-
-          // การ์ดหลัก
-          const card = document.createElement("div");
-          card.className = "bg-white rounded-lg shadow p-3 flex items-center mb-4";
-
-          // รูปห้อง (ซ้าย)
-          const imgWrapper = document.createElement("div");
-          imgWrapper.className = "w-28 h-20 flex-shrink-0 overflow-hidden rounded mr-3 relative";
-          const img = document.createElement("img");
-          img.src = room["รูปภาพ"];
-          img.alt = room["ชื่อ"];
-          img.className = "w-full h-full object-cover";
-          imgWrapper.appendChild(img);
-          card.appendChild(imgWrapper);
-
-          // ส่วนกลาง (ชื่อห้อง + ฟีเจอร์)
-          const middleDiv = document.createElement("div");
-          middleDiv.className = "flex-1";
-
-          // แถวแรก: สถานะ + ชื่อห้อง (หมวดหมู่)
-          const topRow = document.createElement("div");
-          topRow.className = "flex items-center space-x-2 mb-1";
-
-          // Badge สถานะ (ถ้ามีการคำนวณสถานะแล้ว)
-          if (isStatusCalculated) {
-            const statusBadge = document.createElement("span");
-            statusBadge.className = `rounded px-2 py-0.5 text-white text-xs ${statusColorClass}`;
-            statusBadge.textContent = statusText;
-            topRow.appendChild(statusBadge);
-          }
-
-          // ชื่อห้อง + หมวดหมู่
-          const roomTitle = document.createElement("h2");
-          roomTitle.className = "font-bold text-sm";
-          // แสดงเป็น "ห้อง A (VIP)" เช่น
-          roomTitle.textContent = `${room["ชื่อ"]} (${room["หมวดหมู่"]})`;
-          topRow.appendChild(roomTitle);
-
-          middleDiv.appendChild(topRow);
-
-          // ฟีเจอร์ (แบ่งเป็น 2 คอลัมน์ด้วย columns-2)
-          const features = [];
-          if (String(room["แอร์"]).toLowerCase() === "true") features.push("แอร์");
-          if (String(room["เตียง"]).toLowerCase() === "true") features.push("เตียง");
-          if (String(room["สระน้ำ"]).toLowerCase() === "true") features.push("สระน้ำ");
-          if (String(room["วิว"]).toLowerCase() === "true") features.push("วิว");
-          if (String(room["ที่จอดรถ"]).toLowerCase() === "true") features.push("ที่จอดรถ");
-
-          if (features.length > 0) {
-            const featureList = document.createElement("ul");
-            featureList.className = "list-disc list-inside text-xs text-gray-600 columns-2";
-            features.forEach(f => {
-              const li = document.createElement("li");
-              li.textContent = f;
-              featureList.appendChild(li);
-            });
-            middleDiv.appendChild(featureList);
-          }
-
-          card.appendChild(middleDiv);
-
-          // ส่วนขวา (ราคา + ปุ่ม "ดูห้อง")
-          const rightDiv = document.createElement("div");
-          rightDiv.className = "flex flex-col items-end justify-center space-y-2";
-
-          // ราคาห้อง (ถ้ามีราคาลด ให้แสดง "ราคา ลด 2100" ตามตัวอย่าง)
-          // หรือจะแสดงราคาเดิมขีดทับ + ราคาลดก็ได้ ขึ้นอยู่กับดีไซน์
-          const priceWrapper = document.createElement("div");
-          if (room["ราคาลด"]) {
-            // ตัวอย่าง: "ราคา ลด 2100"
-            // หรือแสดง 2 บรรทัดก็ได้
-            const discountLabel = document.createElement("span");
-            discountLabel.className = "text-red-500 font-bold text-sm";
-            discountLabel.textContent = `ราคา ลด ${room["ราคาลด"]}`;
-            priceWrapper.appendChild(discountLabel);
-          } else {
-            // แสดงราคาเดิม
-            const normalPrice = document.createElement("span");
-            normalPrice.className = "text-red-500 font-bold text-sm";
-            normalPrice.textContent = `ราคา ${room["ราคา"] || "0"}`;
-            priceWrapper.appendChild(normalPrice);
-          }
-          rightDiv.appendChild(priceWrapper);
-
-          // ปุ่ม "ดูห้อง"
-          const detailBtn = document.createElement("a");
-          detailBtn.className = "bg-black text-white text-xs px-3 py-1 rounded";
-          detailBtn.textContent = "ดูห้อง";
-          // ส่งค่าต่างๆ ไป detail.html
-          if (checkInDateValue && checkOutDateValue) {
-            detailBtn.href = `detail.html?id=${room["ไอดี"]}&checkIn=${checkInDateValue}&checkOut=${checkOutDateValue}&status=${room["สถานะ"]}`;
-          } else {
-            detailBtn.href = `detail.html?id=${room["ไอดี"]}&status=${room["สถานะ"]}`;
-          }
-          rightDiv.appendChild(detailBtn);
-
-          card.appendChild(rightDiv);
-          container.appendChild(card);
         });
-      }
-
-      // ฟังก์ชันอัปเดตการแสดงห้องเมื่อเปลี่ยนวันที่
-      function updateRooms() {
-        const checkInDate = document.getElementById("checkInDate").value;
-        const checkOutDate = document.getElementById("checkOutDate").value;
-        if (checkInDate && checkOutDate) {
-          fetchRooms(checkInDate, checkOutDate);
-        } else {
-          fetchAllRooms();
-        }
-      }
-
-      // เมื่อโหลดหน้าเพจ ให้ดึงข้อมูลห้องทั้งหมดก่อน
-      document.addEventListener("DOMContentLoaded", function() {
-        fetchAllRooms();
       });
+  }
 
-      // เมื่อเปลี่ยนวันที่เข้าพักหรือวันที่ออก
-      document.getElementById("checkInDate").addEventListener("change", updateRooms);
-      document.getElementById("checkOutDate").addEventListener("change", updateRooms);
-    </script>
-  </body>
+  // เริ่มต้นแสดงเดือนปัจจุบัน
+  renderCalendar(currentMonth);
+</script>
+
+</body>
 </html>
