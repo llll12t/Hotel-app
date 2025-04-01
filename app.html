@@ -191,7 +191,7 @@
         console.error("LIFF init error:", err);
       }
     }
-   // document.addEventListener("DOMContentLoaded", initLiffGlobal);
+    document.addEventListener("DOMContentLoaded", initLiffGlobal);
 
     // Utility functions
     function parseDateDMY(dateStr) {
@@ -315,7 +315,7 @@
           card.appendChild(gradientOverlay);
           if (statusText) {
             const statusBadge = document.createElement("div");
-            statusBadge.className = `absolute top-2 right-2 p-2 text-white text-xs rounded ${statusColor}`;
+            statusBadge.className = `absolute top-2 right-2 px-3 py-1 text-white text-xs rounded ${statusColor}`;
             statusBadge.textContent = statusText;
             card.appendChild(statusBadge);
           }
@@ -336,7 +336,7 @@
           infoDiv.appendChild(price);
           card.appendChild(infoDiv);
           const selectBtn = document.createElement("button");
-          selectBtn.className = "absolute bottom-2 right-2 bg-[#2E278B] text-white text-sm px-3 py-1 rounded-md shadow";
+          selectBtn.className = "absolute bottom-2 right-2 bg-[#071D4A] text-white text-sm px-3 py-1 rounded-md shadow";
           selectBtn.textContent = "เลือก";
           selectBtn.addEventListener("click", (e) => {
             e.preventDefault();
@@ -392,7 +392,7 @@
           const priceLine = document.createElement("div");
           priceLine.className = "text-sm mt-1";
           if (room["ราคาลด"]) {
-            priceLine.innerHTML = `<span class="text-gray-400 line-through mr-2 text-xs">${room["ราคา"]}</span>
+            priceLine.innerHTML = `<span class="text-gray-400 line-through mr-2 text-sm">${room["ราคา"]}</span>
                                    <span class="text-red-500 font-bold">${room["ราคาลด"]}</span>`;
           } else {
             priceLine.innerHTML = `<span class="text-red-500 font-bold">${room["ราคา"] || "0"}</span>`;
@@ -409,7 +409,7 @@
             rightDiv.appendChild(statusBtn);
           }
           const btnSelect = document.createElement("button");
-          btnSelect.className = "bg-[#071d4a] text-white text-xs px-3 py-1 rounded-md";
+          btnSelect.className = "bg-[#071d4a] text-white text-sm px-3 py-1 rounded-md";
           btnSelect.textContent = "เลือก";
           btnSelect.addEventListener("click", (e) => {
             e.preventDefault();
