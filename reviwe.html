@@ -62,7 +62,7 @@
       </p>
     </div>
     <form class="p-6 text-sm" id="feedbackForm">
-      <!-- ตัวอย่างข้อมูล (อธิบายเท่านั้น ไม่ได้บันทึกจริง) -->
+      <!-- ตัวอย่างข้อมูล (เป็นเพียงข้อมูลอธิบาย ไม่ได้บันทึกจริง) -->
       <div class="mb-4 text-gray-700 text-sm">
         <p><b>ตัวอย่างข้อมูล:</b></p>
         <ul class="list-disc ml-6">
@@ -71,13 +71,11 @@
         </ul>
       </div>
 
-  <!-- สร้าง hidden fields ตามที่ต้องการ -->
-  <input type="hidden" id="id" name="id" value="1234" />
-  <input type="hidden" id="room" name="room" value="Room A" />
-  <input type="hidden" id="fullname" name="fullname" value="นายทดสอบ" />
-  <input type="hidden" id="userIdLine" name="userIdLine" value="U6d75b8c962b77905280c7dd74dbbc035" />
+      <!-- Hidden Inputs -->
+      <input type="hidden" id="id" name="id" />
+      <input type="hidden" id="room" name="room" />
+      <input type="hidden" id="fullname" name="fullname" />
 
-      <!-- คะแนน 4 หัวข้อ: สะอาด / เสียงรบกวน / บริการ / แก้ไขปัญหา -->
       <!-- 1) ความสะอาด -->
       <div class="mb-6">
         <p class="mb-2 text-gray-700">1. ความสะอาด (1-5 ดาว)</p>
@@ -124,7 +122,7 @@
         </div>
       </div>
 
-      <!-- 3) บริการ -->
+      <!-- 3) การบริการ -->
       <div class="mb-6">
         <p class="mb-2 text-gray-700">3. การบริการ (1-5 ดาว)</p>
         <div class="star-rating">
@@ -149,32 +147,15 @@
 
       <!-- 4) การแก้ไขปัญหา -->
       <div class="mb-6">
-        <p class="mb-2 text-gray-700">
-          4. การแก้ไขปัญหา (1-5 ดาว)
-        </p>
+        <p class="mb-2 text-gray-700">4. การแก้ไขปัญหา (1-5 ดาว)</p>
         <div class="star-rating">
           <input type="radio" id="fixproblem5" name="fixproblem" value="5" />
           <label for="fixproblem5"><i class="fas fa-star"></i></label>
-          <input
-            type="radio"
-            id="fixproblem4"
-            name="fixproblem"
-            value="4"
-          />
+          <input type="radio" id="fixproblem4" name="fixproblem" value="4" />
           <label for="fixproblem4"><i class="fas fa-star"></i></label>
-          <input
-            type="radio"
-            id="fixproblem3"
-            name="fixproblem"
-            value="3"
-          />
+          <input type="radio" id="fixproblem3" name="fixproblem" value="3" />
           <label for="fixproblem3"><i class="fas fa-star"></i></label>
-          <input
-            type="radio"
-            id="fixproblem2"
-            name="fixproblem"
-            value="2"
-          />
+          <input type="radio" id="fixproblem2" name="fixproblem" value="2" />
           <label for="fixproblem2"><i class="fas fa-star"></i></label>
           <input
             type="radio"
@@ -216,7 +197,7 @@
   <script>
     // 1) เริ่มต้น LIFF
     liff
-      .init({ liffId: "2007106715-AWxXWQ0P" }) // <== ใส่ LIFF ID ของคุณ
+      .init({ liffId: "2007106715-AWxXWQ0P" }) // <-- ใส่ LIFF ID ของคุณ
       .then(() => {
         // รับพารามิเตอร์จาก URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -224,7 +205,7 @@
         const room = urlParams.get("room");
         const fullname = urlParams.get("fullname");
 
-        // เซ็ตค่าใน hidden input (หากไม่มีใน URL ก็จะเป็นค่าว่าง "")
+        // ใส่ค่าใน hidden input
         document.getElementById("id").value = id || "";
         document.getElementById("room").value = room || "";
         document.getElementById("fullname").value = fullname || "";
@@ -261,11 +242,11 @@
 
           details: document.getElementById("details").value,
 
-          // สำคัญ: ชื่อ "userIdLine" ตรงกับฝั่ง GAS
+          // สำคัญ: ชื่อ param "userIdLine" ให้ตรงฝั่ง GAS
           userIdLine: liff.getContext() ? liff.getContext().userId : "",
         };
 
-        // ตรวจสอบว่ากรอกทุกดาวหรือไม่
+        // ตรวจสอบว่ากรอกดาวทุกข้อหรือไม่
         if (
           !formData.clean ||
           !formData.noise ||
@@ -280,10 +261,10 @@
           return;
         }
 
-        // เรียกใช้งาน Fetch เพื่อส่งข้อมูลไป Google Apps Script
+        // ส่งข้อมูลด้วย Fetch ไป Google Apps Script
         fetch(
           "https://script.google.com/macros/s/AKfycbwvzvB7ZLt8b_UHImWdvTqGyE2fT4Yh4OKB4SFTRGxwjfYMT93-8QYgNYlwf3O9JAE/exec",
-          // ^^^ ใส่ URL ของ Web App (deploy) ที่ได้จาก Google Apps Script
+          // ^^^ ใส่ URL ของ Web App ที่ได้จากการ Deploy Google Apps Script
           {
             method: "POST",
             headers: {
@@ -301,7 +282,7 @@
                 text: "ระบบได้บันทึกข้อมูลเรียบร้อย",
                 confirmButtonText: "ตกลง",
               }).then(() => {
-                // ปิด LIFF (หรือจะ redirect ไปหน้าอื่นก็ได้)
+                // ปิด LIFF (หรือจะ redirect ไปหน้าอื่นแทนได้)
                 liff.closeWindow();
               });
             } else {
