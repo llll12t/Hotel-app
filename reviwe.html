@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>แสดงความคิดเห็นและให้คะแนน</title>
+  <!-- LIFF SDK -->
+  <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- SweetAlert2 CSS and JS -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css"
+  />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <!-- FontAwesome for star icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+  />
+  <!-- Custom CSS for star ratings -->
+  <style>
+    .bg-green {
+      background: #33422b;
+    }
+    .border-green {
+      border: 2px solid #33422b;
+      border-radius: 10px;
+    }
+    .star-rating {
+      direction: rtl;
+      display: inline-block;
+    }
+    .star-rating input[type="radio"] {
+      display: none;
+    }
+    .star-rating label {
+      color: #ccc;
+      font-size: 2rem;
+      padding: 0;
+      cursor: pointer;
+    }
+    .star-rating input[type="radio"]:checked ~ label {
+      color: #f5b301;
+    }
+    .star-rating label:hover,
+    .star-rating label:hover ~ label {
+      color: #f5b301;
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <div class="max-w-md mx-auto m-4 bg-white rounded-lg shadow-md">
+    <div class="bg-green p-6 rounded-t-lg">
+      <h1 class="text-xl text-yellow-400 font-bold mb-5">
+        แสดงความคิดเห็นและให้คะแนน
+      </h1>
+      <p class="mb-6 text-sm text-gray-100">
+        ขอรบกวนลูกค้าช่วยประเมินความพึงพอใจ เพื่อเป็นการปรับปรุงและพัฒนา
+        การให้บริการของเราให้ดียิ่งขึ้น
+      </p>
+    </div>
+    <form class="p-6 text-sm" id="feedbackForm">
+      <!-- ตัวอย่างข้อมูล (อธิบายเท่านั้น ไม่ได้บันทึกจริง) -->
+      <div class="mb-4 text-gray-700 text-sm">
+        <p><b>ตัวอย่างข้อมูล:</b></p>
+        <ul class="list-disc ml-6">
+          <li>ไอดี: 1, ห้องพัก: ห้อง A, ชื่อ: นายเอ, รายละเอียด: เยี่ยมมาก, สะอาด: 5, เสียงรบกวน: 5, บริการ: 5, แก้ไขปัญหา: 5, คะแนนรวม: 20, userIdLine: 123134564, เวลาบันทึก: 25-03-25</li>
+          <li>ไอดี: 2, ห้องพัก: ห้อง B, ชื่อ: นางสาวบี, รายละเอียด: ดีมาก, สะอาด: 4, เสียงรบกวน: 4, บริการ: 5, แก้ไขปัญหา: 4, คะแนนรวม: 17, userIdLine: 987654321, เวลาบันทึก: 26-03-25</li>
+        </ul>
+      </div>
+
+      <!-- ฟิลด์ Hidden Input สำหรับส่งไป GAS -->
+      <input type="hidden" id="id" name="id" />
+      <input type="hidden" id="room" name="room" />
+      <input type="hidden" id="fullname" name="fullname" />
+
+      <!-- คะแนน 4 หัวข้อ: สะอาด / เสียงรบกวน / บริการ / แก้ไขปัญหา -->
+      <!-- 1) ความสะอาด -->
+      <div class="mb-6">
+        <p class="mb-2 text-gray-700">1. ความสะอาด (1-5 ดาว)</p>
+        <div class="star-rating">
+          <input type="radio" id="clean5" name="clean" value="5" />
+          <label for="clean5"><i class="fas fa-star"></i></label>
+          <input type="radio" id="clean4" name="clean" value="4" />
+          <label for="clean4"><i class="fas fa-star"></i></label>
+          <input type="radio" id="clean3" name="clean" value="3" />
+          <label for="clean3"><i class="fas fa-star"></i></label>
+          <input type="radio" id="clean2" name="clean" value="2" />
+          <label for="clean2"><i class="fas fa-star"></i></label>
+          <input
+            type="radio"
+            id="clean1"
+            name="clean"
+            value="1"
+            required
+          />
+          <label for="clean1"><i class="fas fa-star"></i></label>
+        </div>
+      </div>
+
+      <!-- 2) เสียงรบกวน -->
+      <div class="mb-6">
+        <p class="mb-2 text-gray-700">2. เสียงรบกวน (1-5 ดาว)</p>
+        <div class="star-rating">
+          <input type="radio" id="noise5" name="noise" value="5" />
+          <label for="noise5"><i class="fas fa-star"></i></label>
+          <input type="radio" id="noise4" name="noise" value="4" />
+          <label for="noise4"><i class="fas fa-star"></i></label>
+          <input type="radio" id="noise3" name="noise" value="3" />
+          <label for="noise3"><i class="fas fa-star"></i></label>
+          <input type="radio" id="noise2" name="noise" value="2" />
+          <label for="noise2"><i class="fas fa-star"></i></label>
+          <input
+            type="radio"
+            id="noise1"
+            name="noise"
+            value="1"
+            required
+          />
+          <label for="noise1"><i class="fas fa-star"></i></label>
+        </div>
+      </div>
+
+      <!-- 3) บริการ -->
+      <div class="mb-6">
+        <p class="mb-2 text-gray-700">3. การบริการ (1-5 ดาว)</p>
+        <div class="star-rating">
+          <input type="radio" id="service5" name="service" value="5" />
+          <label for="service5"><i class="fas fa-star"></i></label>
+          <input type="radio" id="service4" name="service" value="4" />
+          <label for="service4"><i class="fas fa-star"></i></label>
+          <input type="radio" id="service3" name="service" value="3" />
+          <label for="service3"><i class="fas fa-star"></i></label>
+          <input type="radio" id="service2" name="service" value="2" />
+          <label for="service2"><i class="fas fa-star"></i></label>
+          <input
+            type="radio"
+            id="service1"
+            name="service"
+            value="1"
+            required
+          />
+          <label for="service1"><i class="fas fa-star"></i></label>
+        </div>
+      </div>
+
+      <!-- 4) การแก้ไขปัญหา -->
+      <div class="mb-6">
+        <p class="mb-2 text-gray-700">
+          4. การแก้ไขปัญหา (1-5 ดาว)
+        </p>
+        <div class="star-rating">
+          <input type="radio" id="fixproblem5" name="fixproblem" value="5" />
+          <label for="fixproblem5"><i class="fas fa-star"></i></label>
+          <input
+            type="radio"
+            id="fixproblem4"
+            name="fixproblem"
+            value="4"
+          />
+          <label for="fixproblem4"><i class="fas fa-star"></i></label>
+          <input
+            type="radio"
+            id="fixproblem3"
+            name="fixproblem"
+            value="3"
+          />
+          <label for="fixproblem3"><i class="fas fa-star"></i></label>
+          <input
+            type="radio"
+            id="fixproblem2"
+            name="fixproblem"
+            value="2"
+          />
+          <label for="fixproblem2"><i class="fas fa-star"></i></label>
+          <input
+            type="radio"
+            id="fixproblem1"
+            name="fixproblem"
+            value="1"
+            required
+          />
+          <label for="fixproblem1"><i class="fas fa-star"></i></label>
+        </div>
+      </div>
+
+      <!-- รายละเอียดเพิ่มเติม -->
+      <div class="mb-6">
+        <label for="details" class="block mb-2 text-gray-700"
+          >รายละเอียดเพิ่มเติม:</label
+        >
+        <textarea
+          id="details"
+          name="details"
+          rows="4"
+          class="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:ring focus:border-blue-300"
+          placeholder="กรอกความคิดเห็นหรือรายละเอียดเพิ่มเติม"
+        ></textarea>
+      </div>
+
+      <!-- ปุ่มส่งฟอร์ม -->
+      <div class="text-center">
+        <button
+          type="submit"
+          class="w-full p-4 font-bold text-white bg-green rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400"
+        >
+          ส่งความคิดเห็น
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // 1) เริ่มต้น LIFF
+    liff
+      .init({ liffId: "2007106715-AWxXWQ0P" }) // <== ใส่ LIFF ID ของคุณ
+      .then(() => {
+        // รับพารามิเตอร์จาก URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get("id");
+        const room = urlParams.get("room");
+        const fullname = urlParams.get("fullname");
+
+        // เซ็ตค่าใน hidden input (หากไม่มีใน URL ก็จะเป็นค่าว่าง "")
+        document.getElementById("id").value = id || "";
+        document.getElementById("room").value = room || "";
+        document.getElementById("fullname").value = fullname || "";
+      })
+      .catch((err) => {
+        console.error("LIFF Initialization failed", err);
+      });
+
+    // 2) เมื่อกดส่งฟอร์ม
+    document
+      .getElementById("feedbackForm")
+      .addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        // เก็บข้อมูลจากฟอร์ม
+        const formData = {
+          method: "submitFeedback",
+          id: document.getElementById("id").value,
+          room: document.getElementById("room").value,
+          fullname: document.getElementById("fullname").value,
+
+          clean: document.querySelector('input[name="clean"]:checked')
+            ? document.querySelector('input[name="clean"]:checked').value
+            : "",
+          noise: document.querySelector('input[name="noise"]:checked')
+            ? document.querySelector('input[name="noise"]:checked').value
+            : "",
+          service: document.querySelector('input[name="service"]:checked')
+            ? document.querySelector('input[name="service"]:checked').value
+            : "",
+          fixproblem: document.querySelector('input[name="fixproblem"]:checked')
+            ? document.querySelector('input[name="fixproblem"]:checked').value
+            : "",
+
+          details: document.getElementById("details").value,
+
+          // สำคัญ: ชื่อ "userIdLine" ตรงกับฝั่ง GAS
+          userIdLine: liff.getContext() ? liff.getContext().userId : "",
+        };
+
+        // ตรวจสอบว่ากรอกทุกดาวหรือไม่
+        if (
+          !formData.clean ||
+          !formData.noise ||
+          !formData.service ||
+          !formData.fixproblem
+        ) {
+          Swal.fire({
+            icon: "error",
+            title: "กรุณาให้คะแนนทุกข้อ",
+            confirmButtonText: "ตกลง",
+          });
+          return;
+        }
+
+        // เรียกใช้งาน Fetch เพื่อส่งข้อมูลไป Google Apps Script
+        fetch(
+          "https://script.google.com/macros/s/AKfycbwvzvB7ZLt8b_UHImWdvTqGyE2fT4Yh4OKB4SFTRGxwjfYMT93-8QYgNYlwf3O9JAE/exec",
+          // ^^^ ใส่ URL ของ Web App (deploy) ที่ได้จาก Google Apps Script
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams(formData),
+          }
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              Swal.fire({
+                icon: "success",
+                title: "ขอบคุณสำหรับความคิดเห็นของคุณ!",
+                text: "ระบบได้บันทึกข้อมูลเรียบร้อย",
+                confirmButtonText: "ตกลง",
+              }).then(() => {
+                // ปิด LIFF (หรือจะ redirect ไปหน้าอื่นก็ได้)
+                liff.closeWindow();
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "เกิดข้อผิดพลาดในการส่งความคิดเห็น",
+                text: data.message,
+                confirmButtonText: "ตกลง",
+              });
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            Swal.fire({
+              icon: "error",
+              title: "เกิดข้อผิดพลาดในการส่งความคิดเห็น",
+              confirmButtonText: "ตกลง",
+            });
+          });
+      });
+  </script>
+</body>
+</html>
