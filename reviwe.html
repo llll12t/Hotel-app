@@ -2,24 +2,17 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>แสดงความคิดเห็นและให้คะแนน</title>
   <!-- LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CSS (ตัวอย่าง) -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- SweetAlert2 CSS and JS -->
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css"
-  />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
-  <!-- FontAwesome for star icons -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
-  />
-  <!-- Custom CSS for star ratings -->
+  <!-- FontAwesome (สำหรับดาว) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" />
+
   <style>
     .star-rating {
       direction: rtl;
@@ -42,7 +35,6 @@
       color: #f5b301;
     }
 
-    /* กล่องสำหรับแสดง Log (ถ้าต้องการ Debug) */
     #debugLog {
       margin: 10px auto;
       max-width: 600px;
@@ -50,279 +42,194 @@
       background: #f9f9f9;
       padding: 10px;
       font-size: 0.85rem;
-      white-space: pre-wrap; 
+      white-space: pre-wrap;
     }
   </style>
 </head>
 <body class="bg-gray-100">
 
-  <div class="max-w-md mx-auto m-4 bg-white rounded-lg shadow-md">
-    <div class="bg-slate-800 p-6 rounded-t-lg">
-      <h1 class="text-xl text-yellow-400 font-bold mb-5">
-        แสดงความคิดเห็นและให้คะแนน
-      </h1>
-      <p class="mb-6 text-sm text-gray-100">
-        ขอรบกวนลูกค้าช่วยประเมินความพึงพอใจ เพื่อเป็นการปรับปรุงและพัฒนา
-        การให้บริการของเราให้ดียิ่งขึ้น
-      </p>
-    </div>
-    <form class="p-6 text-sm" id="feedbackForm">
-      <!-- Hidden Inputs: ตั้งค่าตัวอย่างค่าเริ่มต้นไว้ที่นี่ -->
-      <input type="hidden" id="id" name="id"  value="1234"/>
-      <input type="hidden" id="room" name="room" value="room" />
-      <input type="hidden" id="fullname" name="fullname" value="fullname"/>
-
-      <!-- 1) ความสะอาด -->
-      <div class="mb-6">
-        <p class="mb-2 text-gray-700">1. ความสะอาด (1-5 ดาว)</p>
-        <div class="star-rating">
-          <input type="radio" id="clean5" name="clean" value="5" />
-          <label for="clean5"><i class="fas fa-star"></i></label>
-          <input type="radio" id="clean4" name="clean" value="4" />
-          <label for="clean4"><i class="fas fa-star"></i></label>
-          <input type="radio" id="clean3" name="clean" value="3" />
-          <label for="clean3"><i class="fas fa-star"></i></label>
-          <input type="radio" id="clean2" name="clean" value="2" />
-          <label for="clean2"><i class="fas fa-star"></i></label>
-          <input
-            type="radio"
-            id="clean1"
-            name="clean"
-            value="1"
-            required
-          />
-          <label for="clean1"><i class="fas fa-star"></i></label>
-        </div>
-      </div>
-
-      <!-- 2) เสียงรบกวน -->
-      <div class="mb-6">
-        <p class="mb-2 text-gray-700">2. เสียงรบกวน (1-5 ดาว)</p>
-        <div class="star-rating">
-          <input type="radio" id="noise5" name="noise" value="5" />
-          <label for="noise5"><i class="fas fa-star"></i></label>
-          <input type="radio" id="noise4" name="noise" value="4" />
-          <label for="noise4"><i class="fas fa-star"></i></label>
-          <input type="radio" id="noise3" name="noise" value="3" />
-          <label for="noise3"><i class="fas fa-star"></i></label>
-          <input type="radio" id="noise2" name="noise" value="2" />
-          <label for="noise2"><i class="fas fa-star"></i></label>
-          <input
-            type="radio"
-            id="noise1"
-            name="noise"
-            value="1"
-            required
-          />
-          <label for="noise1"><i class="fas fa-star"></i></label>
-        </div>
-      </div>
-
-      <!-- 3) การบริการ -->
-      <div class="mb-6">
-        <p class="mb-2 text-gray-700">3. การบริการ (1-5 ดาว)</p>
-        <div class="star-rating">
-          <input type="radio" id="service5" name="service" value="5" />
-          <label for="service5"><i class="fas fa-star"></i></label>
-          <input type="radio" id="service4" name="service" value="4" />
-          <label for="service4"><i class="fas fa-star"></i></label>
-          <input type="radio" id="service3" name="service" value="3" />
-          <label for="service3"><i class="fas fa-star"></i></label>
-          <input type="radio" id="service2" name="service" value="2" />
-          <label for="service2"><i class="fas fa-star"></i></label>
-          <input
-            type="radio"
-            id="service1"
-            name="service"
-            value="1"
-            required
-          />
-          <label for="service1"><i class="fas fa-star"></i></label>
-        </div>
-      </div>
-
-      <!-- 4) การแก้ไขปัญหา -->
-      <div class="mb-6">
-        <p class="mb-2 text-gray-700">4. การแก้ไขปัญหา (1-5 ดาว)</p>
-        <div class="star-rating">
-          <input type="radio" id="fixproblem5" name="fixproblem" value="5" />
-          <label for="fixproblem5"><i class="fas fa-star"></i></label>
-          <input
-            type="radio"
-            id="fixproblem4"
-            name="fixproblem"
-            value="4"
-          />
-          <label for="fixproblem4"><i class="fas fa-star"></i></label>
-          <input
-            type="radio"
-            id="fixproblem3"
-            name="fixproblem"
-            value="3"
-          />
-          <label for="fixproblem3"><i class="fas fa-star"></i></label>
-          <input
-            type="radio"
-            id="fixproblem2"
-            name="fixproblem"
-            value="2"
-          />
-          <label for="fixproblem2"><i class="fas fa-star"></i></label>
-          <input
-            type="radio"
-            id="fixproblem1"
-            name="fixproblem"
-            value="1"
-            required
-          />
-          <label for="fixproblem1"><i class="fas fa-star"></i></label>
-        </div>
-      </div>
-
-      <!-- รายละเอียดเพิ่มเติม -->
-      <div class="mb-6">
-        <label for="details" class="block mb-2 text-gray-700"
-          >รายละเอียดเพิ่มเติม:</label
-        >
-        <textarea
-          id="details"
-          name="details"
-          rows="4"
-          class="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:ring focus:border-blue-300"
-          placeholder="กรอกความคิดเห็นหรือรายละเอียดเพิ่มเติม"
-        ></textarea>
-      </div>
-
-      <!-- ปุ่มส่งฟอร์ม -->
-      <div class="text-center">
-        <button
-          type="submit"
-          class="w-full p-4 font-bold text-white bg-slate-800 rounded-lg hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-green-400"
-        >
-          ส่งความคิดเห็น
-        </button>
-      </div>
-    </form>
+<div class="max-w-md mx-auto m-4 bg-white rounded-lg shadow-md">
+  <div class="bg-slate-800 p-6 rounded-t-lg">
+    <h1 class="text-xl text-yellow-400 font-bold mb-5">
+      แสดงความคิดเห็นและให้คะแนน
+    </h1>
+    <p class="mb-6 text-sm text-gray-100">
+      ขอรบกวนลูกค้าช่วยประเมินความพึงพอใจ เพื่อปรับปรุงให้ดียิ่งขึ้น
+    </p>
   </div>
+  <form class="p-6 text-sm" id="feedbackForm">
+    <!-- Hidden Inputs -->
+    <input type="hidden" id="id" name="id" value="1234" />
+    <input type="hidden" id="room" name="room" value="room" />
+    <input type="hidden" id="fullname" name="fullname" value="fullname" />
+    <!-- จะใส่ userIdLine ตรงนี้ก็ได้ -->
+    <input type="hidden" id="userIdLine" name="userIdLine" value="" />
 
-  <!-- 3) กล่องแสดง Log ตรงนี้ (กรณีต้องการ Debug) -->
-  <div id="debugLog"></div>
+    <!-- (1) ความสะอาด -->
+    <div class="mb-6">
+      <p class="mb-2 text-gray-700">1. ความสะอาด (1-5 ดาว)</p>
+      <div class="star-rating">
+        <input type="radio" id="clean5" name="clean" value="5" /><label for="clean5"><i class="fas fa-star"></i></label>
+        <input type="radio" id="clean4" name="clean" value="4" /><label for="clean4"><i class="fas fa-star"></i></label>
+        <input type="radio" id="clean3" name="clean" value="3" /><label for="clean3"><i class="fas fa-star"></i></label>
+        <input type="radio" id="clean2" name="clean" value="2" /><label for="clean2"><i class="fas fa-star"></i></label>
+        <input type="radio" id="clean1" name="clean" value="1" required /><label for="clean1"><i class="fas fa-star"></i></label>
+      </div>
+    </div>
 
-  <script>
-    // ฟังก์ชันสำหรับใส่ข้อความลงในกล่อง debugLog
-    function logMessage(msg) {
-      const logDiv = document.getElementById("debugLog");
-      logDiv.textContent += msg + "\n";  // เพิ่มบรรทัดใหม่
+    <!-- (2) เสียงรบกวน -->
+    <div class="mb-6">
+      <p class="mb-2 text-gray-700">2. เสียงรบกวน (1-5 ดาว)</p>
+      <div class="star-rating">
+        <input type="radio" id="noise5" name="noise" value="5" /><label for="noise5"><i class="fas fa-star"></i></label>
+        <input type="radio" id="noise4" name="noise" value="4" /><label for="noise4"><i class="fas fa-star"></i></label>
+        <input type="radio" id="noise3" name="noise" value="3" /><label for="noise3"><i class="fas fa-star"></i></label>
+        <input type="radio" id="noise2" name="noise" value="2" /><label for="noise2"><i class="fas fa-star"></i></label>
+        <input type="radio" id="noise1" name="noise" value="1" required /><label for="noise1"><i class="fas fa-star"></i></label>
+      </div>
+    </div>
+
+    <!-- (3) การบริการ -->
+    <div class="mb-6">
+      <p class="mb-2 text-gray-700">3. การบริการ (1-5 ดาว)</p>
+      <div class="star-rating">
+        <input type="radio" id="service5" name="service" value="5" /><label for="service5"><i class="fas fa-star"></i></label>
+        <input type="radio" id="service4" name="service" value="4" /><label for="service4"><i class="fas fa-star"></i></label>
+        <input type="radio" id="service3" name="service" value="3" /><label for="service3"><i class="fas fa-star"></i></label>
+        <input type="radio" id="service2" name="service" value="2" /><label for="service2"><i class="fas fa-star"></i></label>
+        <input type="radio" id="service1" name="service" value="1" required /><label for="service1"><i class="fas fa-star"></i></label>
+      </div>
+    </div>
+
+    <!-- (4) การแก้ไขปัญหา -->
+    <div class="mb-6">
+      <p class="mb-2 text-gray-700">4. การแก้ไขปัญหา (1-5 ดาว)</p>
+      <div class="star-rating">
+        <input type="radio" id="fixproblem5" name="fixproblem" value="5" /><label for="fixproblem5"><i class="fas fa-star"></i></label>
+        <input type="radio" id="fixproblem4" name="fixproblem" value="4" /><label for="fixproblem4"><i class="fas fa-star"></i></label>
+        <input type="radio" id="fixproblem3" name="fixproblem" value="3" /><label for="fixproblem3"><i class="fas fa-star"></i></label>
+        <input type="radio" id="fixproblem2" name="fixproblem" value="2" /><label for="fixproblem2"><i class="fas fa-star"></i></label>
+        <input type="radio" id="fixproblem1" name="fixproblem" value="1" required /><label for="fixproblem1"><i class="fas fa-star"></i></label>
+      </div>
+    </div>
+
+    <!-- รายละเอียดเพิ่มเติม -->
+    <div class="mb-6">
+      <label for="details" class="block mb-2 text-gray-700">รายละเอียดเพิ่มเติม:</label>
+      <textarea id="details" name="details" rows="4" class="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:ring focus:border-blue-300" placeholder="กรอกความคิดเห็นหรือรายละเอียดเพิ่มเติม"></textarea>
+    </div>
+
+    <!-- ปุ่มส่งฟอร์ม -->
+    <div class="text-center">
+      <button type="submit" class="w-full p-4 font-bold text-white bg-slate-800 rounded-lg hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-green-400">
+        ส่งความคิดเห็น
+      </button>
+    </div>
+  </form>
+</div>
+
+<div id="debugLog"></div>
+
+<script>
+  // ฟังก์ชันสำหรับใส่ข้อความลงในกล่อง debugLog
+  function logMessage(msg) {
+    const logDiv = document.getElementById("debugLog");
+    logDiv.textContent += msg + "\n";  // เพิ่มบรรทัดใหม่
+  }
+
+  // เริ่มต้น LIFF
+  async function mainLiff() {
+    try {
+      await liff.init({ liffId: "2007106715-AWxXWQ0P" }); // ใส่ LIFF ID ของคุณ
+      logMessage("LIFF init success");
+
+      // ถ้ายังไม่ล็อกอิน ให้บังคับ login (กรณีผู้ใช้เปิดผ่านบราวเซอร์นอก LINE ก็จะได้ไป login)
+      if (!liff.isLoggedIn()) {
+        logMessage("Not logged in => login()");
+        liff.login({ redirectUri: window.location.href });
+        return; // หลัง login เสร็จ จะรีโหลดหน้านี้ใหม่
+      }
+
+      // หลัง login หรืออยู่ใน in-app browser แล้ว => ลอง getProfile()
+      const profile = await liff.getProfile();
+      // แสดง debug
+      logMessage("Got profile => userId=" + profile.userId + ", displayName=" + profile.displayName);
+
+      // ใส่ค่า userId ลงใน hidden field เพื่อส่งต่อไป GAS
+      document.getElementById("userIdLine").value = profile.userId;
+
+    } catch (err) {
+      console.error("LIFF init error:", err);
+      logMessage("LIFF init error: " + err);
+    }
+  }
+  mainLiff(); // เรียกทำงานหลัก
+
+  // เมื่อกดส่งฟอร์ม
+  document.getElementById("feedbackForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    
+    // เก็บข้อมูลจากฟอร์ม
+    const formData = {
+      method: "submitFeedback",
+      id: document.getElementById("id").value,
+      room: document.getElementById("room").value,
+      fullname: document.getElementById("fullname").value,
+
+      clean: document.querySelector('input[name="clean"]:checked')?.value || "",
+      noise: document.querySelector('input[name="noise"]:checked')?.value || "",
+      service: document.querySelector('input[name="service"]:checked')?.value || "",
+      fixproblem: document.querySelector('input[name="fixproblem"]:checked')?.value || "",
+      details: document.getElementById("details").value,
+
+      userIdLine: document.getElementById("userIdLine").value, // ดึงจาก hidden field
+    };
+
+    logMessage("Form Data to send:\n" + JSON.stringify(formData, null, 2));
+
+    // เช็คว่ากรอกดาวครบหรือไม่
+    if (!formData.clean || !formData.noise || !formData.service || !formData.fixproblem) {
+      Swal.fire({ icon: "error", title: "กรุณาให้คะแนนทุกข้อ", confirmButtonText: "ตกลง" });
+      logMessage("Error: Missing rating fields");
+      return;
     }
 
-    // เริ่มต้น LIFF ทันที
-    liff
-      .init({ liffId: "2007106715-AWxXWQ0P" }) // ใส่ LIFF ID ของคุณ
-      .then(() => {
-        // (ตัวอย่าง) ถ้าต้องการรับพารามิเตอร์จาก URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const id = urlParams.get("id");
-        const room = urlParams.get("room");
-        const fullname = urlParams.get("fullname");
+    // ส่งข้อมูลด้วย Fetch ไปยัง Google Apps Script (URL Web App)
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwvzvB7ZLt8b_UHImWdvTqGyE2fT4Yh4OKB4SFTRGxwjfYMT93-8QYgNYlwf3O9JAE/exec"; // ใส่ URL ของ Web App
+    logMessage("Sending data to: " + GAS_URL);
 
-        // ใส่ค่าใน hidden input (ถ้าพารามิเตอร์ไม่มา ก็ใช้ค่าที่ตั้งไว้แล้ว)
-        if (id) document.getElementById("id").value = id;
-        if (room) document.getElementById("room").value = room;
-        if (fullname) document.getElementById("fullname").value = fullname;
-
-        logMessage("LIFF init success");
-        logMessage("User's URL Params => id=" + (id||"") + ", room=" + (room||"") + ", fullname=" + (fullname||""));
+    fetch(GAS_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams(formData),
+    })
+      .then((response) => {
+        logMessage("Got response status: " + response.status);
+        return response.json();
       })
-      .catch((err) => {
-        console.error("LIFF Initialization failed", err);
-        logMessage("LIFF init error: " + err);
-      });
-
-    // เมื่อกดส่งฟอร์ม
-    document
-      .getElementById("feedbackForm")
-      .addEventListener("submit", function (e) {
-        e.preventDefault();
-        
-        // เก็บข้อมูลจากฟอร์ม พร้อมแนบ userIdLine
-        const formData = {
-          method: "submitFeedback",
-          id: document.getElementById("id").value,
-          room: document.getElementById("room").value,
-          fullname: document.getElementById("fullname").value,
-
-          clean: document.querySelector('input[name="clean"]:checked')?.value || "",
-          noise: document.querySelector('input[name="noise"]:checked')?.value || "",
-          service: document.querySelector('input[name="service"]:checked')?.value || "",
-          fixproblem: document.querySelector('input[name="fixproblem"]:checked')?.value || "",
-          details: document.getElementById("details").value,
-
-          // สำคัญ: ส่งค่า userIdLine
-          userIdLine: liff.getContext()?.userId || "",
-        };
-
-        // Log ค่าที่จะส่ง
-        logMessage("Form Data to send:\n" + JSON.stringify(formData, null, 2));
-
-        // ตรวจสอบว่ากรอกดาวครบ
-        if (!formData.clean || !formData.noise || !formData.service || !formData.fixproblem) {
+      .then((data) => {
+        logMessage("Response JSON:\n" + JSON.stringify(data, null, 2));
+        if (data.success) {
           Swal.fire({
-            icon: "error",
-            title: "กรุณาให้คะแนนทุกข้อ",
+            icon: "success",
+            title: "ขอบคุณสำหรับความคิดเห็นของคุณ!",
+            text: "ระบบได้บันทึกข้อมูลเรียบร้อย",
             confirmButtonText: "ตกลง",
+          }).then(() => {
+            logMessage("Success => closing LIFF");
+            liff.closeWindow();
           });
-          logMessage("Error: Missing rating fields");
-          return;
+        } else {
+          Swal.fire({ icon: "error", title: "เกิดข้อผิดพลาดในการส่งความคิดเห็น", text: data.message });
         }
-
-        // ส่งข้อมูลด้วย Fetch ไปยัง Google Apps Script (URL Web App)
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwvzvB7ZLt8b_UHImWdvTqGyE2fT4Yh4OKB4SFTRGxwjfYMT93-8QYgNYlwf3O9JAE/exec"; // <-- ใส่ URL ของ Web App GAS
-        logMessage("Sending data to: " + GAS_URL);
-
-        fetch(GAS_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: new URLSearchParams(formData),
-        })
-          .then((response) => {
-            logMessage("Got response status: " + response.status);
-            return response.json();
-          })
-          .then((data) => {
-            logMessage("Response JSON:\n" + JSON.stringify(data, null, 2));
-
-            if (data.success) {
-              Swal.fire({
-                icon: "success",
-                title: "ขอบคุณสำหรับความคิดเห็นของคุณ!",
-                text: "ระบบได้บันทึกข้อมูลเรียบร้อย",
-                confirmButtonText: "ตกลง",
-              }).then(() => {
-                logMessage("Success => closing LIFF");
-                // ปิด LIFF
-                liff.closeWindow();
-              });
-            } else {
-              Swal.fire({
-                icon: "error",
-                title: "เกิดข้อผิดพลาดในการส่งความคิดเห็น",
-                text: data.message,
-                confirmButtonText: "ตกลง",
-              });
-            }
-          })
-          .catch((error) => {
-            console.error("Error:", error);
-            logMessage("Fetch error: " + error);
-            Swal.fire({
-              icon: "error",
-              title: "เกิดข้อผิดพลาดในการส่งความคิดเห็น",
-              confirmButtonText: "ตกลง",
-            });
-          });
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        logMessage("Fetch error: " + error);
+        Swal.fire({ icon: "error", title: "เกิดข้อผิดพลาดในการส่งความคิดเห็น" });
       });
-  </script>
+  });
+</script>
+
 </body>
 </html>
