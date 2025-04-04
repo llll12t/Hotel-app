@@ -42,7 +42,7 @@
       color: #f5b301;
     }
 
-    /* กล่องสำหรับแสดง Log (ปรับแต่งได้ตามต้องการ) */
+    /* กล่องสำหรับแสดง Log (ถ้าต้องการ Debug) */
     #debugLog {
       margin: 10px auto;
       max-width: 600px;
@@ -50,7 +50,7 @@
       background: #f9f9f9;
       padding: 10px;
       font-size: 0.85rem;
-      white-space: pre-wrap; /* ให้ขึ้นบรรทัดใหม่ได้เมื่อข้อความยาว */
+      white-space: pre-wrap; 
     }
   </style>
 </head>
@@ -205,7 +205,7 @@
     </form>
   </div>
 
-  <!-- 3) กล่องแสดง Log ตรงนี้ -->
+  <!-- 3) กล่องแสดง Log ตรงนี้ (กรณีต้องการ Debug) -->
   <div id="debugLog"></div>
 
   <script>
@@ -215,69 +215,57 @@
       logDiv.textContent += msg + "\n";  // เพิ่มบรรทัดใหม่
     }
 
-    // 1) เริ่มต้น LIFF
+    // เริ่มต้น LIFF ทันที
     liff
-      .init({ liffId: "2006504113-VWYEMlmk" }) // <-- ใส่ LIFF ID ของคุณ (หากไม่ใช้ LIFF ก็ลบทิ้งได้)
+      .init({ liffId: "2006504113-VWYEMlmk" }) // ใส่ LIFF ID ของคุณ
       .then(() => {
-        // (ตัวอย่าง) รับพารามิเตอร์จาก URL
+        // (ตัวอย่าง) ถ้าต้องการรับพารามิเตอร์จาก URL
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get("id");
         const room = urlParams.get("room");
         const fullname = urlParams.get("fullname");
 
-        // ใส่ค่าใน hidden input (ถ้าพารามิเตอร์ไม่มา ก็ใช้ค่า default ที่ตั้งไว้ก่อนหน้า)
+        // ใส่ค่าใน hidden input (ถ้าพารามิเตอร์ไม่มา ก็ใช้ค่าที่ตั้งไว้แล้ว)
         if (id) document.getElementById("id").value = id;
         if (room) document.getElementById("room").value = room;
         if (fullname) document.getElementById("fullname").value = fullname;
 
         logMessage("LIFF init success");
-        logMessage("URL Params => id=" + (id||"") + ", room=" + (room||"") + ", fullname=" + (fullname||""));
+        logMessage("User's URL Params => id=" + (id||"") + ", room=" + (room||"") + ", fullname=" + (fullname||""));
       })
       .catch((err) => {
         console.error("LIFF Initialization failed", err);
         logMessage("LIFF init error: " + err);
       });
 
-    // 2) เมื่อกดส่งฟอร์ม
+    // เมื่อกดส่งฟอร์ม
     document
       .getElementById("feedbackForm")
       .addEventListener("submit", function (e) {
         e.preventDefault();
         
-        // เก็บข้อมูลจากฟอร์ม
+        // เก็บข้อมูลจากฟอร์ม พร้อมแนบ userIdLine
         const formData = {
           method: "submitFeedback",
           id: document.getElementById("id").value,
           room: document.getElementById("room").value,
           fullname: document.getElementById("fullname").value,
 
-          clean: document.querySelector('input[name="clean"]:checked')
-            ? document.querySelector('input[name="clean"]:checked').value
-            : "",
-          noise: document.querySelector('input[name="noise"]:checked')
-            ? document.querySelector('input[name="noise"]:checked').value
-            : "",
-          service: document.querySelector('input[name="service"]:checked')
-            ? document.querySelector('input[name="service"]:checked').value
-            : "",
-          fixproblem: document.querySelector('input[name="fixproblem"]:checked')
-            ? document.querySelector('input[name="fixproblem"]:checked').value
-            : "",
+          clean: document.querySelector('input[name="clean"]:checked')?.value || "",
+          noise: document.querySelector('input[name="noise"]:checked')?.value || "",
+          service: document.querySelector('input[name="service"]:checked')?.value || "",
+          fixproblem: document.querySelector('input[name="fixproblem"]:checked')?.value || "",
           details: document.getElementById("details").value,
 
-          userIdLine: liff.getContext() ? liff.getContext().userId : "",
+          // สำคัญ: ส่งค่า userIdLine
+          userIdLine: liff.getContext()?.userId || "",
         };
 
-        // แสดง Log ค่า formData ก่อนส่ง
+        // Log ค่าที่จะส่ง
         logMessage("Form Data to send:\n" + JSON.stringify(formData, null, 2));
 
-        // ตรวจสอบการให้คะแนน
-        if (
-          !formData.clean ||
-          !formData.noise ||
-          !formData.service ||
-          !formData.fixproblem
-        ) {
+        // ตรวจสอบว่ากรอกดาวครบ
+        if (!formData.clean || !formData.noise || !formData.service || !formData.fixproblem) {
           Swal.fire({
             icon: "error",
             title: "กรุณาให้คะแนนทุกข้อ",
@@ -288,7 +276,7 @@
         }
 
         // ส่งข้อมูลด้วย Fetch ไปยัง Google Apps Script (URL Web App)
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwvzvB7ZLt8b_UHImWdvTqGyE2fT4Yh4OKB4SFTRGxwjfYMT93-8QYgNYlwf3O9JAE/exec";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwvzvB7ZLt8b_UHImWdvTqGyE2fT4Yh4OKB4SFTRGxwjfYMT93-8QYgNYlwf3O9JAE/exec"; // <-- ใส่ URL ของ Web App GAS
         logMessage("Sending data to: " + GAS_URL);
 
         fetch(GAS_URL, {
@@ -313,6 +301,7 @@
                 confirmButtonText: "ตกลง",
               }).then(() => {
                 logMessage("Success => closing LIFF");
+                // ปิด LIFF
                 liff.closeWindow();
               });
             } else {
