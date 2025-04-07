@@ -22,12 +22,10 @@
       0% {
         transform: rotate(0deg);
       }
-
       100% {
         transform: rotate(360deg);
       }
     }
-
     .loader {
       border: 8px solid #f3f3f3;
       border-top: 8px solid #3498db;
@@ -157,7 +155,7 @@
           <textarea id="bookNote" class="w-full border rounded p-2 text-sm" rows="3"></textarea>
         </div>
         <!-- ฟิลด์ซ่อนสำหรับเก็บ userLineId -->
-        <input type="hidden" id="bookUserLineId"  required/>
+        <input type="hidden" id="bookUserLineId" required />
         <button type="button" id="submitBookingBtn" class="bg-[#071d4a] text-white w-full py-2 rounded text-sm">
           บันทึกการจอง
         </button>
@@ -191,7 +189,7 @@
         console.error("LIFF init error:", err);
       }
     }
-    document.addEventListener("DOMContentLoaded", initLiffGlobal);
+  document.addEventListener("DOMContentLoaded", initLiffGlobal);
 
     // Utility functions
     function parseDateDMY(dateStr) {
@@ -484,13 +482,17 @@
 
     // Populate detail page ของห้อง
     function populateDetail() {
-      if (selectedRoom["ราคาลด"]) {
+      // กำหนดชื่อและหมวดหมู่ให้แสดงเสมอ
       document.getElementById("detailRoomName").textContent = selectedRoom["ชื่อ"] || "";
       document.getElementById("detailRoomCategory").textContent = selectedRoom["หมวดหมู่"] ? `(${selectedRoom["หมวดหมู่"]})` : "";
-      document.getElementById("detailRoomPrice").innerHTML = `<span class="line-through text-gray-500 mr-2">${selectedRoom["ราคา"]}</span><span class="text-red-500 font-bold">${selectedRoom["ราคาลด"]}</span>`;
+
+      // กำหนดราคา
+      if (selectedRoom["ราคาลด"]) {
+        document.getElementById("detailRoomPrice").innerHTML = `<span class="line-through text-gray-500 mr-2">${selectedRoom["ราคา"]}</span><span class="text-red-500 font-bold">${selectedRoom["ราคาลด"]}</span>`;
       } else {
         document.getElementById("detailRoomPrice").textContent = selectedRoom["ราคา"] || "0";
       }
+
       const mainImgElement = document.getElementById("detailMainImg");
       mainImgElement.src = selectedRoom["รูปภาพ"] || "";
       mainImgElement.alt = selectedRoom["ชื่อ"] || "Room";
@@ -501,7 +503,7 @@
 
       // ไอคอน SVG ตัวอย่าง
       const iconAir = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"  fill="none">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none">
         <path d="M2 5.94145C5.5 9.37313 10.5755 7.90241 11.7324 5.94145C11.9026 5.65301 12 5.31814 12 4.96096C12 3.87795 11.1046 3 10 3C8.89543 3 8 3.87795 8 4.96096" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
         <path d="M17 8.92814C17 7.31097 18.1193 6 19.5 6C20.8807 6 22 7.31097 22 8.92814C22 9.6452 21.7799 10.3021 21.4146 10.8111C19.3463 14.1915 9.2764 12.9164 4 11.8563" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
         <path d="M13.0854 19.8873C13.2913 20.5356 13.8469 21 14.5 21C15.3284 21 16 20.2528 16 19.331C16 19.0176 15.9224 18.7244 15.7873 18.4738C14.4999 15.9925 7.99996 14.3239 2 18.7746" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
@@ -509,7 +511,7 @@
     </svg>
   `;
       const iconParking = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"  fill="none">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none">
         <path d="M12 6L12.9536 9.85977C13.119 10.5295 13.72 11 14.4098 11H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
         <path d="M2 6H13.0689C14.6176 6 15.3919 6 16.0484 6.34597C16.705 6.69194 17.1427 7.33069 18.0182 8.60818C18.6321 9.50396 19.2765 10.1542 20.1826 10.7326C21.0949 11.315 21.5287 11.5996 21.7694 12.0566C22 12.4942 22 13.0125 22 14.049C22 15.4156 22 16.0989 21.5875 16.5331C21.5699 16.5517 21.5517 16.5699 21.5331 16.5875C21.0989 17 20.4156 17 19.049 17M5 17C4.67926 17 4.38501 17 4.22939 16.9666C4.07377 16.9332 3.92752 16.8674 3.63503 16.7358L2 16C2 12.8056 2.47904 10.9623 3.10557 9.44992C3.5164 8.45825 3.72182 7.96241 3.63686 7.52064C3.5519 7.07887 2.5 6 2.5 6M9 17H15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
         <circle cx="17" cy="17" r="2" stroke="currentColor" stroke-width="1.5" />
@@ -527,7 +529,7 @@
     </svg>
   `;
       const iconView = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20"  fill="none">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none">
         <path d="M21 21C18.8012 19.7735 15.5841 19 12 19C8.41592 19 5.19883 19.7735 3 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
         <path d="M9.5 6.45068C7.83333 6.11465 5 6.45068 3.5 9.48348M9.5 6.45068C10.5 6.95471 11.5 8.47764 11.5 12M9.5 6.45068C12 5.94657 15 7.47125 15 11.4968M9.5 6.45068C8.5 4.43502 6.5 2.94235 3 4.95391" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
         <path d="M9.5 6.5C8.5 8.33333 6.5 13.5 6.5 19.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
@@ -547,7 +549,6 @@
         const hasFeature = String(selectedRoom[item.key]).toLowerCase() === "true";
         const featureDiv = document.createElement("div");
         featureDiv.className = "flex items-center space-x-2";
-
         if (hasFeature) {
           featureDiv.innerHTML = `
         <span class="text-green-500">
@@ -628,7 +629,6 @@
       const totalPrice = nightlyPrice * nights;
       document.getElementById("bookRoomPrice").value = totalPrice;
     }
-
 
     // Show specific step
     function showStep(stepId) {
