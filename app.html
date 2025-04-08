@@ -398,16 +398,16 @@
           middleDiv.appendChild(priceLine);
           row.appendChild(middleDiv);
           const rightDiv = document.createElement("div");
-          rightDiv.className = "flex flex-col items-end space-y-1";
+          rightDiv.className = "flex flex-col w-16 items-end space-y-1";
           if (statusText) {
             const statusBtn = document.createElement("button");
-            statusBtn.className = "text-white text-xs px-3 py-1 rounded-md";
+            statusBtn.className = " w-full text-white text-xs px-3 py-1 rounded-md";
             statusBtn.textContent = statusText;
             statusBtn.classList.add(statusColor);
             rightDiv.appendChild(statusBtn);
           }
           const btnSelect = document.createElement("button");
-          btnSelect.className = "bg-[#071d4a] text-white text-sm px-3 py-1 rounded-md";
+          btnSelect.className = "bg-[#071d4a] w-full text-white text-sm px-3 py-1 rounded-md";
           btnSelect.textContent = "เลือก";
           btnSelect.addEventListener("click", (e) => {
             e.preventDefault();
