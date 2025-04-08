@@ -34,6 +34,14 @@
       height: 64px;
       animation: spin 1s linear infinite;
     }
+    .glass{
+      background: rgba( 255, 255, 255, 0.3 );
+      box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+      backdrop-filter: blur( 3.5px );
+      -webkit-backdrop-filter: blur( 3.5px );
+      border-radius: 10px;
+      border: 1px solid rgba( 255, 255, 255, 0.18 );
+    }
   </style>
 </head>
 
@@ -46,15 +54,15 @@
 
   <!-- STEP 1: เลือกห้อง -->
   <div id="step1" class="p-4 max-w-md mx-auto">
-    <div class="bg-[#071d4a] rounded-lg p-4 my-2 shadow-sm">
+    <div class="glass rounded-lg p-4 my-2 shadow-sm">
       <div class="flex justify-between space-x-2">
         <div class="w-24"> <img src="https://lh5.googleusercontent.com/d/11T_mR9juPgAqfLdtBdCE1NPz5FOSrEbH" alt="logo">
         </div>
         <div class="w-full px-2">
-          <label class="text-sm text-gray-100 block mb-1 text-center">เลือกวันที่เข้าพักและวันที่ออก</label>
-          <div class="bg-white rounded-md px-4 py-2 mb-2 shadow-sm">
+          <label class="text-sm text-slate-800 block mb-1 text-center">เลือกวันที่เข้าพักและวันที่ออก</label>
+          <div class="bg-white rounded-full px-4 py-2 mb-2 shadow-sm">
             <input type="text" id="step1DateRange" placeholder="เลือกวันที่..."
-              class="w-full text-sm text-center focus:outline-none" />
+              class="w-full text-sm text-center font-bold text-slate-800 focus:outline-none" />
           </div>
         </div>
       </div>
@@ -189,7 +197,7 @@
         console.error("LIFF init error:", err);
       }
     }
-    document.addEventListener("DOMContentLoaded", initLiffGlobal);
+   // document.addEventListener("DOMContentLoaded", initLiffGlobal);
 
     // Utility functions
     function parseDateDMY(dateStr) {
