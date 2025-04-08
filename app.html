@@ -22,10 +22,12 @@
       0% {
         transform: rotate(0deg);
       }
+
       100% {
         transform: rotate(360deg);
       }
     }
+
     .loader {
       border: 8px solid #f3f3f3;
       border-top: 8px solid #071d4a;
@@ -34,13 +36,14 @@
       height: 64px;
       animation: spin 1s linear infinite;
     }
-    .glass{
-      background: rgba( 255, 255, 255, 0.7 );
-      box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
-      backdrop-filter: blur( 3.5px );
-      -webkit-backdrop-filter: blur( 3.5px );
+
+    .glass {
+      background: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      backdrop-filter: blur(3.5px);
+      -webkit-backdrop-filter: blur(3.5px);
       border-radius: 10px;
-      border: 1px solid rgba( 255, 255, 255, 0.18 );
+      border: 1px solid rgba(255, 255, 255, 0.18);
     }
   </style>
 </head>
@@ -147,16 +150,18 @@
         </div>
         <div class="mb-2">
           <label class="block text-sm font-semibold mb-1">ชื่อผู้เช่า</label>
-          <input type="text" id="bookRenterName" class="w-full border rounded p-2 text-sm"
-            placeholder="เช่น สมชาย ใจดี" required />
+          <input type="text" id="bookRenterName" class="w-full border rounded p-2 text-sm" placeholder="เช่น สมชาย ใจดี"
+            required />
         </div>
         <div class="mb-2">
           <label class="block text-sm font-semibold mb-1">เบอร์ติดต่อ</label>
-          <input type="tel" id="bookPhone" class="w-full border rounded p-2 text-sm" placeholder="เช่น 0812345678" required />
+          <input type="tel" id="bookPhone" class="w-full border rounded p-2 text-sm" placeholder="เช่น 0812345678"
+            required />
         </div>
         <div class="mb-2">
           <label class="block text-sm font-semibold mb-1">อีเมล</label>
-          <input type="email" id="bookEmail" class="w-full border rounded p-2 text-sm" placeholder="example@gmail.com" />
+          <input type="email" id="bookEmail" class="w-full border rounded p-2 text-sm"
+            placeholder="example@gmail.com" />
         </div>
         <div class="mb-2">
           <label class="block text-sm font-semibold mb-1">หมายเหตุ</label>
@@ -164,7 +169,7 @@
         </div>
         <!-- ฟิลด์ซ่อนสำหรับเก็บ userLineId -->
         <input type="hidden" id="bookUserLineId" required />
-        <button type="button" id="submitBookingBtn" class="bg-[#071d4a] text-white w-full py-2 rounded text-sm">
+        <button type="button" id="submitBookingBtn" class="bg-[#071d4a] text-white w-full py-3 rounded text-sm">
           บันทึกการจอง
         </button>
       </form>
@@ -197,7 +202,7 @@
         console.error("LIFF init error:", err);
       }
     }
-   // document.addEventListener("DOMContentLoaded", initLiffGlobal);
+    document.addEventListener("DOMContentLoaded", initLiffGlobal);
 
     // Utility functions
     function parseDateDMY(dateStr) {
@@ -623,16 +628,16 @@
       document.getElementById("bookRoomCategory").value = selectedRoom["หมวดหมู่"] || "";
       document.getElementById("bookCheckIn").value = selectedCheckIn;
       document.getElementById("bookCheckOut").value = selectedCheckOut;
-    
+
       const nights = calculateNights(selectedCheckIn, selectedCheckOut);
       document.getElementById("bookNightCount").value = nights + " คืน";
-      
+
       // ใช้ราคาลดหากมี ไม่เช่นนั้นใช้ราคาปกติ
       let nightlyPrice = selectedRoom["ราคาลด"] ? parseFloat(selectedRoom["ราคาลด"]) : parseFloat(selectedRoom["ราคา"]);
       if (isNaN(nightlyPrice)) {
         nightlyPrice = 0;
       }
-      
+
       // คำนวณราคารวมตามจำนวนคืน
       const totalPrice = nightlyPrice * nights;
       document.getElementById("bookRoomPrice").value = totalPrice;
