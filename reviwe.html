@@ -61,8 +61,8 @@
     <!-- Hidden Inputs รับค่าจาก URL -->
     <input type="hidden" id="bookerName" name="bookerName" value="" />
     <input type="hidden" id="roomName" name="roomName" value="" />
-    <input type="hidden" id="checkinDate" name="checkinDate" value="" />
-    <input type="hidden" id="checkoutDate" name="checkoutDate" value="" />
+    <!-- เปลี่ยนฟิลด์จาก checkinDate, checkoutDate เป็น roomId -->
+    <input type="hidden" id="roomId" name="roomId" value="" />
     <input type="hidden" id="userIdLine" name="userIdLine" value="" />
 
     <!-- (1) ความสะอาด -->
@@ -141,8 +141,8 @@
   const urlParams = new URLSearchParams(window.location.search);
   document.getElementById("bookerName").value = urlParams.get("bookerName") || "";
   document.getElementById("roomName").value = urlParams.get("roomName") || "";
-  document.getElementById("checkinDate").value = urlParams.get("checkinDate") || "";
-  document.getElementById("checkoutDate").value = urlParams.get("checkoutDate") || "";
+  document.getElementById("roomId").value = urlParams.get("roomId") || "";
+  // ไม่ต้องรับ checkinDate และ checkoutDate อีกต่อไป
 
   // เริ่มต้น LIFF
   async function mainLiff() {
@@ -175,8 +175,7 @@
       method: "submitFeedback",
       bookerName: document.getElementById("bookerName").value,
       roomName: document.getElementById("roomName").value,
-      checkinDate: document.getElementById("checkinDate").value,
-      checkoutDate: document.getElementById("checkoutDate").value,
+      roomId: document.getElementById("roomId").value,
       clean: document.querySelector('input[name="clean"]:checked')?.value || "",
       noise: document.querySelector('input[name="noise"]:checked')?.value || "",
       service: document.querySelector('input[name="service"]:checked')?.value || "",
