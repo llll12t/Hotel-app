@@ -36,7 +36,13 @@
       height: 64px;
       animation: spin 1s linear infinite;
     }
-
+    .flatpickr-day.selected, .flatpickr-day.startRange{
+      background: #071d4a;
+      -webkit-box-shadow: none;
+      box-shadow: none;
+      color: #fff;
+      border-color: #071d4a;
+    }
     .glass {
       background: rgba(255, 255, 255, 0.7);
       box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
@@ -81,7 +87,7 @@
       <span>&larr;</span><span>กลับ</span>
     </button>
     <div>
-      <img id="detailMainImg" src="" alt="Room" class="w-full h-48 object-cover rounded mb-4" />
+      <img id="detailMainImg" src="" alt="Room" class="w-full h-48 object-cover rounded-2xl mb-4" />
       <div class="flex items-center justify-between mb-3">
         <div>
           <h2 id="detailRoomName" class="font-bold text-base md:text-lg leading-tight"></h2>
@@ -299,7 +305,7 @@
       // Popular Rooms
       if (popularRooms.length > 0) {
         const headingPopular = document.createElement("h3");
-        headingPopular.className = "text-md font-bold mb-2";
+        headingPopular.className = "text-md font-bold  mb-2";
         headingPopular.textContent = "⭐ POPULAR";
         container.appendChild(headingPopular);
         const poppularContainer = document.createElement("div");
@@ -329,7 +335,7 @@
           card.appendChild(gradientOverlay);
           if (statusText) {
             const statusBadge = document.createElement("div");
-            statusBadge.className = `absolute top-2 right-2 px-3 py-1 text-white text-xs rounded-2xl ${statusColor}`;
+            statusBadge.className = `absolute top-2 right-2 px-3 py-1 text-white text-sm rounded-2xl ${statusColor}`;
             statusBadge.textContent = statusText;
             card.appendChild(statusBadge);
           }
@@ -417,7 +423,7 @@
           rightDiv.className = "flex flex-col w-24 items-end space-y-1 p-2";
           if (statusText) {
             const statusBtn = document.createElement("button");
-            statusBtn.className = " w-full text-white text-sm p-2 rounded-2xl bg-green-500";
+            statusBtn.className = " w-full text-white text-sm p-2  rounded-2xl bg-green-500";
             statusBtn.textContent = statusText;
             statusBtn.classList.add(statusColor);
             rightDiv.appendChild(statusBtn);
@@ -478,7 +484,7 @@
         reviewer.textContent = "ชื่อ " + review["ชื่อ"];
 
         const detail = document.createElement("div");
-        detail.className = "text-xs text-gray-500";
+        detail.className = "text-sm text-gray-500";
         detail.textContent = review["รายละเอียด"];
 
         leftPart.appendChild(reviewer);
