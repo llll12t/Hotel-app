@@ -56,7 +56,7 @@
 
   <!-- STEP 1: เลือกห้อง -->
   <div id="step1" class="p-4 max-w-md mx-auto">
-    <div class="glass rounded-lg p-4 my-2 shadow-sm">
+    <div class="glass rounded-2xl p-4 my-2 shadow-sm">
       <div class="flex justify-between space-x-2">
         <div class="w-24">
           <img src="https://lh5.googleusercontent.com/d/12rrakhyHp_C19gAeDn3SF-C97NN--YhA" alt="logo">
@@ -76,7 +76,7 @@
   <!-- STEP 2: ดูรายละเอียดห้อง -->
   <div id="step2" class="hidden p-4 max-w-md mx-auto">
     <button id="backToStep1"
-      class="bg-[#071d4a] py-2 px-4 rounded-md text-sm text-white mb-2 flex items-center space-x-1">
+      class="bg-[#071d4a] py-2 px-4 rounded-2xl text-sm text-white mb-2 flex items-center space-x-1">
       <span>&larr;</span><span>กลับ</span>
     </button>
     <div>
@@ -107,10 +107,10 @@
   <!-- STEP 3: ฟอร์มจอง -->
   <div id="step3" class="hidden p-4 max-w-md mx-auto">
     <button id="backToStep2"
-      class="bg-[#071d4a] py-2 px-4 rounded-md text-sm text-white mb-2 flex items-center space-x-1">
+      class="bg-[#071d4a] py-2 px-4 rounded-2xl text-sm text-white mb-2 flex items-center space-x-1">
       <span>&larr;</span><span>กลับ</span>
     </button>
-    <div class="bg-white p-4 rounded ">
+    <div class="bg-white p-4 rounded-2xl ">
       <form id="bookingForm">
         <div class="grid grid-cols-2 gap-3 mb-4">
           <div>
@@ -146,26 +146,26 @@
         </div>
         <div class="mb-2">
           <label class="block text-sm font-semibold mb-1">จำนวนคนเข้าพัก</label>
-          <input type="number" id="bookNumGuests" class="w-full border rounded p-2 text-sm" min="1" value="1" />
+          <input type="number" id="bookNumGuests" class="w-full border rounded-2xl p-2 text-sm" min="1" value="1" />
         </div>
         <div class="mb-2">
           <label class="block text-sm font-semibold mb-1">ชื่อผู้เช่า</label>
-          <input type="text" id="bookRenterName" class="w-full border rounded p-2 text-sm" placeholder="เช่น สมชาย ใจดี"
+          <input type="text" id="bookRenterName" class="w-full border rounded-2xl p-2 text-sm" placeholder="เช่น สมชาย ใจดี"
             required />
         </div>
         <div class="mb-2">
           <label class="block text-sm font-semibold mb-1">เบอร์ติดต่อ</label>
-          <input type="tel" id="bookPhone" class="w-full border rounded p-2 text-sm" placeholder="เช่น 0812345678"
+          <input type="tel" id="bookPhone" class="w-full border rounded-2xl p-2 text-sm" placeholder="เช่น 0812345678"
             required />
         </div>
         <div class="mb-2">
           <label class="block text-sm font-semibold mb-1">อีเมล</label>
-          <input type="email" id="bookEmail" class="w-full border rounded p-2 text-sm"
+          <input type="email" id="bookEmail" class="w-full border rounded-2xl p-2 text-sm"
             placeholder="example@gmail.com" />
         </div>
         <div class="mb-2">
           <label class="block text-sm font-semibold mb-1">หมายเหตุ</label>
-          <textarea id="bookNote" class="w-full border rounded p-2 text-sm" rows="3"></textarea>
+          <textarea id="bookNote" class="w-full border rounded-2xl p-2 text-sm" rows="3"></textarea>
         </div>
         <!-- ฟิลด์ซ่อนสำหรับเก็บ ไอดีห้อง (ไม่ให้แสดงใน UI) -->
         <input type="hidden" id="bookRoomId" required />
@@ -317,7 +317,7 @@
             }
           }
           const card = document.createElement("div");
-          card.className = "relative w-48 h-40 rounded-lg overflow-hidden shadow flex-shrink-0";
+          card.className = "relative w-48 h-40 rounded-2xl overflow-hidden shadow flex-shrink-0";
           const bgImg = document.createElement("img");
           bgImg.src = room["รูปภาพ"];
           bgImg.alt = room["ชื่อ"] || "Room";
@@ -349,7 +349,7 @@
           infoDiv.appendChild(price);
           card.appendChild(infoDiv);
           const selectBtn = document.createElement("button");
-          selectBtn.className = "absolute bottom-2 right-2 bg-[#071D4A] text-white text-sm px-3 py-1 rounded-md shadow";
+          selectBtn.className = "absolute bottom-2 right-2 bg-[#071D4A] text-white text-sm px-3 py-1 rounded-2xl shadow";
           selectBtn.textContent = "เลือก";
           selectBtn.addEventListener("click", (e) => {
             e.preventDefault();
@@ -383,7 +383,7 @@
             }
           }
           const row = document.createElement("div");
-          row.className = "glass rounded-lg shadow  flex items-center mb-3";
+          row.className = "glass rounded-2xl shadow  flex items-center mb-3";
           const imgWrapper = document.createElement("div");
           imgWrapper.className = "w-28 h-24 overflow-hidden rounded-l-lg";
           const img = document.createElement("img");
@@ -416,13 +416,13 @@
           rightDiv.className = "flex flex-col w-24 items-end space-y-1 p-2";
           if (statusText) {
             const statusBtn = document.createElement("button");
-            statusBtn.className = " w-full text-white text-xs p-2  rounded-md bg-green-500";
+            statusBtn.className = " w-full text-white text-xs p-2  rounded-2xl bg-green-500";
             statusBtn.textContent = statusText;
             statusBtn.classList.add(statusColor);
             rightDiv.appendChild(statusBtn);
           }
           const btnSelect = document.createElement("button");
-          btnSelect.className = "bg-[#071d4a] w-full text-white text-sm p-2  rounded-md";
+          btnSelect.className = "bg-[#071d4a] w-full text-white text-sm p-2  rounded-2xl";
           btnSelect.textContent = "เลือก";
           btnSelect.addEventListener("click", (e) => {
             e.preventDefault();
@@ -513,7 +513,7 @@
       mainImgElement.alt = selectedRoom["ชื่อ"] || "Room";
 
       const featuresContainer = document.getElementById("detailFeatures");
-      featuresContainer.className = "grid grid-cols-3 gap-y-2 gap-x-4 text-sm text-gray-600 p-4 mb-4 bg-[#071d4a] rounded-lg shadow-sm";
+      featuresContainer.className = "grid grid-cols-3 gap-y-2 gap-x-4 text-sm text-gray-600 p-4 mb-4 bg-[#071d4a] rounded-2xl shadow-sm";
       featuresContainer.innerHTML = "";
 
       // ไอคอน SVG ตัวอย่าง
