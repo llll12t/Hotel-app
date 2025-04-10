@@ -19,7 +19,7 @@
     <div class="p-4 font-bold text-lg border-b">
       Dashboard Appointment
     </div>
-    <nav class="flex-1 mt-4">
+    <nav class="flex-1 mt-4 ">
       <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Calendar</a>
       <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">List</a>
       <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-gray-200">Member</a>
@@ -80,7 +80,7 @@
     <h1 class="text-xl font-bold mb-4">ข้อมูล Appointment (ตาราง)</h1>
     <table id="data-table" class="min-w-full bg-slate-100 rounded-xl text-xs">
       <thead>
-        <tr class="text-slate-800">
+        <tr class="bg-white text-slate-800">
           <th class="py-2 px-4 border">ชื่อห้องพัก</th>
           <th class="py-2 px-4 border">วันที่เข้าพัก</th>
           <th class="py-2 px-4 border">วันที่ออก</th>
@@ -93,7 +93,7 @@
           <th class="py-2 px-4 border">จัดการ</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="bg-white ">
         <!-- ข้อมูลจะแสดงที่นี่โดย JS -->
       </tbody>
     </table>
@@ -317,22 +317,22 @@
           <td class="py-2 px-4 border">${getStatusBadge(item.status)}</td>
           <td class="py-2 px-4 border">${item.payment}</td>
           <td class="py-2 px-4 border">
-            <button class="bg-gray-200 hover:bg-gray-300 p-2 rounded-sm" onclick="toggleDetails('${item.id}', this)" title="แสดงรายละเอียด">
+            <button class="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded-sm" onclick="toggleDetails('${item.id}', this)" title="แสดงรายละเอียด">
               <span class="material-icons-round text-base text-gray-700">expand_more</span>
             </button>
-            <button class="bg-gray-200 hover:bg-gray-300 p-2 rounded-sm" onclick="openPaymentModal('${item.id}')" title="อัพเดทการชำระเงิน">
+            <button class="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded-sm" onclick="openPaymentModal('${item.id}')" title="อัพเดทการชำระเงิน">
               <span class="material-icons-round text-base text-gray-700">payment</span>
             </button>
-            <button class="bg-gray-200 hover:bg-gray-300 p-2 rounded-sm" onclick="openCheckinModal('${item.id}')" title="อัพเดทเข้าพัก">
+            <button class="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded-sm" onclick="openCheckinModal('${item.id}')" title="อัพเดทเข้าพัก">
               <span class="material-icons-round text-base text-gray-700">how_to_reg</span>
             </button>
-            <button class="bg-gray-200 hover:bg-gray-300 p-2 rounded-sm" onclick="openCheckoutModal('${item.id}')" title="อัพเดทเสร็จสิ้น">
+            <button class="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded-sm" onclick="openCheckoutModal('${item.id}')" title="อัพเดทเสร็จสิ้น">
               <span class="material-icons-round text-base text-gray-700">exit_to_app</span>
             </button>
-            <button class="bg-gray-200 hover:bg-gray-300 p-2 rounded-sm" onclick="openEditModal('${item.id}')" title="แก้ไข">
+            <button class="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded-sm" onclick="openEditModal('${item.id}')" title="แก้ไข">
               <span class="material-icons-round text-base text-gray-700">edit</span>
             </button>
-            <button class="bg-gray-200 hover:bg-gray-300 p-2 rounded-sm" onclick="deleteRecord('${item.id}')" title="ลบ">
+            <button class="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded-sm" onclick="deleteRecord('${item.id}')" title="ลบ">
               <span class="material-icons-round text-base text-gray-700">delete</span>
             </button>
           </td>
@@ -355,12 +355,12 @@
       const detailsCell = document.createElement('td');
       detailsCell.setAttribute('colspan', '9');
       detailsCell.innerHTML = `
-        <table class="w-full border-collapse">
+        <table class="bg-white w-full border-collapse">
           <tr>
             <th class="border p-1 text-left">ชื่อห้องพัก</th>
             <td class="border p-1">${item.roomName}</td>
           </tr>
-                <tr>
+          <tr>
             <th class="border p-1 text-left">จำนวนคนพัก</th>
             <td class="border p-1">${item.numGuests}</td>
           </tr>
@@ -433,19 +433,19 @@
           <p class="text-sm">สถานะ: ${getStatusBadge(item.status)}</p>
           <p class="text-sm">การชำระเงิน: ${item.payment}</p>
           <div class="flex mt-2 space-x-1">
-            <button class="bg-gray-200 hover:bg-gray-300 p-2 rounded-sm" onclick="openPaymentModal('${item.id}')" title="อัพเดทการชำระเงิน">
+            <button class="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded-sm" onclick="openPaymentModal('${item.id}')" title="อัพเดทการชำระเงิน">
               <span class="material-icons-round text-base text-gray-700">payment</span>
             </button>
-            <button class="bg-gray-200 hover:bg-gray-300 p-2 rounded-sm" onclick="openCheckinModal('${item.id}')" title="อัพเดทเข้าพัก">
+            <button class="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded-sm" onclick="openCheckinModal('${item.id}')" title="อัพเดทเข้าพัก">
               <span class="material-icons-round text-base text-gray-700">how_to_reg</span>
             </button>
-            <button class="bg-gray-200 hover:bg-gray-300 p-2 rounded-sm" onclick="openCheckoutModal('${item.id}')" title="อัพเดทเสร็จสิ้น">
+            <button class="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded-sm" onclick="openCheckoutModal('${item.id}')" title="อัพเดทเสร็จสิ้น">
               <span class="material-icons-round text-base text-gray-700">exit_to_app</span>
             </button>
-            <button class="bg-gray-200 hover:bg-gray-300 p-2 rounded-sm" onclick="openEditModal('${item.id}')" title="แก้ไข">
+            <button class="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded-sm" onclick="openEditModal('${item.id}')" title="แก้ไข">
               <span class="material-icons-round text-base text-gray-700">edit</span>
             </button>
-            <button class="bg-gray-200 hover:bg-gray-300 p-2 rounded-sm" onclick="deleteRecord('${item.id}')" title="ลบ">
+            <button class="bg-gray-200 hover:bg-gray-300 px-3 py-2 rounded-sm" onclick="deleteRecord('${item.id}')" title="ลบ">
               <span class="material-icons-round text-base text-gray-700">delete</span>
             </button>
           </div>
