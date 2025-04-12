@@ -26,7 +26,7 @@
                             <div class="flex flex-col space-y-1 text-sm">
                                 <div>
                                     <span class="font-medium">Room ID:</span> 
-                                    <span id="displayRoomId" class="text-gray-700"></span>
+                                    <span id="displayBookingId" class="text-gray-700"></span>
                                 </div>
                                 <div>
                                     <span class="font-medium">Price:</span> 
@@ -88,7 +88,7 @@
         parseUrlParams();
     };
 
-    // อ่าน liff.state เพื่อดึงพารามิเตอร์ (roomId, price, phone, userLineId, renterName)
+    // อ่าน liff.state เพื่อดึงพารามิเตอร์ (bookingId, price, phone, userLineId, renterName)
     function parseUrlParams() {
         const urlParams = new URLSearchParams(window.location.search);
         const liffState = urlParams.get('liff.state');
@@ -100,17 +100,17 @@
             const renterName = nestedParams.get('renterName') || '';
             const userLineId = nestedParams.get('userLineId') || '';
             const phone      = nestedParams.get('phone')      || '';
-            const roomId     = nestedParams.get('roomId')     || '';
+            const bookingId     = nestedParams.get('bookingId')     || '';
 
             const uploadForm = document.getElementById('uploadForm');
             uploadForm.price = price;
             uploadForm.renterName = renterName;
             uploadForm.userLineId = userLineId;
             uploadForm.phone = phone;
-            uploadForm.roomId = roomId;
+            uploadForm.bookingId = bookingId;
 
             // แสดงค่าใน UI
-            document.getElementById('displayRoomId').textContent = roomId     || 'ไม่พบข้อมูล';
+            document.getElementById('displayBookingId').textContent = bookingId     || 'ไม่พบข้อมูล';
             document.getElementById('displayPrice').textContent = price      || 'ไม่พบข้อมูล';
             document.getElementById('displayRenterName').textContent = renterName || 'ไม่พบข้อมูล';
             document.getElementById('displayPhone').textContent = phone      || 'ไม่พบข้อมูล';
@@ -184,7 +184,7 @@
                 renterName: formData.renterName,
                 userLineId: formData.userLineId,
                 phone: formData.phone,
-                roomId: formData.roomId
+                bookingId: formData.bookingId
             };
 
             Swal.fire({
