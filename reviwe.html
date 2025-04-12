@@ -51,9 +51,9 @@
   <form class="p-6 text-sm" id="feedbackForm">
     <!-- Hidden Inputs รับค่าจาก URL -->
     <input type="hidden" id="bookerName" name="bookerName" value="" />
-    <input type="hidden" id="roomName" name="roomName" value="" />
+    <input type="text" id="roomName" name="roomName" value="" class="mb-3 w-full px-3 py-2 text-gray-700  " placeholder="ชื่อห้อง" />
     <!-- เปลี่ยนฟิลด์จาก checkinDate, checkoutDate เป็น roomId -->
-    <input type="text" id="roomId" name="roomId" value="" class="mb-3 w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:ring focus:border-blue-300" placeholder="ระบุเลขห้องหรือรหัสห้อง" />
+    <input type="hidden" id="roomId" name="roomId" value="" />
     <input type="hidden" id="userIdLine" name="userIdLine" value="" />
 
     <!-- (1) ความสะอาด -->
