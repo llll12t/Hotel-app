@@ -51,7 +51,8 @@
   <form class="p-6 text-sm" id="feedbackForm">
     <!-- Hidden Inputs รับค่าจาก URL -->
     <input type="hidden" id="bookerName" name="bookerName" value="" />
-    <input type="text" id="roomName" name="roomName" value="" class="mb-3 w-full px-3 py-2 text-gray-700  " placeholder="ชื่อห้อง" />
+    <p class="mb-2 text-gray-700">ชื่อห้อง</p>
+    <input type="text" id="roomName" name="roomName" value="" class="mb-3 w-full px-3 py-2 text-gray-700  " readonly />
     <!-- เปลี่ยนฟิลด์จาก checkinDate, checkoutDate เป็น roomId -->
     <input type="hidden" id="roomId" name="roomId" value="" />
     <input type="hidden" id="userIdLine" name="userIdLine" value="" />
