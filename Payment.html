@@ -13,15 +13,13 @@
 <body style="font-family: Noto Sans Thai;">
     <div class="h-screen flex justify-center items-center">
         <div class="max-w-md mx-auto px-4 py-4 bg-white">
-
-            <!-- ฟอร์มหลัก -->
             <form id="uploadForm">
                 <div class="relative p-4 rounded-lg mx-auto">
                     <div class="text-center">
                         <div class="text-slate-800 text-lg font-semibold mb-2">
                             แจ้งการชำระเงิน แบบอัพโหลด
                         </div>
-                        
+
                         <!-- โซนแสดงข้อมูลที่ได้รับจาก URL -->
                         <div class="bg-gray-50 rounded-lg p-3 mb-4 text-left">
                             <p class="text-sm font-bold mb-1">ข้อมูลการชำระเงิน:</p>
@@ -49,9 +47,8 @@
                             </div>
                         </div>
 
-                        <!-- Image preview and upload button side by side -->
+                        <!-- Image preview -->
                         <div class="flex flex-col items-center mb-4">
-                            <!-- Image preview -->
                             <div class="bg-gray-200 flex items-center justify-center rounded-lg my-4">
                                 <img id="preview" 
                                      src="https://placehold.co/160x208?text=Preview" 
@@ -73,7 +70,6 @@
                     </div>
                 </div>
             </form>
-
         </div>
     </div>
 </body>
@@ -82,53 +78,56 @@
 <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 
 <script>
-    // URL สำหรับส่งข้อมูล (Google Apps Script หรือปลายทางที่ต้องการ)
-    let url = "https://script.google.com/macros/s/AKfycbzNSxS8CsP2syyfXOM5odfj3BYt11qJHXMULIgWtcMDM6ABBmRWKEjhOPPM0cEtY4j-/exec";
+    let url = "YOUR_GAS_ENDPOINT_HERE";
 
-    // Get DOM elements
     let fileInput = document.getElementById("file");
     let imgPreview = document.getElementById("preview");
 
-    // เมื่อหน้าโหลดเสร็จ ให้ดึงพารามิเตอร์จาก URL
     window.onload = function () {
         parseUrlParams();
     };
 
-    /**
-     * อ่านค่าพารามิเตอร์จาก URL แล้วกำหนดให้ฟอร์ม และแสดงใน UI
-     */
+    // สำคัญ: ปรับ parseUrlParams ให้อ่าน liff.state
     function parseUrlParams() {
         const urlParams = new URLSearchParams(window.location.search);
+        // ดึง liffState
+        const liffState = urlParams.get('liff.state');
+        if (liffState) {
+            // decode
+            const decoded = decodeURIComponent(liffState);
+            // สร้าง URLSearchParams จาก decoded
+            const nestedParams = new URLSearchParams(decoded);
 
-        // อ่านค่าพารามิเตอร์
-        const price = urlParams.get('price') || '';
-        const renterName = urlParams.get('renterName') || '';
-        const userLineId = urlParams.get('userLineId') || '';
-        const phone = urlParams.get('phone') || '';
-        const roomId = urlParams.get('roomId') || '';
+            // อ่านค่าต่าง ๆ
+            const price      = nestedParams.get('price')      || '';
+            const renterName = nestedParams.get('renterName') || '';
+            const userLineId = nestedParams.get('userLineId') || '';
+            const phone      = nestedParams.get('phone')      || '';
+            const roomId     = nestedParams.get('roomId')     || '';
 
-        // เก็บค่าใส่ในฟอร์ม
-        const uploadForm = document.getElementById('uploadForm');
-        uploadForm.price = price;
-        uploadForm.renterName = renterName;
-        uploadForm.userLineId = userLineId;
-        uploadForm.phone = phone;
-        uploadForm.roomId = roomId;
+            // เก็บค่าในฟอร์ม
+            const uploadForm = document.getElementById('uploadForm');
+            uploadForm.price = price;
+            uploadForm.renterName = renterName;
+            uploadForm.userLineId = userLineId;
+            uploadForm.phone = phone;
+            uploadForm.roomId = roomId;
 
-        // แสดงค่าใน UI
-        document.getElementById('displayRoomId').textContent = roomId || 'ไม่พบข้อมูล';
-        document.getElementById('displayPrice').textContent = price || 'ไม่พบข้อมูล';
-        document.getElementById('displayRenterName').textContent = renterName || 'ไม่พบข้อมูล';
-        document.getElementById('displayPhone').textContent = phone || 'ไม่พบข้อมูล';
-        document.getElementById('displayUserLineId').textContent = userLineId || 'ไม่พบข้อมูล';
+            // แสดงค่าใน UI
+            document.getElementById('displayRoomId').textContent = roomId     || 'ไม่พบข้อมูล';
+            document.getElementById('displayPrice').textContent = price      || 'ไม่พบข้อมูล';
+            document.getElementById('displayRenterName').textContent = renterName || 'ไม่พบข้อมูล';
+            document.getElementById('displayPhone').textContent = phone      || 'ไม่พบข้อมูล';
+            document.getElementById('displayUserLineId').textContent = userLineId || 'ไม่พบข้อมูล';
+        } else {
+            console.log("No liff.state in URL. Or data is not in liff.state format.");
+        }
     }
 
-    // เมื่อผู้ใช้เลือกไฟล์ จะเรียก previewImage() -> จากนั้น submitData()
     fileInput.addEventListener('change', () => {
         previewImage();
     });
 
-    // แสดงตัวอย่างรูปใน <img id="preview">
     function previewImage() {
         if (fileInput.files.length > 0) {
             let file = fileInput.files[0];
@@ -136,17 +135,14 @@
 
             reader.onload = function (e) {
                 imgPreview.src = e.target.result;
-                // เมื่อแสดงตัวอย่างแล้วถามเพื่อยืนยันการส่งต่อ
                 submitData(file);
             };
-
             reader.readAsDataURL(file);
         } else {
             imgPreview.src = "https://placehold.co/160x208?text=Preview";
         }
     }
 
-    // แปลงไฟล์เป็น base64
     function getBase64(file) {
         return new Promise((resolve, reject) => {
             let reader = new FileReader();
@@ -156,7 +152,6 @@
         });
     }
 
-    // ฟังก์ชัน SweetAlert เพื่อยืนยัน
     async function showConfirmationDialog() {
         const confirmation = await Swal.fire({
             title: 'ยืนยันการส่งข้อมูล',
@@ -169,9 +164,7 @@
         return confirmation.isConfirmed;
     }
 
-    // ฟังก์ชันส่งข้อมูลไปยังปลายทาง
     async function submitData(file) {
-        // ยืนยันก่อน
         const isConfirmed = await showConfirmationDialog();
         if (!isConfirmed) {
             Swal.fire('ยกเลิกการส่งข้อมูล', 'ข้อมูลของคุณยังไม่ถูกส่ง', 'info');
@@ -179,19 +172,16 @@
         }
 
         try {
-            // แปลงไฟล์เป็น base64
             let base64 = await getBase64(file);
-            // อัปเดต preview เป็นรูปไฟล์ที่เพิ่งอัปโหลด (base64)
             imgPreview.src = `data:${file.type};base64,${base64}`;
 
-            // ดึงข้อมูลจากฟอร์ม (ที่เราเก็บไว้เป็น property)
             const formData = document.getElementById('uploadForm');
             let obj = {
                 base64: base64,
                 type: file.type,
                 name: file.name,
 
-                // รับค่าจากพารามิเตอร์ตามที่เราต้องการ
+                // รับค่าจากฟอร์ม
                 price: formData.price,
                 renterName: formData.renterName,
                 userLineId: formData.userLineId,
@@ -199,7 +189,6 @@
                 roomId: formData.roomId
             };
 
-            // แสดงหน้าต่าง Loading
             Swal.fire({
                 title: 'กำลังบันทึก, กรุณารอสักครู่...',
                 allowOutsideClick: false,
@@ -210,14 +199,12 @@
                 }
             });
 
-            // ส่งข้อมูลไปยัง Apps Script (หรือปลายทางที่คุณต้องการ)
             let response = await fetch(url, {
                 method: "POST",
                 body: JSON.stringify(obj)
             });
-            let data = await response.text();  // ถ้าปลายทางส่ง JSON กลับ ก็ใช้ .json() ได้
+            let data = await response.text();
 
-            // เสร็จแล้ว popup แจ้ง
             Swal.fire({
                 title: 'สำเร็จ!',
                 text: 'อัปโหลดใบเสร็จเรียบร้อยแล้ว!',
@@ -225,12 +212,11 @@
                 confirmButtonText: 'ปิด',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    liff.closeWindow(); // ปิดหน้าต่าง LIFF ได้
+                    liff.closeWindow(); 
                 }
             });
             console.log(data);
         } catch (error) {
-            // ถ้า error
             Swal.fire({
                 icon: 'error',
                 title: 'ข้อผิดพลาด',
@@ -241,3 +227,4 @@
     }
 </script>
 </html>
+
