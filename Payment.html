@@ -13,12 +13,42 @@
 <body style="font-family: Noto Sans Thai;">
     <div class="h-screen flex justify-center items-center">
         <div class="max-w-md mx-auto px-4 py-4 bg-white">
+
+            <!-- ฟอร์มหลัก -->
             <form id="uploadForm">
                 <div class="relative p-4 rounded-lg mx-auto">
                     <div class="text-center">
                         <div class="text-slate-800 text-lg font-semibold mb-2">
                             แจ้งการชำระเงิน แบบอัพโหลด
                         </div>
+                        
+                        <!-- โซนแสดงข้อมูลที่ได้รับจาก URL -->
+                        <div class="bg-gray-50 rounded-lg p-3 mb-4 text-left">
+                            <p class="text-sm font-bold mb-1">ข้อมูลการชำระเงิน:</p>
+                            <div class="flex flex-col space-y-1 text-sm">
+                                <div>
+                                    <span class="font-medium">Room ID:</span> 
+                                    <span id="displayRoomId" class="text-gray-700"></span>
+                                </div>
+                                <div>
+                                    <span class="font-medium">Price:</span> 
+                                    <span id="displayPrice" class="text-gray-700"></span>
+                                </div>
+                                <div>
+                                    <span class="font-medium">Renter Name:</span> 
+                                    <span id="displayRenterName" class="text-gray-700"></span>
+                                </div>
+                                <div>
+                                    <span class="font-medium">Phone:</span> 
+                                    <span id="displayPhone" class="text-gray-700"></span>
+                                </div>
+                                <div>
+                                    <span class="font-medium">User Line ID:</span> 
+                                    <span id="displayUserLineId" class="text-gray-700"></span>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Image preview and upload button side by side -->
                         <div class="flex flex-col items-center mb-4">
                             <!-- Image preview -->
@@ -43,6 +73,7 @@
                     </div>
                 </div>
             </form>
+
         </div>
     </div>
 </body>
@@ -58,38 +89,38 @@
     let fileInput = document.getElementById("file");
     let imgPreview = document.getElementById("preview");
 
-    // เมื่อโหลดหน้าเสร็จ ให้ดึงพารามิเตอร์จาก URL
+    // เมื่อหน้าโหลดเสร็จ ให้ดึงพารามิเตอร์จาก URL
     window.onload = function () {
         parseUrlParams();
     };
 
+    /**
+     * อ่านค่าพารามิเตอร์จาก URL แล้วกำหนดให้ฟอร์ม และแสดงใน UI
+     */
     function parseUrlParams() {
         const urlParams = new URLSearchParams(window.location.search);
-        // กรณีได้รับพารามิเตอร์ตรง ๆ เช่น ?price=...&renterName=...&userLineId=...&phone=...&roomId=...
-        // (หากคุณส่งจาก LIFF แบบใช้ liff.openWindow({url: "..."}) ก็จะได้พารามิเตอร์ที่นี่ตรง ๆ)
 
         // อ่านค่าพารามิเตอร์
-        const price = urlParams.get('price');
-        const renterName = urlParams.get('renterName');
-        const userLineId = urlParams.get('userLineId');
-        const phone = urlParams.get('phone');
-        const roomId = urlParams.get('roomId');
+        const price = urlParams.get('price') || '';
+        const renterName = urlParams.get('renterName') || '';
+        const userLineId = urlParams.get('userLineId') || '';
+        const phone = urlParams.get('phone') || '';
+        const roomId = urlParams.get('roomId') || '';
 
-        // หากคุณต้องการใช้ LIFF STATE (liff.state) สามารถปรับตรงนี้
-        // const liffState = urlParams.get('liff.state');
-        // if (liffState) {
-        //   const decodedLiffState = decodeURIComponent(liffState);
-        //   const nestedParams = new URLSearchParams(decodedLiffState);
-        //   // อ่านค่าจาก nestedParams.get('price') ฯลฯ ได้เหมือนกัน
-        // }
-
-        // เก็บค่าใส่ในฟอร์มหรือเก็บเป็น property ของ form (แล้วจะเรียกใช้งานใน submitData)
+        // เก็บค่าใส่ในฟอร์ม
         const uploadForm = document.getElementById('uploadForm');
         uploadForm.price = price;
         uploadForm.renterName = renterName;
         uploadForm.userLineId = userLineId;
         uploadForm.phone = phone;
         uploadForm.roomId = roomId;
+
+        // แสดงค่าใน UI
+        document.getElementById('displayRoomId').textContent = roomId || 'ไม่พบข้อมูล';
+        document.getElementById('displayPrice').textContent = price || 'ไม่พบข้อมูล';
+        document.getElementById('displayRenterName').textContent = renterName || 'ไม่พบข้อมูล';
+        document.getElementById('displayPhone').textContent = phone || 'ไม่พบข้อมูล';
+        document.getElementById('displayUserLineId').textContent = userLineId || 'ไม่พบข้อมูล';
     }
 
     // เมื่อผู้ใช้เลือกไฟล์ จะเรียก previewImage() -> จากนั้น submitData()
@@ -105,13 +136,13 @@
 
             reader.onload = function (e) {
                 imgPreview.src = e.target.result;
-                // เมื่อแสดงตัวอย่างแล้วถามเพื่อยืนยันการส่งทันที
+                // เมื่อแสดงตัวอย่างแล้วถามเพื่อยืนยันการส่งต่อ
                 submitData(file);
             };
 
             reader.readAsDataURL(file);
         } else {
-            imgPreview.src = "https://via.placeholder.com/160x208?text=Preview";
+            imgPreview.src = "https://placehold.co/160x208?text=Preview";
         }
     }
 
@@ -125,7 +156,7 @@
         });
     }
 
-    // ฟังก์ชันแสดง SweetAlert เพื่อยืนยันการส่งข้อมูล
+    // ฟังก์ชัน SweetAlert เพื่อยืนยัน
     async function showConfirmationDialog() {
         const confirmation = await Swal.fire({
             title: 'ยืนยันการส่งข้อมูล',
@@ -138,7 +169,7 @@
         return confirmation.isConfirmed;
     }
 
-    // ฟังก์ชันส่งข้อมูลไปยัง GAS (หรือปลายทาง)
+    // ฟังก์ชันส่งข้อมูลไปยังปลายทาง
     async function submitData(file) {
         // ยืนยันก่อน
         const isConfirmed = await showConfirmationDialog();
@@ -153,7 +184,7 @@
             // อัปเดต preview เป็นรูปไฟล์ที่เพิ่งอัปโหลด (base64)
             imgPreview.src = `data:${file.type};base64,${base64}`;
 
-            // ดึงข้อมูลจากฟอร์ม (ที่เราเก็บไว้เป็น property ไว้ก่อนหน้านี้)
+            // ดึงข้อมูลจากฟอร์ม (ที่เราเก็บไว้เป็น property)
             const formData = document.getElementById('uploadForm');
             let obj = {
                 base64: base64,
@@ -184,9 +215,9 @@
                 method: "POST",
                 body: JSON.stringify(obj)
             });
-            let data = await response.text();  // รอผลลัพธ์เป็น text หรือ JSON ก็ได้
+            let data = await response.text();  // ถ้าปลายทางส่ง JSON กลับ ก็ใช้ .json() ได้
 
-            // เสร็จแล้ว popup แจ้งสำเร็จ
+            // เสร็จแล้ว popup แจ้ง
             Swal.fire({
                 title: 'สำเร็จ!',
                 text: 'อัปโหลดใบเสร็จเรียบร้อยแล้ว!',
@@ -194,12 +225,12 @@
                 confirmButtonText: 'ปิด',
             }).then((result) => {
                 if (result.isConfirmed) {
-                    liff.closeWindow(); // ปิดหน้าต่าง LIFF ได้ทันที
+                    liff.closeWindow(); // ปิดหน้าต่าง LIFF ได้
                 }
             });
             console.log(data);
         } catch (error) {
-            // กรณีเกิด error
+            // ถ้า error
             Swal.fire({
                 icon: 'error',
                 title: 'ข้อผิดพลาด',
