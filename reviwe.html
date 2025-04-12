@@ -51,7 +51,7 @@
   <form class="p-6 text-sm" id="feedbackForm">
     <!-- Hidden Inputs รับค่าจาก URL -->
     <input type="hidden" id="bookerName" name="bookerName" value="" />
-    <input type="text" id="roomName" name="roomName" value="" class="mb-3 w-full font-b text-center px-3 py-2 text-blue-800  " readonly />
+    <input type="text" id="roomName" name="roomName" value="" class="mb-3 w-full font-b text-center p-4 bg-gray-100 rounded-2xl text-blue-800  " readonly />
     <!-- เปลี่ยนฟิลด์จาก checkinDate, checkoutDate เป็น roomId -->
     <input type="hidden" id="roomId" name="roomId" value="" />
     <input type="hidden" id="userIdLine" name="userIdLine" value="" />
@@ -143,12 +143,12 @@
     <!-- รายละเอียดเพิ่มเติม -->
     <div class="mb-6">
       <label for="details" class="block mb-2 text-gray-700">รายละเอียดเพิ่มเติม:</label>
-      <textarea id="details" name="details" rows="4" class="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:ring focus:border-blue-300" placeholder="กรอกความคิดเห็นหรือรายละเอียดเพิ่มเติม"></textarea>
+      <textarea id="details" name="details" rows="4" class="w-full px-3 py-2 text-gray-700 border rounded-2xl focus:outline-none focus:ring focus:border-blue-300" placeholder="กรอกความคิดเห็นหรือรายละเอียดเพิ่มเติม"></textarea>
     </div>
 
     <!-- ปุ่มส่งฟอร์ม -->
     <div class="text-center">
-      <button type="submit" class="w-full p-4 font-bold text-white bg-slate-800 rounded-lg hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-green-400">
+      <button type="submit" class="w-full p-4 font-bold text-white bg-slate-800 rounded-2xl hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-green-400">
         ส่งความคิดเห็น
       </button>
     </div>
