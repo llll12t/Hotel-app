@@ -78,7 +78,8 @@
 <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
 
 <script>
-    let url = "YOUR_GAS_ENDPOINT_HERE";
+    // ใส่ลิงก์ปลายทาง Google Apps Script หรือ Webhook API ของคุณ
+    let url = "https://script.google.com/macros/s/AKfycbzNSxS8CsP2syyfXOM5odfj3BYt11qJHXMULIgWtcMDM6ABBmRWKEjhOPPM0cEtY4j-/exec";
 
     let fileInput = document.getElementById("file");
     let imgPreview = document.getElementById("preview");
@@ -87,25 +88,20 @@
         parseUrlParams();
     };
 
-    // สำคัญ: ปรับ parseUrlParams ให้อ่าน liff.state
+    // อ่าน liff.state เพื่อดึงพารามิเตอร์ (roomId, price, phone, userLineId, renterName)
     function parseUrlParams() {
         const urlParams = new URLSearchParams(window.location.search);
-        // ดึง liffState
         const liffState = urlParams.get('liff.state');
         if (liffState) {
-            // decode
             const decoded = decodeURIComponent(liffState);
-            // สร้าง URLSearchParams จาก decoded
             const nestedParams = new URLSearchParams(decoded);
 
-            // อ่านค่าต่าง ๆ
             const price      = nestedParams.get('price')      || '';
             const renterName = nestedParams.get('renterName') || '';
             const userLineId = nestedParams.get('userLineId') || '';
             const phone      = nestedParams.get('phone')      || '';
             const roomId     = nestedParams.get('roomId')     || '';
 
-            // เก็บค่าในฟอร์ม
             const uploadForm = document.getElementById('uploadForm');
             uploadForm.price = price;
             uploadForm.renterName = renterName;
@@ -120,7 +116,7 @@
             document.getElementById('displayPhone').textContent = phone      || 'ไม่พบข้อมูล';
             document.getElementById('displayUserLineId').textContent = userLineId || 'ไม่พบข้อมูล';
         } else {
-            console.log("No liff.state in URL. Or data is not in liff.state format.");
+            console.log("No liff.state in URL or data is not in the correct format.");
         }
     }
 
@@ -135,6 +131,7 @@
 
             reader.onload = function (e) {
                 imgPreview.src = e.target.result;
+                // เมื่ออ่านเสร็จ ส่งยืนยันอัปโหลดทันที
                 submitData(file);
             };
             reader.readAsDataURL(file);
@@ -176,6 +173,7 @@
             imgPreview.src = `data:${file.type};base64,${base64}`;
 
             const formData = document.getElementById('uploadForm');
+            // แปลงเป็นวัตถุสำหรับส่ง
             let obj = {
                 base64: base64,
                 type: file.type,
@@ -212,10 +210,11 @@
                 confirmButtonText: 'ปิด',
             }).then((result) => {
                 if (result.isConfirmed) {
+                    // ปิด LIFF window
                     liff.closeWindow(); 
                 }
             });
-            console.log(data);
+            console.log("Response from server:", data);
         } catch (error) {
             Swal.fire({
                 icon: 'error',
@@ -227,4 +226,3 @@
     }
 </script>
 </html>
-
