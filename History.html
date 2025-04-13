@@ -10,6 +10,9 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    /* Custom CSS (ถ้ามี) */
+  </style>
 </head>
 <body class="bg-slate-50 p-4 relative">
   <!-- Loading Overlay -->
@@ -35,7 +38,7 @@
     </table>
   </div>
 
-  <!-- Modal ส่วนอื่น ๆ (ตัวอย่าง Modal: อัพเดทการชำระเงิน) -->
+  <!-- Modal ตัวอย่าง: อัพเดทการชำระเงิน -->
   <div id="update-payment-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
     <div class="bg-white p-4 rounded-xl w-11/12 max-w-md">
       <h2 class="text-lg font-bold mb-4">อัพเดทการชำระเงิน</h2>
@@ -56,27 +59,32 @@
       </form>
     </div>
   </div>
-  <!-- (Modal อื่น ๆ สามารถคงโค้ดเดิมได้) -->
+  <!-- (Modal อื่น ๆ สามารถเพิ่มหรือปรับปรุงได้ตามที่คุณต้องการ) -->
 
   <script>
-    // ตัวแปรเก็บ userId จาก LIFF
+    // ตัวแปรสำหรับเก็บ userId จาก LIFF
     let currentUserId = null;
+    // ตัวแปรสำหรับเก็บข้อมูลตาราง
+    let tableData = [];
+    // URL ของ Web App (Google Apps Script)
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyPljZ05WrGsoQK08sjgbt3MRD9TO1s12jVrTO5Py_3-WhyyHjIsdiOA0nDhdD34tCV/exec';
 
-    // ฟังก์ชันสำหรับเรียกใช้งาน LIFF และดึง profile ของผู้ใช้
+    // เริ่มต้น LIFF และดึง userId ของผู้ใช้
     async function initLIFF() {
       try {
         await liff.init({ liffId: "2007106715-OYJEx946" });
+        // ตรวจสอบสิทธิ์ในการเข้าถึง profile
         const profile = await liff.getProfile();
         currentUserId = profile.userId;
         console.log("LIFF init success, userId:", currentUserId);
-        // หลังจากได้ userId แล้วดึงข้อมูล
+        // เริ่มดึงข้อมูลหลังจากได้ userId แล้ว
         fetchData();
       } catch (error) {
         console.error("LIFF initialization error", error);
         Swal.fire({
           icon: 'error',
           title: 'เกิดข้อผิดพลาดในการเชื่อมต่อ LIFF',
-          text: 'ไม่สามารถดึงข้อมูล user ได้'
+          text: error.message
         });
       }
     }
@@ -89,7 +97,7 @@
       document.getElementById('loading-overlay').classList.add('hidden');
     }
 
-    // ฟังก์ชันสำหรับแสดง badge ของสถานะ
+    // ฟังก์ชันสำหรับสร้าง badge ของสถานะ
     function getStatusBadge(status) {
       if (status === 'เสร็จสิ้น') {
         return `<span class="px-2 py-1 bg-green-100 text-green-800 rounded">${status}</span>`;
@@ -100,11 +108,7 @@
       }
     }
 
-    // URL ของ Web App (Google Apps Script)
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyPljZ05WrGsoQK08sjgbt3MRD9TO1s12jVrTO5Py_3-WhyyHjIsdiOA0nDhdD34tCV/exec';
-    let tableData = [];
-
-    // ดึงข้อมูลจาก Server พร้อม Loading
+    // ดึงข้อมูลจาก Server (Google Apps Script)
     async function fetchData() {
       startLoading();
       try {
@@ -140,7 +144,7 @@
         checkInTime: row[14],
         checkOutTime: row[15],
         additionalNotes: row[16],
-        useridline: row[17]  // คอลัมน์ useridline ที่ได้จากข้อมูล
+        useridline: row[17]  // คอลัมน์ useridline ในข้อมูล
       }));
     }
 
@@ -165,10 +169,11 @@
       return formatted.replace(/\//g, '-').replace(',', '').trim();
     }
 
-    // แสดงข้อมูลในตารางสำหรับมือถือ โดยกรองตาม useridline จาก LIFF (ถ้ามี)
+    // แสดงข้อมูลในตารางสำหรับมือถือ โดยกรองข้อมูลตาม useridline (ถ้ามี)
     function renderTable(data) {
       const tbody = document.querySelector('#data-table tbody');
       tbody.innerHTML = '';
+      // หาก currentUserId ไม่เป็นค่าว่าง ให้กรองข้อมูล
       const filteredData = currentUserId
         ? data.filter(item => item.useridline === currentUserId)
         : data;
@@ -189,7 +194,7 @@
       });
     }
 
-    // ฟังก์ชัน toggleDetailsMobile สำหรับมือถือ (ใช้ colspan=4) เพื่อแสดงรายละเอียดเพิ่ม
+    // ฟังก์ชัน toggleDetailsMobile สำหรับมือถือ (ใช้ colspan=4) เพื่อแสดงรายละเอียดเพิ่มเติม
     function toggleDetailsMobile(id, btn) {
       const currentRow = btn.closest('tr');
       if (currentRow.nextElementSibling && currentRow.nextElementSibling.classList.contains('details-row')) {
@@ -222,9 +227,7 @@
       currentRow.parentNode.insertBefore(detailsRow, currentRow.nextSibling);
     }
 
-    // =====================================
-    // ตัวอย่างฟังก์ชันสำหรับ Modal (คงรูปแบบเดิม)
-    // =====================================
+    // ตัวอย่างฟังก์ชันสำหรับ Modal (ในที่นี้ใช้สำหรับอัพเดทการชำระเงิน)
     function openPaymentModal(id) {
       const item = tableData.find(x => String(x.id) === String(id));
       if (!item) return;
@@ -251,7 +254,7 @@
       });
     });
 
-    // เริ่มต้นการเรียก LIFF เมื่อหน้าโหลด
+    // เมื่อหน้าโหลด ให้เริ่มต้น LIFF
     window.onload = function() {
       initLIFF();
     };
