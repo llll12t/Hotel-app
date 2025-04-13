@@ -267,8 +267,8 @@
           <div><strong>เบอร์ติดต่อ:</strong> ${item.phone}</div>
           <div><strong>สถานะ:</strong> ${getStatusBadge(item.status)}</div>
           <div><strong>การชำระเงิน:</strong> ${item.payment}</div>
-          <div><strong>เช็คอิน:</strong> ${formatDateTime(item.checkInTime)}</div>
-          <div><strong>เช็คเอาท์:</strong> ${formatDateTime(item.checkOutTime)}</div>
+          <div><strong>เช็คอิน:</strong> ${item.checkInTime}</div>
+          <div><strong>เช็คเอาท์:</strong> ${item.checkOutTime}</div>
           <div><strong>บันทึกเพิ่มเติม:</strong> ${item.additionalNotes || ''}</div>
           <div class="mt-2 flex flex-wrap gap-2">
             <button class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded" onclick="openPaymentModal('${item.id}')">ชำระเงิน</button>
