@@ -3,29 +3,265 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Test LIFF Login</title>
+  <title>ข้อมูล Appointment (Mobile - LIFF)</title>
+  <!-- LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body>
+<body class="bg-slate-50 p-4 relative">
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <span class="text-white text-xl">Loading...</span>
+  </div>
+
+  <!-- ตารางสำหรับมือถือ -->
+  <div class="max-w-3xl mx-auto mt-4">
+    <h1 class="text-xl font-bold mb-4">ข้อมูล Appointment (ตารางมือถือ)</h1>
+    <table id="data-table" class="min-w-full bg-slate-100 rounded-xl text-sm">
+      <thead>
+        <tr class="text-slate-800">
+          <th class="py-2 px-4 border">ชื่อห้องพัก</th>
+          <th class="py-2 px-4 border">ราคา</th>
+          <th class="py-2 px-4 border">ชื่อผู้เช่า</th>
+          <th class="py-2 px-4 border">เพิ่มเติม</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- ข้อมูลจะแสดงที่นี่โดย JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal ตัวอย่าง: อัพเดทการชำระเงิน -->
+  <div id="update-payment-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white p-4 rounded-xl w-11/12 max-w-md">
+      <h2 class="text-lg font-bold mb-4">อัพเดทการชำระเงิน</h2>
+      <form id="update-payment-form">
+        <input type="hidden" id="payment-update-id">
+        <div class="mb-2">
+          <label class="block text-sm">การชำระเงิน</label>
+          <select id="update-payment-select" class="w-full border px-2 py-1 rounded">
+            <option value="ชำระเงินสำเร็จ">ชำระเงินสำเร็จ</option>
+            <option value="จ่ายหน้าเค้าเตอร์">จ่ายหน้าเค้าเตอร์</option>
+            <option value="ยกเลิก">ยกเลิก</option>
+          </select>
+        </div>
+        <div class="flex justify-end">
+          <button type="button" onclick="closePaymentModal()" class="bg-gray-500 text-white py-1 px-3 rounded mr-2">ยกเลิก</button>
+          <button type="submit" class="bg-blue-500 text-white py-1 px-3 rounded">บันทึก</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- (Modal อื่น ๆ สามารถเพิ่มหรือปรับปรุงได้ตามที่ต้องการ) -->
+
   <script>
+    // ตัวแปรสำหรับเก็บ userId จาก LIFF
+    let currentUserId = null;
+    // ตัวแปรสำหรับเก็บข้อมูลตาราง
+    let tableData = [];
+    // URL ของ Web App (Google Apps Script)
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyPljZ05WrGsoQK08sjgbt3MRD9TO1s12jVrTO5Py_3-WhyyHjIsdiOA0nDhdD34tCV/exec';
+
+    // ฟังก์ชันสำหรับเริ่มต้น LIFF (รวม login) โดยใช้ LIFF ID ที่ถูกต้อง
     async function initLIFF() {
       try {
         await liff.init({ liffId: "2007106715-OYJEx946" });
         console.log("LIFF init success");
-        // ตรวจสอบสถานะการเข้าสู่ระบบ
+        // ตรวจสอบสถานะการเข้าสู่ระบบ ถ้าไม่ได้เข้าสู่ระบบให้ redirect ไป login
         if (!liff.isLoggedIn()) {
           console.log("ยังไม่ได้เข้าสู่ระบบ, redirecting to login...");
-          liff.login();  // จะ redirect ไปยังหน้า login ของ LINE
+          liff.login(); // redirect ไปยังหน้า login ของ LINE
         } else {
           const profile = await liff.getProfile();
-          console.log("ผู้ใช้เข้าสู่ระบบ, userId:", profile.userId);
+          currentUserId = profile.userId;
+          console.log("ผู้ใช้เข้าสู่ระบบ, userId:", currentUserId);
+          // หลังจากได้ userId แล้ว เรียกใช้งานดึงข้อมูล
+          fetchData();
         }
       } catch (error) {
         console.error("LIFF initialization error:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาดในการเชื่อมต่อ LIFF',
+          text: error.message
+        });
       }
     }
 
-    window.onload = initLIFF;
+    // ฟังก์ชันสำหรับแสดง/ซ่อน Loading
+    function startLoading() {
+      document.getElementById('loading-overlay').classList.remove('hidden');
+    }
+    function stopLoading() {
+      document.getElementById('loading-overlay').classList.add('hidden');
+    }
+
+    // ฟังก์ชันสำหรับสร้าง badge ของสถานะ
+    function getStatusBadge(status) {
+      if (status === 'เสร็จสิ้น') {
+        return `<span class="px-2 py-1 bg-green-100 text-green-800 rounded">${status}</span>`;
+      } else if (status === 'ยกเลิก') {
+        return `<span class="px-2 py-1 bg-red-100 text-red-800 rounded">${status}</span>`;
+      } else {
+        return `<span class="px-2 py-1 bg-blue-100 text-blue-800 rounded">${status}</span>`;
+      }
+    }
+
+    // ดึงข้อมูลจาก Server (Google Apps Script)
+    async function fetchData() {
+      startLoading();
+      try {
+        const response = await fetch(WEB_APP_URL);
+        const data = await response.json();
+        tableData = processData(data);
+        renderTable(tableData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาด',
+          text: 'ไม่สามารถโหลดข้อมูลได้'
+        });
+      } finally {
+        stopLoading();
+      }
+    }
+
+    // แปลงข้อมูลจากชีต (ไม่รวม header) โดยเพิ่ม property useridline (สมมุติว่าอยู่ที่ index 17)
+    function processData(data) {
+      return data.slice(1).map(row => ({
+        id: String(row[0]),
+        roomName: row[2],
+        roomPrice: row[4],
+        checkinDate: row[5],
+        checkoutDate: row[6],
+        numGuests: row[7],
+        bookerName: row[8],
+        phone: row[9],
+        status: row[12],
+        payment: row[13],
+        checkInTime: row[14],
+        checkOutTime: row[15],
+        additionalNotes: row[16],
+        useridline: row[17]  // คอลัมน์ useridline ในข้อมูล
+      }));
+    }
+
+    // ฟังก์ชันแปลงวันที่ให้อยู่ในรูปแบบ DD-MM-YYYY
+    function formatDateDMY(dateStr) {
+      if (!dateStr) return '';
+      if (dateStr.indexOf('T') !== -1) {
+        const date = new Date(dateStr);
+        const options = { timeZone: 'Asia/Bangkok', day: '2-digit', month: '2-digit', year: 'numeric' };
+        const formatted = new Intl.DateTimeFormat('en-GB', options).format(date);
+        return formatted.replace(/\//g, '-');
+      }
+      return dateStr;
+    }
+
+    // ฟังก์ชันแปลงวันที่และเวลาให้อยู่ในรูปแบบ DD-MM-YYYY HH:mm
+    function formatDateTime(dateStr) {
+      if (!dateStr) return '';
+      const date = new Date(dateStr);
+      const options = { timeZone: 'Asia/Bangkok', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
+      let formatted = new Intl.DateTimeFormat('en-GB', options).format(date);
+      return formatted.replace(/\//g, '-').replace(',', '').trim();
+    }
+
+    // แสดงข้อมูลในตารางสำหรับมือถือ โดยกรองข้อมูลตาม useridline (ถ้ามี)
+    function renderTable(data) {
+      const tbody = document.querySelector('#data-table tbody');
+      tbody.innerHTML = '';
+      // หาก currentUserId มีค่า ให้กรองข้อมูลเฉพาะรายการที่ตรงกับ
+      const filteredData = currentUserId 
+        ? data.filter(item => item.useridline === currentUserId)
+        : data;
+      filteredData.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.setAttribute('data-id', item.id);
+        tr.innerHTML = `
+          <td class="py-2 px-4 border">${item.roomName}</td>
+          <td class="py-2 px-4 border">${item.roomPrice}</td>
+          <td class="py-2 px-4 border">${item.bookerName}</td>
+          <td class="py-2 px-4 border">
+            <button class="bg-gray-200 hover:bg-gray-300 p-2 rounded-sm" onclick="toggleDetailsMobile('${item.id}', this)" title="แสดงรายละเอียด">
+              <span class="material-icons-round text-base text-gray-700">expand_more</span>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ฟังก์ชัน toggleDetailsMobile สำหรับมือถือ (ใช้ colspan=4) เพื่อแสดงรายละเอียดเพิ่มเติม
+    function toggleDetailsMobile(id, btn) {
+      const currentRow = btn.closest('tr');
+      if (currentRow.nextElementSibling && currentRow.nextElementSibling.classList.contains('details-row')) {
+        currentRow.parentNode.removeChild(currentRow.nextElementSibling);
+        return;
+      }
+      const item = tableData.find(x => String(x.id) === String(id));
+      if (!item) return;
+      const detailsRow = document.createElement('tr');
+      detailsRow.classList.add('details-row');
+      const detailsCell = document.createElement('td');
+      detailsCell.setAttribute('colspan', '4');
+      detailsCell.innerHTML = `
+        <div class="p-2 border-t">
+          <div><strong>ชื่อห้องพัก:</strong> ${item.roomName}</div>
+          <div><strong>ราคา:</strong> ${item.roomPrice}</div>
+          <div><strong>วันที่เข้าพัก:</strong> ${formatDateDMY(item.checkinDate)}</div>
+          <div><strong>วันที่ออก:</strong> ${formatDateDMY(item.checkoutDate)}</div>
+          <div><strong>จำนวนคน:</strong> ${item.numGuests}</div>
+          <div><strong>ชื่อผู้เช่า:</strong> ${item.bookerName}</div>
+          <div><strong>เบอร์ติดต่อ:</strong> ${item.phone}</div>
+          <div><strong>สถานะ:</strong> ${getStatusBadge(item.status)}</div>
+          <div><strong>การชำระเงิน:</strong> ${item.payment}</div>
+          <div><strong>เช็คอิน:</strong> ${formatDateTime(item.checkInTime)}</div>
+          <div><strong>เช็คเอาท์:</strong> ${formatDateTime(item.checkOutTime)}</div>
+          <div><strong>บันทึกเพิ่มเติม:</strong> ${item.additionalNotes || ''}</div>
+        </div>
+      `;
+      detailsRow.appendChild(detailsCell);
+      currentRow.parentNode.insertBefore(detailsRow, currentRow.nextSibling);
+    }
+
+    // ตัวอย่างฟังก์ชันสำหรับ Modal (ตัวอย่างนี้ใช้สำหรับอัพเดทการชำระเงิน)
+    function openPaymentModal(id) {
+      const item = tableData.find(x => String(x.id) === String(id));
+      if (!item) return;
+      document.getElementById('payment-update-id').value = item.id;
+      document.getElementById('update-payment-select').value = item.payment || 'รอการชำระเงิน';
+      document.getElementById('update-payment-modal').classList.remove('hidden');
+    }
+    function closePaymentModal() {
+      document.getElementById('update-payment-modal').classList.add('hidden');
+    }
+    document.getElementById('update-payment-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      startLoading();
+      const id = document.getElementById('payment-update-id').value;
+      const payment = document.getElementById('update-payment-select').value;
+      $.post(WEB_APP_URL, { method: 'updatePaymentData', id: id, payment: payment }, function(response) {
+        Swal.fire({ icon: 'success', title: 'อัพเดทการชำระเงินเรียบร้อย', text: response });
+        fetchData();
+        closePaymentModal();
+        stopLoading();
+      }).fail(function(error) {
+        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: 'ไม่สามารถอัพเดทการชำระเงินได้' });
+        stopLoading();
+      });
+    });
+
+    // เมื่อหน้าโหลด ให้เริ่มต้น LIFF (ถ้ายังไม่ได้เข้าสู่ระบบจะ redirect ไปที่หน้า login)
+    window.onload = function() {
+      initLIFF();
+    };
   </script>
 </body>
 </html>
