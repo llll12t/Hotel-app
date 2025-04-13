@@ -30,7 +30,7 @@
         <tr class="text-slate-800">
           <th class="py-2 px-4 border">ชื่อห้องพัก</th>
           <th class="py-2 px-4 border">ราคา</th>
-          <th class="py-2 px-4 border">สถานะ</th>
+          <th class="py-2 px-4 border">ชื่อผู้เช่า</th>
           <th class="py-2 px-4 border">เพิ่มเติม</th>
         </tr>
       </thead>
@@ -39,6 +39,29 @@
       </tbody>
     </table>
   </div>
+
+  <!-- Modal ตัวอย่าง: อัพเดทการชำระเงิน -->
+  <div id="update-payment-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white p-4 rounded-xl w-11/12 max-w-md">
+      <h2 class="text-lg font-bold mb-4">อัพเดทการชำระเงิน</h2>
+      <form id="update-payment-form">
+        <input type="hidden" id="payment-update-id">
+        <div class="mb-2">
+          <label class="block text-sm">การชำระเงิน</label>
+          <select id="update-payment-select" class="w-full border px-2 py-1 rounded">
+            <option value="ชำระเงินสำเร็จ">ชำระเงินสำเร็จ</option>
+            <option value="จ่ายหน้าเค้าเตอร์">จ่ายหน้าเค้าเตอร์</option>
+            <option value="ยกเลิก">ยกเลิก</option>
+          </select>
+        </div>
+        <div class="flex justify-end">
+          <button type="button" onclick="closePaymentModal()" class="bg-gray-500 text-white py-1 px-3 rounded mr-2">ยกเลิก</button>
+          <button type="submit" class="bg-blue-500 text-white py-1 px-3 rounded">บันทึก</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- (Modal อื่น ๆ สามารถเพิ่มหรือปรับปรุงได้ตามที่ต้องการ) -->
 
   <script>
     // ตัวแปรสำหรับเก็บ userId จาก LIFF
@@ -168,7 +191,7 @@
         tr.innerHTML = `
           <td class="py-2 px-4 border">${item.roomName}</td>
           <td class="py-2 px-4 border">${item.roomPrice}</td>
-          <td class="py-2 px-4 border">${item.status}</td>
+          <td class="py-2 px-4 border">${item.bookerName}</td>
           <td class="py-2 px-4 border">
             <button class="bg-[#071D4A]  hover:bg-gray-300 py-2 px-3 rounded-2xl" onclick="toggleDetailsMobile('${item.id}', this)" title="แสดงรายละเอียด">
               <span class="material-icons-round text-base text-gray-100">expand_more</span>
