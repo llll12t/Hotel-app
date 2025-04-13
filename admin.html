@@ -16,9 +16,11 @@
   </div>
 
   <!-- ตารางสำหรับมือถือ -->
-  <div class="max-w-3xl mx-auto mt-4">
-    <h1 class="text-xl font-bold mb-4">ข้อมูล Appointment (ตารางมือถือ)</h1>
-    <table id="data-table" class="min-w-full bg-slate-100 rounded-xl text-sm">
+  <div class="max-w-md mx-auto mt-2">
+    <div class="p-4 bg-[#071D4A] my-2 rounded-2xl">
+    <p class="text-md text-gray-100 text-center font-bold">จัดการการเข้าพัก</p>
+    </div>
+    <table id="data-table" class="min-w-full bg-white rounded-xl text-sm">
       <thead>
         <tr class="text-slate-800">
           <th class="py-2 px-4 border">ชื่อห้องพัก</th>
@@ -233,8 +235,8 @@
           <td class="py-2 px-4 border">${item.roomPrice}</td>
           <td class="py-2 px-4 border">${item.bookerName}</td>
           <td class="py-2 px-4 border">
-            <button class="bg-gray-200 hover:bg-gray-300 p-2 rounded-sm" onclick="toggleDetailsMobile('${item.id}', this)" title="แสดงรายละเอียด">
-              <span class="material-icons-round text-base text-gray-700">expand_more</span>
+            <button class="bg-[#071D4A]  hover:bg-gray-300 py-2 px-3 rounded-2xl" onclick="toggleDetailsMobile('${item.id}', this)" title="แสดงรายละเอียด">
+              <span class="material-icons-round text-base text-gray-100">expand_more</span>
             </button>
           </td>
         `;
