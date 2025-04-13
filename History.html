@@ -3,21 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Test LIFF Init</title>
+  <title>Test LIFF Login</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body>
   <script>
     async function initLIFF() {
       try {
-        // ใส่ LIFF ID ที่ถูกต้องที่คุณได้คัดลอกมา
-        await liff.init({ liffId: "2007106715-7eGL8Nov" });
-        const profile = await liff.getProfile();
-        console.log("LIFF init success, userId:", profile.userId);
+        await liff.init({ liffId: "2007106715-OYJEx946" });
+        console.log("LIFF init success");
+        // ตรวจสอบสถานะการเข้าสู่ระบบ
+        if (!liff.isLoggedIn()) {
+          console.log("ยังไม่ได้เข้าสู่ระบบ, redirecting to login...");
+          liff.login();  // จะ redirect ไปยังหน้า login ของ LINE
+        } else {
+          const profile = await liff.getProfile();
+          console.log("ผู้ใช้เข้าสู่ระบบ, userId:", profile.userId);
+        }
       } catch (error) {
-        console.error("LIFF initialization error", error);
+        console.error("LIFF initialization error:", error);
       }
     }
+
     window.onload = initLIFF;
   </script>
 </body>
