@@ -104,9 +104,9 @@
       <div id="detailGallery" class="flex space-x-2 overflow-x-auto mb-4"></div>
       <div id="detailRoomDesc" class="text-sm text-gray-700 mb-2"></div>
       <div id="detailRoomDesc2" class="text-sm text-gray-700 mb-2"></div>
-      <!-- ส่วนรีวิว -->
+      <!-- ส่วนรีนวด -->
       <div id="reviewSection" class="mt-4">
-        <h3 class="font-bold mb-2">รีวิวล่าสุด</h3>
+        <h3 class="font-bold mb-2">รีนวดล่าสุด</h3>
       </div>
     </div>
   </div>
@@ -446,12 +446,12 @@
       }
     }
 
-    // โหลดรีวิวทั้งหมดจากชีต "Reviwe" แล้วกรองด้วย "ห้องพัก" = ชื่อห้อง
+    // โหลดรีนวดทั้งหมดจากชีต "Reviwe" แล้วกรองด้วย "ห้องพัก" = ชื่อห้อง
     function loadReviews(roomName) {
       fetch(API_URL + "?action=getAllReviews")
         .then(response => response.json())
         .then(allReviews => {
-          // กรองรีวิวที่ "ห้องพัก" ตรงกับชื่อห้อง (เช่น "ห้อง A")
+          // กรองรีนวดที่ "ห้องพัก" ตรงกับชื่อห้อง (เช่น "ห้อง A")
           const reviews = allReviews.filter(review =>
             String(review["ห้องพัก"]).trim() === String(roomName).trim()
           );
@@ -460,16 +460,16 @@
         .catch(error => console.error("Error fetching reviews:", error));
     }
 
-    // Render รีวิวลงใน reviewSection (UI แบบใหม่)
+    // Render รีนวดลงใน reviewSection (UI แบบใหม่)
     function renderReviews(reviews) {
       const reviewSection = document.getElementById("reviewSection");
-      reviewSection.innerHTML = "<h3 class='font-bold mb-2'>รีวิวล่าสุด</h3>";
+      reviewSection.innerHTML = "<h3 class='font-bold mb-2'>รีนวดล่าสุด</h3>";
       if (!Array.isArray(reviews)) {
-        reviewSection.innerHTML += "<p class='text-red-500'>ข้อมูลรีวิวไม่ถูกต้อง</p>";
+        reviewSection.innerHTML += "<p class='text-red-500'>ข้อมูลรีนวดไม่ถูกต้อง</p>";
         return;
       }
       if (reviews.length === 0) {
-        reviewSection.innerHTML += "<p class='text-gray-500'>ไม่มีรีวิว</p>";
+        reviewSection.innerHTML += "<p class='text-gray-500'>ไม่มีรีนวด</p>";
         return;
       }
       reviews.forEach(review => {
@@ -560,11 +560,11 @@
       `;
 
       const featuresData = [
-        { label: "แอร์", key: "แอร์", icon: iconAir },
+        { label: "Wi-Fi", key: "Wi-Fi", icon: iconAir },
         { label: "ที่จอดรถ", key: "ที่จอดรถ", icon: iconParking },
-        { label: "สระน้ำ", key: "สระน้ำ", icon: iconPool },
-        { label: "เตียง", key: "เตียง", icon: iconBed },
-        { label: "วิว", key: "วิว", icon: iconView },
+        { label: "สระว่ายน้ำ", key: "สระว่ายน้ำ", icon: iconPool },
+        { label: "ห้องอาหาร", key: "ห้องอาหาร", icon: iconBed },
+        { label: "นวด", key: "นวด", icon: iconView },
       ];
 
       featuresData.forEach(item => {
