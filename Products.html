@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
   <meta charset="UTF-8">
   <title>Dashboard ห้องพัก</title>
@@ -7,31 +8,28 @@
   <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body class="bg-gray-50">
   <div class="container mx-auto px-4">
     <!-- หัวเรื่องและปุ่มเพิ่มข้อมูล -->
-    <div class="flex justify-between items-center my-4">
-      <h1 class="text-3xl font-bold">Dashboard ห้องพัก</h1>
-      <button class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-md" onclick="showAddForm()">เพิ่มข้อมูล</button>
+    <div class="flex justify-end items-center my-4">
+      <button class="bg-slate-700 hover:bg-slate-600 text-white py-2 px-4 rounded-md"
+        onclick="showAddForm()">เพิ่มข้อมูล</button>
     </div>
-    
-    <!-- รายการห้องพัก -->
-    <section class="bg-white shadow rounded p-4 mb-4">
-      <h2 class="text-2xl font-semibold mb-4 text-gray-700">รายการห้องพัก</h2>
-      <div id="roomTable" class="overflow-x-auto"></div>
-    </section>
-    
+
+   
     <!-- แบบฟอร์มบันทึก/แก้ไขข้อมูล (ซ่อนโดยค่าเริ่มต้น) -->
     <section id="formSection" class="bg-white shadow rounded p-4 hidden">
       <div class="flex justify-between items-center mb-4">
-         <h2 class="text-2xl font-semibold text-gray-700" id="formTitle">บันทึกข้อมูลห้องพัก</h2>
-         <button class="text-red-500" onclick="hideForm()">ปิด</button>
+        <h2 class="text-2xl font-semibold text-gray-700" id="formTitle">บันทึกข้อมูลห้องพัก</h2>
+        <button class="text-red-500" onclick="hideForm()">ปิด</button>
       </div>
       <form id="roomForm" class="space-y-4">
-        <!-- กลุ่มฟิลด์เบื้องต้น -->
+        <!-- ฟิลด์ข้อมูลพื้นฐาน -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-600">ไอดีห้อง</label>
+            <!-- หากไม่กรอก ระบบจะสร้างโดยอัตโนมัติ -->
             <input type="text" name="ไอดีห้อง" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm"
               placeholder="ระบบจะสร้างถ้าไม่ระบุ">
           </div>
@@ -42,16 +40,20 @@
           </div>
         </div>
 
-        <!-- ฟิลด์กลุ่มข้อมูลเพิ่มเติม -->
+        <!-- ฟิลด์เพิ่มเติม -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-600">หมวดหมู่</label>
             <input type="text" name="หมวดหมู่" required
               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm" placeholder="เช่น VIP, SILVER">
           </div>
+
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-600">Wi‑Fi</label>
-            <input type="checkbox" id="wifi" name="Wi‑Fi"
+            <label class="block text-sm font-medium text-gray-600">WiFi</label>
+            <input type="checkbox" id="wifi" name="WiFi"
               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
           </div>
           <div>
@@ -59,9 +61,6 @@
             <input type="checkbox" id="restaurant" name="ห้องอาหาร"
               class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
           </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-600">สระว่ายน้ำ</label>
             <input type="checkbox" id="swimmingPool" name="สระว่ายน้ำ"
@@ -79,7 +78,7 @@
           </div>
         </div>
 
-        <!-- ฟิลด์ราคาต่าง ๆ -->
+        <!-- ฟิลด์ราคา -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-600">ราคา</label>
@@ -93,14 +92,16 @@
           </div>
         </div>
 
-        <!-- ฟิลด์สถานะ -->
-        <div>
-          <label class="block text-sm font-medium text-gray-600">สถานะ</label>
-          <input type="text" name="สถานะ" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm"
-            placeholder="สถานะ">
-        </div>
+        <!-- สถานะ -->
+        <select name="สถานะ" class="mt-1 block border border-slate-800 p-2 rounded-md shadow-sm text-sm">
+          <option value="">สถานะ</option>
+          <option value="พร้อมบริการ">พร้อมบริการ</option>
+          <option value="ไม่พร้อมบริการ">ไม่พร้อมบริการ</option>
+          <option value="ซ่อมแซม">ซ่อมแซม</option>
+        </select>
 
-        <!-- รูปปกห้อง (อัปโหลดไฟล์) พร้อมแสดงตัวอย่าง -->
+
+        <!-- รูปปกห้อง -->
         <div>
           <label class="block text-sm font-medium text-gray-600">รูปปกห้อง</label>
           <input type="file" id="coverInput" name="รูปภาพ" accept="image/*" class="mt-1 block w-full text-sm">
@@ -108,7 +109,7 @@
           <input type="hidden" name="รูปภาพOLD" id="รูปภาพOLD">
         </div>
 
-        <!-- กลุ่มอัปโหลดไฟล์สำหรับรูปประกอบ พร้อม hidden field -->
+        <!-- รูปประกอบ -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-600">รูปประกอบ-1</label>
@@ -136,7 +137,7 @@
           </div>
         </div>
 
-        <!-- กลุ่มรายละเอียด -->
+        <!-- รายละเอียด -->
         <div class="grid grid-cols-1 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-600">รายละเอียด</label>
@@ -159,12 +160,19 @@
         </div>
       </form>
     </section>
+
+     <!-- รายการห้องพัก -->
+     <section class="bg-white shadow rounded p-4 mb-4">
+      <h2 class="text-2xl font-semibold mb-4 text-gray-700">รายการห้องพัก</h2>
+      <div id="roomTable" class="overflow-x-auto"></div>
+    </section>
+
   </div>
 
   <!-- JavaScript ส่วนการทำงาน -->
   <script>
-    // กำหนด URL ของ Web App (ให้แทนที่ด้วย URL จริงของคุณ)
-    const API_URL = "https://script.google.com/macros/s/AKfycbx89UiSzrguGFFcx7XTDXVV-XTvYNQaE3oMVC3SE0L2yexJpynaMDRYIK6fQqLEYJWe/exec";
+    // URL ของ Web App (เปลี่ยนเป็น URL จริงของคุณ)
+    const API_URL = "https://script.google.com/macros/s/AKfycbxLx5_3Gb7PwMLAH-ngFVWFebOSItk5MwzgzHv1W0k8fCbGY1-gJAdqk7vSvFgwLnoz/exec";
 
     // ฟังก์ชันสำหรับแสดง preview ของไฟล์ที่อัปโหลด
     function setupPreview(fileInputId, previewImgId) {
@@ -181,14 +189,14 @@
         }
       });
     }
-    // ตั้งค่า preview สำหรับไฟล์แต่ละอัน
+    // ตั้งค่า preview สำหรับไฟล์ต่าง ๆ
     setupPreview('coverInput', 'coverPreview');
     setupPreview('image1Input', 'image1Preview');
     setupPreview('image2Input', 'image2Preview');
     setupPreview('image3Input', 'image3Preview');
     setupPreview('image4Input', 'image4Preview');
 
-    // ฟังก์ชัน processFilePromise รับพารามิเตอร์เพิ่มอีกตัวคือ roomObj
+    // ฟังก์ชันสำหรับแปลงไฟล์เป็น Base64 พร้อมจัดการค่าเดิม (ถ้าไม่มีการเปลี่ยนแปลง)
     function processFilePromise(inputId, oldFieldId, base64Key, mimeKey, actualField, roomObj) {
       return new Promise(function (resolve, reject) {
         var fileInput = document.getElementById(inputId);
@@ -214,7 +222,7 @@
       });
     }
 
-    // ฟังก์ชันแสดงรายการห้องพัก (GET API)
+    // โหลดข้อมูลห้องพักจาก API
     function loadRooms() {
       Swal.fire({
         title: 'กำลังโหลดข้อมูล...',
@@ -227,7 +235,7 @@
           Swal.close();
           let html = `<table class="min-w-full">
                           <thead>
-                            <tr class="bg-gray-200 text-gray-700 uppercase text-xs">
+                            <tr class="bg-slate-800 text-gray-100 uppercase text-sm">
                               <th class="py-2 px-3 text-left">รูปปก</th>
                               <th class="py-2 px-3 text-left">ไอดีห้อง</th>
                               <th class="py-2 px-3 text-left">ชื่อ</th>
@@ -269,14 +277,13 @@
         });
     }
 
-    // เมื่อ submit ฟอร์ม (POST API)
+    // เมื่อ submit ฟอร์ม (สำหรับเพิ่ม/แก้ไข)
     document.getElementById("roomForm").addEventListener("submit", function (e) {
       e.preventDefault();
-      // ประกาศตัวแปร room ใน scope ท้องถิ่น
-      let room = {};  
+      let room = {};
 
       // รับค่าจาก checkbox
-      room["Wi‑Fi"] = this.elements["Wi‑Fi"].checked ? "TRUE" : "";
+      room["WiFi"] = this.elements["WiFi"].checked ? "TRUE" : "";
       room["ห้องอาหาร"] = this.elements["ห้องอาหาร"].checked ? "TRUE" : "";
       room["สระว่ายน้ำ"] = this.elements["สระว่ายน้ำ"].checked ? "TRUE" : "";
       room["ที่จอดรถ"] = this.elements["ที่จอดรถ"].checked ? "TRUE" : "";
@@ -295,11 +302,11 @@
         processFilePromise("image3Input", "รูปประกอบ-3OLD", "รูปประกอบ-3Base64", "รูปประกอบ-3MimeType", "รูปประกอบ-3", room),
         processFilePromise("image4Input", "รูปประกอบ-4OLD", "รูปประกอบ-4Base64", "รูปประกอบ-4MimeType", "รูปประกอบ-4", room)
       ]).then(() => {
-        // รับค่าจาก form ที่เหลือ (ไม่รวมไฟล์หรือ checkbox)
+        // รับค่าอื่น ๆ จาก form (ไม่รวม checkbox และไฟล์)
         let formData = new FormData(this);
         formData.forEach((value, key) => {
           if (
-            key !== "Wi‑Fi" && key !== "ห้องอาหาร" && key !== "สระว่ายน้ำ" &&
+            key !== "WiFi" && key !== "ห้องอาหาร" && key !== "สระว่ายน้ำ" &&
             key !== "ที่จอดรถ" && key !== "นวด" &&
             key !== "รูปภาพ" && key !== "รูปประกอบ-1" && key !== "รูปประกอบ-2" &&
             key !== "รูปประกอบ-3" && key !== "รูปประกอบ-4" &&
@@ -309,9 +316,9 @@
           }
         });
 
+        // ส่ง request POST โดยไม่กำหนด header "Content-Type" เพื่อส่งเป็น simple request
         fetch(API_URL, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action: "insertOrUpdate", data: room })
         })
           .then(response => response.json())
@@ -332,7 +339,7 @@
                 img.classList.add("hidden");
               });
               loadRooms();
-              hideForm(); // ซ่อนฟอร์มหลังบันทึก
+              hideForm();
             } else {
               throw new Error(result.message);
             }
@@ -348,25 +355,7 @@
       });
     });
 
-    // ฟังก์ชันช่วยสร้าง HTML สำหรับแสดงเครื่องหมายเช็คในข้อมูลที่เป็น TRUE
-    function buildCheckboxHtml(roomData) {
-      var checkboxFields = [
-        { label: "Wi‑Fi", value: roomData["Wi‑Fi"] },
-        { label: "ห้องอาหาร", value: roomData["ห้องอาหาร"] },
-        { label: "สระว่ายน้ำ", value: roomData["สระว่ายน้ำ"] },
-        { label: "ที่จอดรถ", value: roomData["ที่จอดรถ"] },
-        { label: "นวด", value: roomData["นวด"] }
-      ];
-      var trueFields = checkboxFields.filter(function (field) {
-        return field.value && field.value.toString().toUpperCase() === "TRUE";
-      }).map(function (field) {
-        return `<div><strong>${field.label}:</strong> ✅</div>`;
-      });
-      if (trueFields.length === 0) return "";
-      return `<div class="grid grid-cols-2 gap-4">${trueFields.join("")}</div>`;
-    }
-
-    // ฟังก์ชันแสดงรายละเอียดห้องพัก
+    // ฟังก์ชันสำหรับแสดงรายละเอียดห้องพัก
     function showDetails(id) {
       Swal.fire({
         title: 'กำลังโหลดข้อมูล...',
@@ -379,7 +368,7 @@
           Swal.close();
           let roomData = rooms.find(r => r["ไอดีห้อง"] == id);
           if (roomData) {
-            let mainImageUrl = roomData["รูปภาพ"] ? roomData["รูปภาพ"] : "";
+            let mainImageUrl = roomData["รูปภาพ"] || "";
             let thumbnails = "";
             if (roomData["รูปประกอบ-1"]) {
               thumbnails += `<img src="${roomData["รูปประกอบ-1"]}" alt="Thumbnail 1" class="w-12 h-12 object-cover border rounded cursor-pointer" onclick="document.getElementById('swalMainImage').src='${roomData["รูปประกอบ-1"]}'">`;
@@ -393,7 +382,12 @@
             if (roomData["รูปประกอบ-4"]) {
               thumbnails += `<img src="${roomData["รูปประกอบ-4"]}" alt="Thumbnail 4" class="w-12 h-12 object-cover border rounded cursor-pointer" onclick="document.getElementById('swalMainImage').src='${roomData["รูปประกอบ-4"]}'">`;
             }
-            let checkboxHtml = buildCheckboxHtml(roomData);
+            let checkboxHtml = "";
+            ["WiFi", "ห้องอาหาร", "สระว่ายน้ำ", "ที่จอดรถ", "นวด"].forEach(field => {
+              if (roomData[field] && roomData[field].toString().toUpperCase() === "TRUE") {
+                checkboxHtml += `<div><strong>${field}:</strong> ✅</div>`;
+              }
+            });
             let htmlContent = `
               <div class="p-4 text-left">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -445,14 +439,14 @@
           let roomData = rooms.find(r => r["ไอดีห้อง"] == id);
           if (roomData) {
             let form = document.getElementById("roomForm");
-            // เติมข้อมูลลงในฟอร์ม
+            // เติมข้อมูลลงในฟอร์ม (สำหรับ fields ที่ไม่ใช่ file และ checkbox)
             for (let key in roomData) {
               if (form.elements[key] && form.elements[key].type !== "file" && form.elements[key].type !== "checkbox") {
                 form.elements[key].value = roomData[key];
               }
             }
-            // ตั้งค่า checkbox ให้ตรงกับข้อมูล
-            form.elements["Wi‑Fi"].checked = (roomData["Wi‑Fi"] && roomData["Wi‑Fi"].toString().toUpperCase() === "TRUE");
+            // กำหนดค่า checkbox
+            form.elements["WiFi"].checked = (roomData["WiFi"] && roomData["WiFi"].toString().toUpperCase() === "TRUE");
             form.elements["ห้องอาหาร"].checked = (roomData["ห้องอาหาร"] && roomData["ห้องอาหาร"].toString().toUpperCase() === "TRUE");
             form.elements["สระว่ายน้ำ"].checked = (roomData["สระว่ายน้ำ"] && roomData["สระว่ายน้ำ"].toString().toUpperCase() === "TRUE");
             form.elements["ที่จอดรถ"].checked = (roomData["ที่จอดรถ"] && roomData["ที่จอดรถ"].toString().toUpperCase() === "TRUE");
@@ -460,18 +454,18 @@
             if (form.elements["สถานะ"]) {
               form.elements["สถานะ"].value = roomData["สถานะ"] || "";
             }
-            // กำหนดค่า hidden สำหรับ URL รูปเดิม
+            // ตั้งค่า hidden สำหรับ URL รูปเดิม
             document.getElementById("รูปภาพOLD").value = roomData["รูปภาพ"] || "";
             document.getElementById("รูปประกอบ-1OLD").value = roomData["รูปประกอบ-1"] || "";
             document.getElementById("รูปประกอบ-2OLD").value = roomData["รูปประกอบ-2"] || "";
             document.getElementById("รูปประกอบ-3OLD").value = roomData["รูปประกอบ-3"] || "";
             document.getElementById("รูปประกอบ-4OLD").value = roomData["รูปประกอบ-4"] || "";
-            
-            // ตั้งค่าให้ฟิลด์ "ไอดีห้อง" เป็น readonly
+
+            // กำหนดให้ฟิลด์ "ไอดีห้อง" เป็น readonly เมื่อแก้ไข
             if (form.elements["ไอดีห้อง"]) {
               form.elements["ไอดีห้อง"].readOnly = true;
             }
-            
+
             // แสดงฟอร์มและเปลี่ยนหัวเรื่องเป็น "แก้ไขข้อมูล"
             document.getElementById("formSection").classList.remove("hidden");
             document.getElementById("formTitle").textContent = "แก้ไขข้อมูลห้องพัก";
@@ -506,9 +500,9 @@
             allowOutsideClick: false,
             didOpen: () => Swal.showLoading()
           });
+          // ส่ง request POST สำหรับการลบโดยไม่กำหนด header
           fetch(API_URL, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ action: "delete", id: id })
           })
             .then(response => response.json())
@@ -542,7 +536,7 @@
     function showAddForm() {
       let form = document.getElementById("roomForm");
       form.reset();
-      // ยกเลิก readOnly ของฟิลด์ "ไอดีห้อง" เมื่อทำการเพิ่มข้อมูลใหม่
+      // ยกเลิก readOnly ของ "ไอดีห้อง" สำหรับกรณีเพิ่มข้อมูลใหม่
       if (form.elements["ไอดีห้อง"]) {
         form.elements["ไอดีห้อง"].readOnly = false;
       }
@@ -556,13 +550,14 @@
       document.getElementById("formTitle").textContent = "บันทึกข้อมูลห้องพัก";
     }
 
-    // ฟังก์ชันซ่อนฟอร์ม
+    // ซ่อนฟอร์มบันทึก/แก้ไข
     function hideForm() {
       document.getElementById("formSection").classList.add("hidden");
     }
 
-    // โหลดข้อมูลห้องพักเมื่อหน้าเว็บโหลดเสร็จ
+    // โหลดข้อมูลเมื่อหน้าเว็บโหลดเสร็จ
     loadRooms();
   </script>
 </body>
+
 </html>
