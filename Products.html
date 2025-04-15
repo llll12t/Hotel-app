@@ -169,11 +169,11 @@
     // ฟังก์ชันสำหรับแสดง preview ของไฟล์ที่อัปโหลด
     function setupPreview(fileInputId, previewImgId) {
       document.getElementById(fileInputId).addEventListener('change', function () {
-        var file = this.files[0];
+        const file = this.files[0];
         if (file) {
-          var reader = new FileReader();
+          const reader = new FileReader();
           reader.onload = function (e) {
-            var preview = document.getElementById(previewImgId);
+            const preview = document.getElementById(previewImgId);
             preview.src = e.target.result;
             preview.classList.remove('hidden');
           }
@@ -188,8 +188,8 @@
     setupPreview('image3Input', 'image3Preview');
     setupPreview('image4Input', 'image4Preview');
 
-    // ฟังก์ชัน processFilePromise สำหรับประมวลผลไฟล์
-    function processFilePromise(inputId, oldFieldId, base64Key, mimeKey, actualField) {
+    // ฟังก์ชัน processFilePromise รับพารามิเตอร์เพิ่มอีกตัวคือ roomObj
+    function processFilePromise(inputId, oldFieldId, base64Key, mimeKey, actualField, roomObj) {
       return new Promise(function (resolve, reject) {
         var fileInput = document.getElementById(inputId);
         if (fileInput.files.length > 0) {
@@ -199,16 +199,16 @@
             var dataUrl = event.target.result;
             var base64Data = dataUrl.split(',')[1];
             var mimeType = file.type;
-            room[base64Key] = base64Data;
-            room[mimeKey] = mimeType;
+            roomObj[base64Key] = base64Data;
+            roomObj[mimeKey] = mimeType;
             resolve();
           };
           reader.onerror = reject;
           reader.readAsDataURL(file);
         } else {
-          room[base64Key] = "";
-          room[mimeKey] = "";
-          room[actualField] = document.getElementById(oldFieldId).value;
+          roomObj[base64Key] = "";
+          roomObj[mimeKey] = "";
+          roomObj[actualField] = document.getElementById(oldFieldId).value;
           resolve();
         }
       });
@@ -272,15 +272,15 @@
     // เมื่อ submit ฟอร์ม (POST API)
     document.getElementById("roomForm").addEventListener("submit", function (e) {
       e.preventDefault();
-      let form = e.target;
-      room = {};  // ตัวแปรเก็บข้อมูล
+      // ประกาศตัวแปร room ใน scope ท้องถิ่น
+      let room = {};  
 
       // รับค่าจาก checkbox
-      room["Wi‑Fi"] = form.elements["Wi‑Fi"].checked ? "TRUE" : "";
-      room["ห้องอาหาร"] = form.elements["ห้องอาหาร"].checked ? "TRUE" : "";
-      room["สระว่ายน้ำ"] = form.elements["สระว่ายน้ำ"].checked ? "TRUE" : "";
-      room["ที่จอดรถ"] = form.elements["ที่จอดรถ"].checked ? "TRUE" : "";
-      room["นวด"] = form.elements["นวด"].checked ? "TRUE" : "";
+      room["Wi‑Fi"] = this.elements["Wi‑Fi"].checked ? "TRUE" : "";
+      room["ห้องอาหาร"] = this.elements["ห้องอาหาร"].checked ? "TRUE" : "";
+      room["สระว่ายน้ำ"] = this.elements["สระว่ายน้ำ"].checked ? "TRUE" : "";
+      room["ที่จอดรถ"] = this.elements["ที่จอดรถ"].checked ? "TRUE" : "";
+      room["นวด"] = this.elements["นวด"].checked ? "TRUE" : "";
 
       Swal.fire({
         title: 'กำลังบันทึกข้อมูล...',
@@ -289,27 +289,29 @@
       });
 
       Promise.all([
-        processFilePromise("coverInput", "รูปภาพOLD", "รูปภาพBase64", "รูปภาพMimeType", "รูปภาพ"),
-        processFilePromise("image1Input", "รูปประกอบ-1OLD", "รูปประกอบ-1Base64", "รูปประกอบ-1MimeType", "รูปประกอบ-1"),
-        processFilePromise("image2Input", "รูปประกอบ-2OLD", "รูปประกอบ-2Base64", "รูปประกอบ-2MimeType", "รูปประกอบ-2"),
-        processFilePromise("image3Input", "รูปประกอบ-3OLD", "รูปประกอบ-3Base64", "รูปประกอบ-3MimeType", "รูปประกอบ-3"),
-        processFilePromise("image4Input", "รูปประกอบ-4OLD", "รูปประกอบ-4Base64", "รูปประกอบ-4MimeType", "รูปประกอบ-4")
-      ]).then(function () {
-        // รับค่าจาก form ที่เหลือ (ไม่รวมไฟล์)
-        let formData = new FormData(form);
-        formData.forEach(function (value, key) {
-          if (key !== "Wi‑Fi" && key !== "ห้องอาหาร" && key !== "สระว่ายน้ำ" && key !== "ที่จอดรถ" && key !== "นวด" &&
-              key !== "รูปภาพ" && key !== "รูปประกอบ-1" && key !== "รูปประกอบ-2" &&
-              key !== "รูปประกอบ-3" && key !== "รูปประกอบ-4" && key.indexOf("OLD") === -1) {
+        processFilePromise("coverInput", "รูปภาพOLD", "รูปภาพBase64", "รูปภาพMimeType", "รูปภาพ", room),
+        processFilePromise("image1Input", "รูปประกอบ-1OLD", "รูปประกอบ-1Base64", "รูปประกอบ-1MimeType", "รูปประกอบ-1", room),
+        processFilePromise("image2Input", "รูปประกอบ-2OLD", "รูปประกอบ-2Base64", "รูปประกอบ-2MimeType", "รูปประกอบ-2", room),
+        processFilePromise("image3Input", "รูปประกอบ-3OLD", "รูปประกอบ-3Base64", "รูปประกอบ-3MimeType", "รูปประกอบ-3", room),
+        processFilePromise("image4Input", "รูปประกอบ-4OLD", "รูปประกอบ-4Base64", "รูปประกอบ-4MimeType", "รูปประกอบ-4", room)
+      ]).then(() => {
+        // รับค่าจาก form ที่เหลือ (ไม่รวมไฟล์หรือ checkbox)
+        let formData = new FormData(this);
+        formData.forEach((value, key) => {
+          if (
+            key !== "Wi‑Fi" && key !== "ห้องอาหาร" && key !== "สระว่ายน้ำ" &&
+            key !== "ที่จอดรถ" && key !== "นวด" &&
+            key !== "รูปภาพ" && key !== "รูปประกอบ-1" && key !== "รูปประกอบ-2" &&
+            key !== "รูปประกอบ-3" && key !== "รูปประกอบ-4" &&
+            key.indexOf("OLD") === -1
+          ) {
             room[key] = value;
           }
         });
 
         fetch(API_URL, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action: "insertOrUpdate", data: room })
         })
           .then(response => response.json())
@@ -322,9 +324,9 @@
                 showConfirmButton: false,
                 timer: 1500
               });
-              form.reset();
+              this.reset();
               // รีเซ็ต preview รูปภาพ
-              ["coverPreview", "image1Preview", "image2Preview", "image3Preview", "image4Preview"].forEach(function (id) {
+              ["coverPreview", "image1Preview", "image2Preview", "image3Preview", "image4Preview"].forEach(id => {
                 let img = document.getElementById(id);
                 img.src = "";
                 img.classList.add("hidden");
@@ -364,7 +366,7 @@
       return `<div class="grid grid-cols-2 gap-4">${trueFields.join("")}</div>`;
     }
 
-    // ฟังก์ชันแสดงรายละเอียดห้องพัก (ไม่ได้เปลี่ยนแปลงจากโค้ดตัวอย่างก่อนหน้านี้)
+    // ฟังก์ชันแสดงรายละเอียดห้องพัก
     function showDetails(id) {
       Swal.fire({
         title: 'กำลังโหลดข้อมูล...',
@@ -429,7 +431,7 @@
         });
     }
 
-    // ฟังก์ชันแก้ไขข้อมูลห้องพัก (เรียกแสดงฟอร์มและเติมข้อมูล)
+    // ฟังก์ชันแก้ไขข้อมูลห้องพัก
     function editRoom(id) {
       Swal.fire({
         title: 'กำลังโหลดข้อมูล...',
@@ -443,11 +445,13 @@
           let roomData = rooms.find(r => r["ไอดีห้อง"] == id);
           if (roomData) {
             let form = document.getElementById("roomForm");
+            // เติมข้อมูลลงในฟอร์ม
             for (let key in roomData) {
               if (form.elements[key] && form.elements[key].type !== "file" && form.elements[key].type !== "checkbox") {
                 form.elements[key].value = roomData[key];
               }
             }
+            // ตั้งค่า checkbox ให้ตรงกับข้อมูล
             form.elements["Wi‑Fi"].checked = (roomData["Wi‑Fi"] && roomData["Wi‑Fi"].toString().toUpperCase() === "TRUE");
             form.elements["ห้องอาหาร"].checked = (roomData["ห้องอาหาร"] && roomData["ห้องอาหาร"].toString().toUpperCase() === "TRUE");
             form.elements["สระว่ายน้ำ"].checked = (roomData["สระว่ายน้ำ"] && roomData["สระว่ายน้ำ"].toString().toUpperCase() === "TRUE");
@@ -456,11 +460,18 @@
             if (form.elements["สถานะ"]) {
               form.elements["สถานะ"].value = roomData["สถานะ"] || "";
             }
+            // กำหนดค่า hidden สำหรับ URL รูปเดิม
             document.getElementById("รูปภาพOLD").value = roomData["รูปภาพ"] || "";
             document.getElementById("รูปประกอบ-1OLD").value = roomData["รูปประกอบ-1"] || "";
             document.getElementById("รูปประกอบ-2OLD").value = roomData["รูปประกอบ-2"] || "";
             document.getElementById("รูปประกอบ-3OLD").value = roomData["รูปประกอบ-3"] || "";
             document.getElementById("รูปประกอบ-4OLD").value = roomData["รูปประกอบ-4"] || "";
+            
+            // ตั้งค่าให้ฟิลด์ "ไอดีห้อง" เป็น readonly
+            if (form.elements["ไอดีห้อง"]) {
+              form.elements["ไอดีห้อง"].readOnly = true;
+            }
+            
             // แสดงฟอร์มและเปลี่ยนหัวเรื่องเป็น "แก้ไขข้อมูล"
             document.getElementById("formSection").classList.remove("hidden");
             document.getElementById("formTitle").textContent = "แก้ไขข้อมูลห้องพัก";
@@ -479,7 +490,7 @@
         });
     }
 
-    // ฟังก์ชันลบข้อมูลห้องพัก (POST API)
+    // ฟังก์ชันลบข้อมูลห้องพัก
     function deleteRoom(id) {
       Swal.fire({
         title: "คุณต้องการลบข้อมูลนี้หรือไม่?",
@@ -497,9 +508,7 @@
           });
           fetch(API_URL, {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ action: "delete", id: id })
           })
             .then(response => response.json())
@@ -531,15 +540,20 @@
 
     // ฟังก์ชันแสดงฟอร์มสำหรับเพิ่มข้อมูลใหม่
     function showAddForm() {
-      document.getElementById("formSection").classList.remove("hidden");
-      document.getElementById("formTitle").textContent = "บันทึกข้อมูลห้องพัก";
-      document.getElementById("roomForm").reset();
+      let form = document.getElementById("roomForm");
+      form.reset();
+      // ยกเลิก readOnly ของฟิลด์ "ไอดีห้อง" เมื่อทำการเพิ่มข้อมูลใหม่
+      if (form.elements["ไอดีห้อง"]) {
+        form.elements["ไอดีห้อง"].readOnly = false;
+      }
       // รีเซ็ต preview รูปภาพ
-      ["coverPreview", "image1Preview", "image2Preview", "image3Preview", "image4Preview"].forEach(function (id) {
+      ["coverPreview", "image1Preview", "image2Preview", "image3Preview", "image4Preview"].forEach(id => {
         let img = document.getElementById(id);
         img.src = "";
         img.classList.add("hidden");
       });
+      document.getElementById("formSection").classList.remove("hidden");
+      document.getElementById("formTitle").textContent = "บันทึกข้อมูลห้องพัก";
     }
 
     // ฟังก์ชันซ่อนฟอร์ม
