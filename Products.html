@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard ห้องพัก</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-gray-50">
+  <div class="container mx-auto px-4">
+    <!-- หัวเรื่องและปุ่มเพิ่มข้อมูล -->
+    <div class="flex justify-between items-center my-4">
+      <h1 class="text-3xl font-bold">Dashboard ห้องพัก</h1>
+      <button class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-md" onclick="showAddForm()">เพิ่มข้อมูล</button>
+    </div>
+    
+    <!-- รายการห้องพัก -->
+    <section class="bg-white shadow rounded p-4 mb-4">
+      <h2 class="text-2xl font-semibold mb-4 text-gray-700">รายการห้องพัก</h2>
+      <div id="roomTable" class="overflow-x-auto"></div>
+    </section>
+    
+    <!-- แบบฟอร์มบันทึก/แก้ไขข้อมูล (ซ่อนโดยค่าเริ่มต้น) -->
+    <section id="formSection" class="bg-white shadow rounded p-4 hidden">
+      <div class="flex justify-between items-center mb-4">
+         <h2 class="text-2xl font-semibold text-gray-700" id="formTitle">บันทึกข้อมูลห้องพัก</h2>
+         <button class="text-red-500" onclick="hideForm()">ปิด</button>
+      </div>
+      <form id="roomForm" class="space-y-4">
+        <!-- กลุ่มฟิลด์เบื้องต้น -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-600">ไอดีห้อง</label>
+            <input type="text" name="ไอดีห้อง" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm"
+              placeholder="ระบบจะสร้างถ้าไม่ระบุ">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-600">ชื่อ</label>
+            <input type="text" name="ชื่อ" required
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm" placeholder="เช่น ห้อง Deluxe">
+          </div>
+        </div>
+
+        <!-- ฟิลด์กลุ่มข้อมูลเพิ่มเติม -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-600">หมวดหมู่</label>
+            <input type="text" name="หมวดหมู่" required
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm" placeholder="เช่น VIP, SILVER">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-600">Wi‑Fi</label>
+            <input type="checkbox" id="wifi" name="Wi‑Fi"
+              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-600">ห้องอาหาร</label>
+            <input type="checkbox" id="restaurant" name="ห้องอาหาร"
+              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-600">สระว่ายน้ำ</label>
+            <input type="checkbox" id="swimmingPool" name="สระว่ายน้ำ"
+              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-600">ที่จอดรถ</label>
+            <input type="checkbox" id="parking" name="ที่จอดรถ"
+              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-600">นวด</label>
+            <input type="checkbox" id="massage" name="นวด"
+              class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+          </div>
+        </div>
+
+        <!-- ฟิลด์ราคาต่าง ๆ -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-600">ราคา</label>
+            <input type="number" name="ราคา" required
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm" placeholder="ราคา">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-600">ราคาลด</label>
+            <input type="number" name="ราคาลด" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm"
+              placeholder="ราคาลด">
+          </div>
+        </div>
+
+        <!-- ฟิลด์สถานะ -->
+        <div>
+          <label class="block text-sm font-medium text-gray-600">สถานะ</label>
+          <input type="text" name="สถานะ" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm"
+            placeholder="สถานะ">
+        </div>
+
+        <!-- รูปปกห้อง (อัปโหลดไฟล์) พร้อมแสดงตัวอย่าง -->
+        <div>
+          <label class="block text-sm font-medium text-gray-600">รูปปกห้อง</label>
+          <input type="file" id="coverInput" name="รูปภาพ" accept="image/*" class="mt-1 block w-full text-sm">
+          <img id="coverPreview" src="" alt="Preview" class="mt-2 w-32 h-20 object-cover border rounded hidden">
+          <input type="hidden" name="รูปภาพOLD" id="รูปภาพOLD">
+        </div>
+
+        <!-- กลุ่มอัปโหลดไฟล์สำหรับรูปประกอบ พร้อม hidden field -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-600">รูปประกอบ-1</label>
+            <input type="file" id="image1Input" name="รูปประกอบ-1" accept="image/*" class="mt-1 block w-full text-sm">
+            <img id="image1Preview" src="" alt="Preview" class="mt-2 w-32 h-20 object-cover border rounded hidden">
+            <input type="hidden" name="รูปประกอบ-1OLD" id="รูปประกอบ-1OLD">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-600">รูปประกอบ-2</label>
+            <input type="file" id="image2Input" name="รูปประกอบ-2" accept="image/*" class="mt-1 block w-full text-sm">
+            <img id="image2Preview" src="" alt="Preview" class="mt-2 w-32 h-20 object-cover border rounded hidden">
+            <input type="hidden" name="รูปประกอบ-2OLD" id="รูปประกอบ-2OLD">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-600">รูปประกอบ-3</label>
+            <input type="file" id="image3Input" name="รูปประกอบ-3" accept="image/*" class="mt-1 block w-full text-sm">
+            <img id="image3Preview" src="" alt="Preview" class="mt-2 w-32 h-20 object-cover border rounded hidden">
+            <input type="hidden" name="รูปประกอบ-3OLD" id="รูปประกอบ-3OLD">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-600">รูปประกอบ-4</label>
+            <input type="file" id="image4Input" name="รูปประกอบ-4" accept="image/*" class="mt-1 block w-full text-sm">
+            <img id="image4Preview" src="" alt="Preview" class="mt-2 w-32 h-20 object-cover border rounded hidden">
+            <input type="hidden" name="รูปประกอบ-4OLD" id="รูปประกอบ-4OLD">
+          </div>
+        </div>
+
+        <!-- กลุ่มรายละเอียด -->
+        <div class="grid grid-cols-1 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-600">รายละเอียด</label>
+            <textarea name="รายละเอียด" rows="3" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm"
+              placeholder="รายละเอียดห้อง"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-600">รายละเอียด-2</label>
+            <textarea name="รายละเอียด-2" rows="3"
+              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm"
+              placeholder="รายละเอียดเพิ่มเติม"></textarea>
+          </div>
+        </div>
+
+        <!-- ปุ่มบันทึกข้อมูล -->
+        <div>
+          <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md text-lg">
+            บันทึกข้อมูล
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <!-- JavaScript ส่วนการทำงาน -->
+  <script>
+    // กำหนด URL ของ Web App (ให้แทนที่ด้วย URL จริงของคุณ)
+    const API_URL = "https://script.google.com/macros/s/AKfycbx89UiSzrguGFFcx7XTDXVV-XTvYNQaE3oMVC3SE0L2yexJpynaMDRYIK6fQqLEYJWe/exec";
+
+    // ฟังก์ชันสำหรับแสดง preview ของไฟล์ที่อัปโหลด
+    function setupPreview(fileInputId, previewImgId) {
+      document.getElementById(fileInputId).addEventListener('change', function () {
+        var file = this.files[0];
+        if (file) {
+          var reader = new FileReader();
+          reader.onload = function (e) {
+            var preview = document.getElementById(previewImgId);
+            preview.src = e.target.result;
+            preview.classList.remove('hidden');
+          }
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+    // ตั้งค่า preview สำหรับไฟล์แต่ละอัน
+    setupPreview('coverInput', 'coverPreview');
+    setupPreview('image1Input', 'image1Preview');
+    setupPreview('image2Input', 'image2Preview');
+    setupPreview('image3Input', 'image3Preview');
+    setupPreview('image4Input', 'image4Preview');
+
+    // ฟังก์ชัน processFilePromise สำหรับประมวลผลไฟล์
+    function processFilePromise(inputId, oldFieldId, base64Key, mimeKey, actualField) {
+      return new Promise(function (resolve, reject) {
+        var fileInput = document.getElementById(inputId);
+        if (fileInput.files.length > 0) {
+          var file = fileInput.files[0];
+          var reader = new FileReader();
+          reader.onload = function (event) {
+            var dataUrl = event.target.result;
+            var base64Data = dataUrl.split(',')[1];
+            var mimeType = file.type;
+            room[base64Key] = base64Data;
+            room[mimeKey] = mimeType;
+            resolve();
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        } else {
+          room[base64Key] = "";
+          room[mimeKey] = "";
+          room[actualField] = document.getElementById(oldFieldId).value;
+          resolve();
+        }
+      });
+    }
+
+    // ฟังก์ชันแสดงรายการห้องพัก (GET API)
+    function loadRooms() {
+      Swal.fire({
+        title: 'กำลังโหลดข้อมูล...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+      fetch(API_URL + "?action=fetchData")
+        .then(response => response.json())
+        .then(rooms => {
+          Swal.close();
+          let html = `<table class="min-w-full">
+                          <thead>
+                            <tr class="bg-gray-200 text-gray-700 uppercase text-xs">
+                              <th class="py-2 px-3 text-left">รูปปก</th>
+                              <th class="py-2 px-3 text-left">ไอดีห้อง</th>
+                              <th class="py-2 px-3 text-left">ชื่อ</th>
+                              <th class="py-2 px-3 text-left">หมวดหมู่</th>
+                              <th class="py-2 px-3 text-left">ราคา</th>
+                              <th class="py-2 px-3 text-left">สถานะ</th>
+                              <th class="py-2 px-3 text-left">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody class="text-gray-600 text-sm">`;
+          rooms.forEach(room => {
+            const cover = room["รูปภาพ"] ? `<img src="${room["รูปภาพ"]}" alt="cover" class="w-16 h-12 object-cover rounded">` : "";
+            html += `<tr class="border-b hover:bg-gray-50">
+                         <td class="py-2 px-3">${cover}</td>
+                         <td class="py-2 px-3">${room["ไอดีห้อง"]}</td>
+                         <td class="py-2 px-3">${room["ชื่อ"]}</td>
+                         <td class="py-2 px-3">${room["หมวดหมู่"]}</td>
+                         <td class="py-2 px-3">${room["ราคา"]}</td>
+                         <td class="py-2 px-3">${room["สถานะ"]}</td>
+                         <td class="py-2 px-3">
+                           <button class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-2 rounded text-xs mr-1" onclick="showDetails('${room["ไอดีห้อง"]}')">
+                             รายละเอียด
+                           </button>
+                           <button class="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-2 rounded text-xs mr-1" onclick="editRoom('${room["ไอดีห้อง"]}')">
+                             แก้ไข
+                           </button>
+                           <button class="bg-red-500 hover:bg-red-600 text-white py-1 px-2 rounded text-xs" onclick="deleteRoom('${room["ไอดีห้อง"]}')">
+                             ลบ
+                           </button>
+                         </td>
+                       </tr>`;
+          });
+          html += `</tbody></table>`;
+          document.getElementById("roomTable").innerHTML = html;
+        })
+        .catch(error => {
+          Swal.close();
+          console.error("Error loading rooms:", error);
+        });
+    }
+
+    // เมื่อ submit ฟอร์ม (POST API)
+    document.getElementById("roomForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      let form = e.target;
+      room = {};  // ตัวแปรเก็บข้อมูล
+
+      // รับค่าจาก checkbox
+      room["Wi‑Fi"] = form.elements["Wi‑Fi"].checked ? "TRUE" : "";
+      room["ห้องอาหาร"] = form.elements["ห้องอาหาร"].checked ? "TRUE" : "";
+      room["สระว่ายน้ำ"] = form.elements["สระว่ายน้ำ"].checked ? "TRUE" : "";
+      room["ที่จอดรถ"] = form.elements["ที่จอดรถ"].checked ? "TRUE" : "";
+      room["นวด"] = form.elements["นวด"].checked ? "TRUE" : "";
+
+      Swal.fire({
+        title: 'กำลังบันทึกข้อมูล...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+
+      Promise.all([
+        processFilePromise("coverInput", "รูปภาพOLD", "รูปภาพBase64", "รูปภาพMimeType", "รูปภาพ"),
+        processFilePromise("image1Input", "รูปประกอบ-1OLD", "รูปประกอบ-1Base64", "รูปประกอบ-1MimeType", "รูปประกอบ-1"),
+        processFilePromise("image2Input", "รูปประกอบ-2OLD", "รูปประกอบ-2Base64", "รูปประกอบ-2MimeType", "รูปประกอบ-2"),
+        processFilePromise("image3Input", "รูปประกอบ-3OLD", "รูปประกอบ-3Base64", "รูปประกอบ-3MimeType", "รูปประกอบ-3"),
+        processFilePromise("image4Input", "รูปประกอบ-4OLD", "รูปประกอบ-4Base64", "รูปประกอบ-4MimeType", "รูปประกอบ-4")
+      ]).then(function () {
+        // รับค่าจาก form ที่เหลือ (ไม่รวมไฟล์)
+        let formData = new FormData(form);
+        formData.forEach(function (value, key) {
+          if (key !== "Wi‑Fi" && key !== "ห้องอาหาร" && key !== "สระว่ายน้ำ" && key !== "ที่จอดรถ" && key !== "นวด" &&
+              key !== "รูปภาพ" && key !== "รูปประกอบ-1" && key !== "รูปประกอบ-2" &&
+              key !== "รูปประกอบ-3" && key !== "รูปประกอบ-4" && key.indexOf("OLD") === -1) {
+            room[key] = value;
+          }
+        });
+
+        fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ action: "insertOrUpdate", data: room })
+        })
+          .then(response => response.json())
+          .then(result => {
+            Swal.close();
+            if (result.status === "success") {
+              Swal.fire({
+                icon: "success",
+                title: "บันทึกข้อมูลเรียบร้อย",
+                showConfirmButton: false,
+                timer: 1500
+              });
+              form.reset();
+              // รีเซ็ต preview รูปภาพ
+              ["coverPreview", "image1Preview", "image2Preview", "image3Preview", "image4Preview"].forEach(function (id) {
+                let img = document.getElementById(id);
+                img.src = "";
+                img.classList.add("hidden");
+              });
+              loadRooms();
+              hideForm(); // ซ่อนฟอร์มหลังบันทึก
+            } else {
+              throw new Error(result.message);
+            }
+          })
+          .catch(error => {
+            Swal.close();
+            Swal.fire({
+              icon: "error",
+              title: "เกิดข้อผิดพลาด",
+              text: error.message
+            });
+          });
+      });
+    });
+
+    // ฟังก์ชันช่วยสร้าง HTML สำหรับแสดงเครื่องหมายเช็คในข้อมูลที่เป็น TRUE
+    function buildCheckboxHtml(roomData) {
+      var checkboxFields = [
+        { label: "Wi‑Fi", value: roomData["Wi‑Fi"] },
+        { label: "ห้องอาหาร", value: roomData["ห้องอาหาร"] },
+        { label: "สระว่ายน้ำ", value: roomData["สระว่ายน้ำ"] },
+        { label: "ที่จอดรถ", value: roomData["ที่จอดรถ"] },
+        { label: "นวด", value: roomData["นวด"] }
+      ];
+      var trueFields = checkboxFields.filter(function (field) {
+        return field.value && field.value.toString().toUpperCase() === "TRUE";
+      }).map(function (field) {
+        return `<div><strong>${field.label}:</strong> ✅</div>`;
+      });
+      if (trueFields.length === 0) return "";
+      return `<div class="grid grid-cols-2 gap-4">${trueFields.join("")}</div>`;
+    }
+
+    // ฟังก์ชันแสดงรายละเอียดห้องพัก (ไม่ได้เปลี่ยนแปลงจากโค้ดตัวอย่างก่อนหน้านี้)
+    function showDetails(id) {
+      Swal.fire({
+        title: 'กำลังโหลดข้อมูล...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+      fetch(API_URL + "?action=fetchData")
+        .then(response => response.json())
+        .then(rooms => {
+          Swal.close();
+          let roomData = rooms.find(r => r["ไอดีห้อง"] == id);
+          if (roomData) {
+            let mainImageUrl = roomData["รูปภาพ"] ? roomData["รูปภาพ"] : "";
+            let thumbnails = "";
+            if (roomData["รูปประกอบ-1"]) {
+              thumbnails += `<img src="${roomData["รูปประกอบ-1"]}" alt="Thumbnail 1" class="w-12 h-12 object-cover border rounded cursor-pointer" onclick="document.getElementById('swalMainImage').src='${roomData["รูปประกอบ-1"]}'">`;
+            }
+            if (roomData["รูปประกอบ-2"]) {
+              thumbnails += `<img src="${roomData["รูปประกอบ-2"]}" alt="Thumbnail 2" class="w-12 h-12 object-cover border rounded cursor-pointer" onclick="document.getElementById('swalMainImage').src='${roomData["รูปประกอบ-2"]}'">`;
+            }
+            if (roomData["รูปประกอบ-3"]) {
+              thumbnails += `<img src="${roomData["รูปประกอบ-3"]}" alt="Thumbnail 3" class="w-12 h-12 object-cover border rounded cursor-pointer" onclick="document.getElementById('swalMainImage').src='${roomData["รูปประกอบ-3"]}'">`;
+            }
+            if (roomData["รูปประกอบ-4"]) {
+              thumbnails += `<img src="${roomData["รูปประกอบ-4"]}" alt="Thumbnail 4" class="w-12 h-12 object-cover border rounded cursor-pointer" onclick="document.getElementById('swalMainImage').src='${roomData["รูปประกอบ-4"]}'">`;
+            }
+            let checkboxHtml = buildCheckboxHtml(roomData);
+            let htmlContent = `
+              <div class="p-4 text-left">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <div class="mb-4">
+                      <img id="swalMainImage" src="${mainImageUrl}" alt="Main Image" class="w-full object-cover rounded" style="max-height:300px;">
+                    </div>
+                    ${thumbnails ? `<div class="flex space-x-2 mb-4">${thumbnails}</div>` : ""}
+                  </div>
+                  <div class="text-sm">
+                    <p class="mb-1"><strong>ชื่อ:</strong> ${roomData["ชื่อ"]}</p>
+                    <p class="mb-1"><strong>หมวดหมู่:</strong> ${roomData["หมวดหมู่"]}</p>
+                    <div class="mt-2 mb-2">${checkboxHtml}</div>
+                    <p class="mb-1"><strong>ราคา:</strong> ${roomData["ราคา"]}</p>
+                    <p class="mb-1"><strong>ราคาลด:</strong> ${roomData["ราคาลด"]}</p>
+                    <p class="mt-4 whitespace-pre-line text-sm"><strong>รายละเอียด:</strong> ${roomData["รายละเอียด"] || ""}</p>
+                    <p class="mt-4 whitespace-pre-line text-sm"><strong>รายละเอียด-2:</strong> ${roomData["รายละเอียด-2"] || ""}</p>
+                    <p class="mt-4"><strong>สถานะ:</strong> ${roomData["สถานะ"] || ""}</p>
+                  </div>
+                </div>
+              </div>
+            `;
+            Swal.fire({
+              title: "รายละเอียดห้องพัก",
+              html: htmlContent,
+              width: "600px",
+              showCloseButton: true,
+              showConfirmButton: false
+            });
+          }
+        })
+        .catch(error => {
+          Swal.close();
+          console.error("Error in showDetails:", error);
+        });
+    }
+
+    // ฟังก์ชันแก้ไขข้อมูลห้องพัก (เรียกแสดงฟอร์มและเติมข้อมูล)
+    function editRoom(id) {
+      Swal.fire({
+        title: 'กำลังโหลดข้อมูล...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+      fetch(API_URL + "?action=fetchData")
+        .then(response => response.json())
+        .then(rooms => {
+          Swal.close();
+          let roomData = rooms.find(r => r["ไอดีห้อง"] == id);
+          if (roomData) {
+            let form = document.getElementById("roomForm");
+            for (let key in roomData) {
+              if (form.elements[key] && form.elements[key].type !== "file" && form.elements[key].type !== "checkbox") {
+                form.elements[key].value = roomData[key];
+              }
+            }
+            form.elements["Wi‑Fi"].checked = (roomData["Wi‑Fi"] && roomData["Wi‑Fi"].toString().toUpperCase() === "TRUE");
+            form.elements["ห้องอาหาร"].checked = (roomData["ห้องอาหาร"] && roomData["ห้องอาหาร"].toString().toUpperCase() === "TRUE");
+            form.elements["สระว่ายน้ำ"].checked = (roomData["สระว่ายน้ำ"] && roomData["สระว่ายน้ำ"].toString().toUpperCase() === "TRUE");
+            form.elements["ที่จอดรถ"].checked = (roomData["ที่จอดรถ"] && roomData["ที่จอดรถ"].toString().toUpperCase() === "TRUE");
+            form.elements["นวด"].checked = (roomData["นวด"] && roomData["นวด"].toString().toUpperCase() === "TRUE");
+            if (form.elements["สถานะ"]) {
+              form.elements["สถานะ"].value = roomData["สถานะ"] || "";
+            }
+            document.getElementById("รูปภาพOLD").value = roomData["รูปภาพ"] || "";
+            document.getElementById("รูปประกอบ-1OLD").value = roomData["รูปประกอบ-1"] || "";
+            document.getElementById("รูปประกอบ-2OLD").value = roomData["รูปประกอบ-2"] || "";
+            document.getElementById("รูปประกอบ-3OLD").value = roomData["รูปประกอบ-3"] || "";
+            document.getElementById("รูปประกอบ-4OLD").value = roomData["รูปประกอบ-4"] || "";
+            // แสดงฟอร์มและเปลี่ยนหัวเรื่องเป็น "แก้ไขข้อมูล"
+            document.getElementById("formSection").classList.remove("hidden");
+            document.getElementById("formTitle").textContent = "แก้ไขข้อมูลห้องพัก";
+            Swal.fire({
+              icon: "info",
+              title: "แก้ไขข้อมูล",
+              text: "หากต้องการเปลี่ยนรูป กรุณาเลือกไฟล์ใหม่",
+              timer: 2000,
+              showConfirmButton: false
+            });
+          }
+        })
+        .catch(error => {
+          Swal.close();
+          console.error("Error in editRoom:", error);
+        });
+    }
+
+    // ฟังก์ชันลบข้อมูลห้องพัก (POST API)
+    function deleteRoom(id) {
+      Swal.fire({
+        title: "คุณต้องการลบข้อมูลนี้หรือไม่?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "ใช่, ลบเลย!"
+      }).then(result => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "กำลังลบข้อมูล...",
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+          });
+          fetch(API_URL, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ action: "delete", id: id })
+          })
+            .then(response => response.json())
+            .then(result => {
+              Swal.close();
+              if (result.status === "success") {
+                Swal.fire({
+                  icon: "success",
+                  title: "ลบข้อมูลเรียบร้อย",
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+                loadRooms();
+              } else {
+                throw new Error(result.message);
+              }
+            })
+            .catch(error => {
+              Swal.close();
+              Swal.fire({
+                icon: "error",
+                title: "เกิดข้อผิดพลาด",
+                text: error.message
+              });
+            });
+        }
+      });
+    }
+
+    // ฟังก์ชันแสดงฟอร์มสำหรับเพิ่มข้อมูลใหม่
+    function showAddForm() {
+      document.getElementById("formSection").classList.remove("hidden");
+      document.getElementById("formTitle").textContent = "บันทึกข้อมูลห้องพัก";
+      document.getElementById("roomForm").reset();
+      // รีเซ็ต preview รูปภาพ
+      ["coverPreview", "image1Preview", "image2Preview", "image3Preview", "image4Preview"].forEach(function (id) {
+        let img = document.getElementById(id);
+        img.src = "";
+        img.classList.add("hidden");
+      });
+    }
+
+    // ฟังก์ชันซ่อนฟอร์ม
+    function hideForm() {
+      document.getElementById("formSection").classList.add("hidden");
+    }
+
+    // โหลดข้อมูลห้องพักเมื่อหน้าเว็บโหลดเสร็จ
+    loadRooms();
+  </script>
+</body>
+</html>
