@@ -11,12 +11,25 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     body { font-family: 'Sarabun', sans-serif; }
-    .nav-link.active { background-color: #e2e8f0; font-weight: 600; }
+    .nav-link.active { background-color: #eef2ff; color: #4f46e5; font-weight: 600; }
+    .nav-link.active .material-icons-round { color: #4f46e5; }
+    /* Spinner for buttons */
+    .btn-spinner {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        vertical-align: text-bottom;
+        border: 0.15em solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        animation: spinner-border .75s linear infinite;
+    }
+    @keyframes spinner-border { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body class="bg-slate-100 min-h-screen flex">
 
-  <!-- Loading Overlay -->
+  <!-- Loading Overlay for full page actions -->
   <div id="loading-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
     <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-white"></div>
   </div>
@@ -28,19 +41,19 @@
     </div>
     <nav id="main-nav" class="flex-1 space-y-1 mt-4">
       <a href="#appointment" data-view="appointment" class="nav-link flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg mx-2">
-        <span class="material-icons-round">book_online</span>
+        <span class="material-icons-round text-gray-500">book_online</span>
         <span>Booking</span>
       </a>
       <a href="#room" data-view="room" class="nav-link flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg mx-2">
-        <span class="material-icons-round">king_bed</span>
+        <span class="material-icons-round text-gray-500">king_bed</span>
         <span>Room</span>
       </a>
       <a href="#member" data-view="member" class="nav-link flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg mx-2">
-        <span class="material-icons-round">group</span>
+        <span class="material-icons-round text-gray-500">group</span>
         <span>Member</span>
       </a>
       <a href="#setting" data-view="setting" class="nav-link flex items-center space-x-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg mx-2">
-        <span class="material-icons-round">settings</span>
+        <span class="material-icons-round text-gray-500">settings</span>
         <span>Setting</span>
       </a>
     </nav>
@@ -50,24 +63,27 @@
   <main class="flex-1 flex flex-col p-4 md:p-8 overflow-y-auto">
     <!-- ======================= APPOINTMENT VIEW ======================= -->
     <div id="view-appointment" class="view-content hidden">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-slate-800">Booking Management</h2>
+        <button id="add-booking-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md flex items-center space-x-2">
+          <span class="material-icons-round">add_circle_outline</span>
+          <span>เพิ่มการจอง</span>
+        </button>
+      </div>
       <div id="cards-section">
-        <h2 class="text-2xl font-bold mb-4 text-slate-800">Active Bookings</h2>
+        <h3 class="text-xl font-semibold mb-4 text-slate-700">Active Bookings</h3>
         <div id="cards-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
         <div id="more-container" class="mt-6 text-center"></div>
       </div>
       <div class="mt-8">
-        <h2 class="text-2xl font-bold mb-4 text-slate-800">Booking History</h2>
+        <h3 class="text-xl font-semibold mb-4 text-slate-700">Booking History</h3>
         <div class="bg-white rounded-lg shadow-md overflow-hidden">
           <div class="overflow-x-auto">
             <table id="data-table" class="min-w-full text-sm">
               <thead class="bg-slate-50">
                 <tr class="text-slate-600">
-                  <th class="py-3 px-4 text-left">ห้องพัก</th>
-                  <th class="py-3 px-4 text-left">เข้าพัก</th>
-                  <th class="py-3 px-4 text-left">ออก</th>
-                  <th class="py-3 px-4 text-left">ผู้จอง</th>
-                  <th class="py-3 px-4 text-left">สถานะ</th>
-                  <th class="py-3 px-4 text-center">จัดการ</th>
+                  <th class="py-3 px-4 text-left">ห้องพัก</th><th class="py-3 px-4 text-left">เข้าพัก</th><th class="py-3 px-4 text-left">ออก</th>
+                  <th class="py-3 px-4 text-left">ผู้จอง</th><th class="py-3 px-4 text-left">สถานะ</th><th class="py-3 px-4 text-center">จัดการ</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200"></tbody>
@@ -82,8 +98,7 @@
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-slate-800">Room Management</h2>
         <button class="bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 px-4 rounded-md flex items-center space-x-2" onclick="showAddForm()">
-          <span class="material-icons-round">add</span>
-          <span>เพิ่มห้องพัก</span>
+          <span class="material-icons-round">add</span><span>เพิ่มห้องพัก</span>
         </button>
       </div>
       <section id="formSection" class="bg-white shadow-lg rounded-lg p-6 hidden mb-6"></section>
@@ -111,11 +126,8 @@
           <table id="member-data-table" class="min-w-full text-sm bg-white">
             <thead class="bg-slate-50">
               <tr class="text-slate-600">
-                <th class="py-3 px-4 text-left">ไอดี</th>
-                <th class="py-3 px-4 text-left">ชื่อสกุล</th>
-                <th class="py-3 px-4 text-left">เบอร์ติดต่อ</th>
-                <th class="py-3 px-4 text-left">คะแนน</th>
-                <th class="py-3 px-4 text-center">Action</th>
+                <th class="py-3 px-4 text-left">ไอดี</th><th class="py-3 px-4 text-left">ชื่อสกุล</th><th class="py-3 px-4 text-left">เบอร์ติดต่อ</th>
+                <th class="py-3 px-4 text-left">คะแนน</th><th class="py-3 px-4 text-center">Action</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200"></tbody>
@@ -138,8 +150,76 @@
   <!-- MODALS (All Modals are placed here) -->
   <!-- ================================================================= -->
 
+  <!-- Add New Booking Modal -->
+  <div id="add-booking-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 p-4">
+    <div class="bg-white p-6 rounded-xl w-full max-w-lg transform transition-all" role="dialog">
+      <h2 class="text-lg font-bold mb-4">สร้างรายการจองใหม่</h2>
+      <form id="add-booking-form" class="space-y-4">
+        <div><label for="booking-room-select" class="block text-sm font-medium text-gray-700">เลือกห้องพัก*</label><select id="booking-room-select" name="room" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2"></select></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><label for="booking-checkin" class="block text-sm font-medium text-gray-700">วันที่เข้าพัก*</label><input type="date" id="booking-checkin" name="checkinDate" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2"></div>
+            <div><label for="booking-checkout" class="block text-sm font-medium text-gray-700">วันที่ออก*</label><input type="date" id="booking-checkout" name="checkoutDate" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2"></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><label for="booking-bookerName" class="block text-sm font-medium text-gray-700">ชื่อผู้จอง*</label><input type="text" id="booking-bookerName" name="bookerName" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2"></div>
+            <div><label for="booking-phone" class="block text-sm font-medium text-gray-700">เบอร์ติดต่อ*</label><input type="tel" id="booking-phone" name="phone" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2"></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+             <div><label for="booking-numGuests" class="block text-sm font-medium text-gray-700">จำนวนคน*</label><input type="number" id="booking-numGuests" name="numGuests" min="1" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2"></div>
+             <div><label for="booking-payment" class="block text-sm font-medium text-gray-700">สถานะชำระเงิน</label>
+                <select id="booking-payment" name="payment" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2">
+                    <option>รอชำระเงิน</option><option>จ่ายหน้าเค้าเตอร์</option><option>ชำระเงินสำเร็จ</option>
+                </select>
+            </div>
+        </div>
+        <div class="flex justify-end space-x-3 pt-2">
+          <button type="button" id="cancel-add-booking-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md">ยกเลิก</button>
+          <button type="submit" id="submit-add-booking-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md w-28 text-center min-h-[40px]">
+            <span class="btn-text">บันทึก</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+    <!-- ================================================================= -->
+  <!-- MODALS (All Modals are placed here) -->
+  <!-- ================================================================= -->
+
+  <!-- Add New Booking Modal (Already included in the full HTML, but here for completeness) -->
+  <div id="add-booking-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 p-4">
+    <div class="bg-white p-6 rounded-xl w-full max-w-lg transform transition-all" role="dialog">
+      <h2 class="text-lg font-bold mb-4">สร้างรายการจองใหม่</h2>
+      <form id="add-booking-form" class="space-y-4">
+        <div><label for="booking-room-select" class="block text-sm font-medium text-gray-700">เลือกห้องพัก*</label><select id="booking-room-select" name="room" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2"></select></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><label for="booking-checkin" class="block text-sm font-medium text-gray-700">วันที่เข้าพัก*</label><input type="date" id="booking-checkin" name="checkinDate" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2"></div>
+            <div><label for="booking-checkout" class="block text-sm font-medium text-gray-700">วันที่ออก*</label><input type="date" id="booking-checkout" name="checkoutDate" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2"></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><label for="booking-bookerName" class="block text-sm font-medium text-gray-700">ชื่อผู้จอง*</label><input type="text" id="booking-bookerName" name="bookerName" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2"></div>
+            <div><label for="booking-phone" class="block text-sm font-medium text-gray-700">เบอร์ติดต่อ*</label><input type="tel" id="booking-phone" name="phone" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2"></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+             <div><label for="booking-numGuests" class="block text-sm font-medium text-gray-700">จำนวนคน*</label><input type="number" id="booking-numGuests" name="numGuests" min="1" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2"></div>
+             <div><label for="booking-payment" class="block text-sm font-medium text-gray-700">สถานะชำระเงิน</label>
+                <select id="booking-payment" name="payment" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm p-2">
+                    <option>รอชำระเงิน</option><option>จ่ายหน้าเค้าเตอร์</option><option>ชำระเงินสำเร็จ</option>
+                </select>
+            </div>
+        </div>
+        <div class="flex justify-end space-x-3 pt-2">
+          <button type="button" id="cancel-add-booking-btn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md">ยกเลิก</button>
+          <button type="submit" id="submit-add-booking-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md w-28 text-center min-h-[40px]">
+            <span class="btn-text">บันทึก</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Appointment: Update Payment Modal -->
-  <div id="update-payment-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
+  <div id="update-payment-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 p-4">
     <div class="bg-white p-6 rounded-xl w-full max-w-md transform transition-all" role="dialog">
       <h2 class="text-lg font-bold mb-4">อัพเดทการชำระเงิน</h2>
       <form id="update-payment-form">
@@ -154,14 +234,16 @@
         </div>
         <div class="flex justify-end space-x-3">
           <button type="button" onclick="closePaymentModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md">ยกเลิก</button>
-          <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md">บันทึก</button>
+          <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md w-28 text-center min-h-[40px]">
+             <span class="btn-text">บันทึก</span>
+          </button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- Appointment: Update Check-In Modal -->
-  <div id="update-checkin-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
+  <div id="update-checkin-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 p-4">
       <div class="bg-white p-6 rounded-xl w-full max-w-md transform transition-all" role="dialog">
         <h2 class="text-lg font-bold mb-4">อัพเดทข้อมูลเข้าพัก (Check-In)</h2>
         <form id="update-checkin-form">
@@ -176,14 +258,16 @@
           </div>
           <div class="flex justify-end space-x-3">
             <button type="button" onclick="closeCheckinModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md">ยกเลิก</button>
-            <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md">บันทึก</button>
+            <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md w-28 text-center min-h-[40px]">
+                <span class="btn-text">บันทึก</span>
+            </button>
           </div>
         </form>
       </div>
   </div>
 
   <!-- Appointment: Update Check-Out Modal -->
-  <div id="update-checkout-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
+  <div id="update-checkout-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 p-4">
       <div class="bg-white p-6 rounded-xl w-full max-w-md transform transition-all" role="dialog">
         <h2 class="text-lg font-bold mb-4">อัพเดทข้อมูลเสร็จสิ้น (Check-Out)</h2>
         <form id="update-checkout-form">
@@ -198,14 +282,16 @@
           </div>
           <div class="flex justify-end space-x-3">
             <button type="button" onclick="closeCheckoutModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md">ยกเลิก</button>
-            <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-md">บันทึก</button>
+            <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-md w-28 text-center min-h-[40px]">
+                <span class="btn-text">บันทึก</span>
+            </button>
           </div>
         </form>
       </div>
   </div>
 
   <!-- Appointment: Edit General Info Modal -->
-  <div id="edit-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
+  <div id="edit-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 p-4">
       <div class="bg-white p-6 rounded-xl w-full max-w-md transform transition-all" role="dialog">
         <h2 class="text-lg font-bold mb-4">แก้ไขข้อมูลการจอง</h2>
         <form id="edit-form" class="space-y-4">
@@ -218,17 +304,19 @@
           <div><label for="edit-phone" class="block text-sm font-medium text-gray-700">เบอร์ติดต่อ</label><input type="text" id="edit-phone" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm"></div>
           <div class="flex justify-end space-x-3 pt-2">
             <button type="button" onclick="closeEditModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md">ยกเลิก</button>
-            <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-md">บันทึก</button>
+            <button type="submit" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-md w-28 text-center min-h-[40px]">
+                <span class="btn-text">บันทึก</span>
+            </button>
           </div>
         </form>
       </div>
   </div>
 
   <!-- Member: View Profile Modal -->
-  <div id="profile-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
+  <div id="profile-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 p-4">
     <div class="bg-white p-6 rounded-lg w-full max-w-lg transform transition-all" role="dialog">
       <h2 class="text-2xl mb-4 font-bold">ข้อมูลสมาชิก</h2>
-      <div id="profile-content" class="space-y-2 text-sm"></div>
+      <div id="profile-content" class="space-y-2 text-sm border-t border-b py-4"></div>
       <div class="flex justify-end mt-6">
         <button type="button" class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700" onclick="closeProfileModal()">ปิด</button>
       </div>
@@ -236,7 +324,7 @@
   </div>
 
   <!-- Member: Edit Modal -->
-  <div id="member-edit-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
+  <div id="member-edit-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 p-4">
     <div class="bg-white p-6 rounded-lg w-full max-w-2xl transform transition-all" role="dialog">
       <h2 class="text-2xl mb-6 font-bold">แก้ไขข้อมูลสมาชิก</h2>
       <form id="member-edit-form">
@@ -251,23 +339,34 @@
         </div>
         <div class="flex justify-end mt-6 space-x-3">
           <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md" onclick="closeMemberEditModal()">ยกเลิก</button>
-          <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md">บันทึก</button>
+          <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md w-28 text-center min-h-[40px]">
+            <span class="btn-text">บันทึก</span>
+          </button>
         </div>
       </form>
     </div>
   </div>
+  <!-- (คัดลอกเนื้อหา Modal ที่เหลือจาก HTML ก่อนหน้านี้มาวางแทนที่ ... ได้เลย) -->
 
-  <script  >
+  <script >
+
+    // admin.js (Single Page Application Controller - Full Version)
+
 // =================================================================
+// 1. GLOBAL CONFIGURATION & STATE
+// =================================================================
+// !!! สำคัญ: เปลี่ยน YOUR_DEPLOYMENT_ID เป็น ID ของ Web App ที่คุณ Deploy !!!
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzZ7QNIgh1I8mm0khQ4j-y2G0BGiUjHO3obmsnTokdSaencO3-BzPHUKIS8F6rP0Xf3OQ/exec'; 
 
 const state = {
     appointmentDataLoaded: false,
     memberDataLoaded: false,
     roomDataLoaded: false,
+    roomList: [], // Cache for available rooms
 };
+
 // =================================================================
-// 2. CORE APP LOGIC (Navigation and View Control)
+// 2. CORE APP LOGIC & HELPERS
 // =================================================================
 document.addEventListener('DOMContentLoaded', () => {
     const navLinks = document.querySelectorAll('.nav-link');
@@ -279,6 +378,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         navLinks.forEach(link => {
             link.classList.toggle('active', link.dataset.view === viewName);
+            const icon = link.querySelector('.material-icons-round');
+            if (icon) {
+                icon.classList.toggle('text-gray-500', link.dataset.view !== viewName);
+                icon.classList.toggle('text-indigo-600', link.dataset.view === viewName);
+            }
         });
         
         window.location.hash = viewName;
@@ -319,8 +423,25 @@ function loadDataForView(viewName) {
     }
 }
 
-function startLoading() { document.getElementById('loading-overlay')?.classList.remove('hidden'); }
-function stopLoading() { document.getElementById('loading-overlay')?.classList.add('hidden'); }
+function startLoading() { $('#loading-overlay').removeClass('hidden'); }
+function stopLoading() { $('#loading-overlay').addClass('hidden'); }
+
+function setButtonLoading(button, isLoading) {
+    const btn = $(button);
+    const textSpan = btn.find('.btn-text');
+    
+    if (isLoading) {
+        btn.prop('disabled', true);
+        if(textSpan.length > 0) {
+           textSpan.data('original-text', textSpan.text()).html('<div class="btn-spinner mx-auto"></div>');
+        }
+    } else {
+        btn.prop('disabled', false);
+        if(textSpan.length > 0 && textSpan.data('original-text')) {
+           textSpan.text(textSpan.data('original-text'));
+        }
+    }
+}
 
 // =================================================================
 // 3. APPOINTMENT MODULE
@@ -340,10 +461,8 @@ function getStatusBadge(status) {
 async function fetchAppointmentData() {
     startLoading();
     try {
-        const response = await fetch(`${WEB_APP_URL}?module=appointment`);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
-        appointmentTableData = processAppointmentData(data);
+        const response = await $.get(`${WEB_APP_URL}?module=appointment`);
+        appointmentTableData = processAppointmentData(response);
         renderAppointmentTable(appointmentTableData);
         renderAppointmentCards();
     } catch (error) {
@@ -361,11 +480,12 @@ function processAppointmentData(data) {
 
 function formatDateDMY(dateStr) {
     if (!dateStr) return '';
-    if (dateStr.includes('T')) {
-        const date = new Date(dateStr);
-        return new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Bangkok' }).format(date).replace(/\//g, '-');
+    // Handles both ISO (YYYY-MM-DD) and DD-MM-YYYY
+    const parts = dateStr.split('T')[0].split('-');
+    if (parts[0].length === 4) { // YYYY-MM-DD
+        return `${parts[2]}-${parts[1]}-${parts[0]}`;
     }
-    return dateStr;
+    return dateStr; // Already DD-MM-YYYY
 }
 
 function formatDateTime(dateTimeStr) {
@@ -385,7 +505,7 @@ function formatDateTime(dateTimeStr) {
 }
 
 function convertToDatetimeLocalFormat(dateTimeStr) {
-    if (!dateTimeStr) return new Date().toISOString().slice(0, 16);
+    if (!dateTimeStr) return new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
     const parts = dateTimeStr.split(' ');
     if (parts.length < 2) return '';
     const dateParts = parts[0].split('-');
@@ -397,9 +517,16 @@ function renderAppointmentTable(data) {
     const tbody = document.querySelector('#data-table tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
-    const filteredData = data.filter(item => item.status === 'เสร็จสิ้น' || item.status === 'ยกเลิก').sort((a,b) => new Date(b.checkOutTime || 0) - new Date(a.checkOutTime || 0));
+    const filteredData = data.filter(item => item.status === 'เสร็จสิ้น' || item.status === 'ยกเลิก').sort((a, b) => {
+        // Sort by checkout time descending, handling nulls
+        const dateA = a.checkOutTime ? new Date(a.checkOutTime.split(' ')[0].split('-').reverse().join('-') + 'T' + a.checkOutTime.split(' ')[1]) : 0;
+        const dateB = b.checkOutTime ? new Date(b.checkOutTime.split(' ')[0].split('-').reverse().join('-') + 'T' + b.checkOutTime.split(' ')[1]) : 0;
+        return dateB - dateA;
+    });
+
     filteredData.forEach(item => {
         const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50';
         tr.innerHTML = `
             <td class="py-2 px-4">${item.roomName}</td>
             <td class="py-2 px-4">${formatDateDMY(item.checkinDate)}</td>
@@ -408,9 +535,11 @@ function renderAppointmentTable(data) {
             <td class="py-2 px-4">${getStatusBadge(item.status)}</td>
             <td class="py-2 px-4 text-center">
                 <div class="flex space-x-1 justify-center">
+                    <!-- ปุ่ม Action ทั้งหมดกลับมาแล้ว -->
                     <button class="bg-gray-200 hover:bg-gray-300 p-2 rounded-full" onclick="toggleDetails('${item.id}', this)" title="แสดงรายละเอียด"><span class="material-icons-round text-base text-gray-700">visibility</span></button>
-                    <button class="bg-gray-200 hover:bg-gray-300 p-2 rounded-full" onclick="openEditModal('${item.id}')" title="แก้ไข"><span class="material-icons-round text-base text-gray-700">edit</span></button>
-                    <button class="bg-gray-200 hover:bg-gray-300 p-2 rounded-full" onclick="deleteRecord('${item.id}')" title="ลบ"><span class="material-icons-round text-base text-gray-700">delete</span></button>
+                    <button class="bg-blue-100 hover:bg-blue-200 p-2 rounded-full" onclick="openPaymentModal('${item.id}')" title="อัพเดทการชำระเงิน"><span class="material-icons-round text-base text-blue-700">payment</span></button>
+                    <button class="bg-yellow-100 hover:bg-yellow-200 p-2 rounded-full" onclick="openEditModal('${item.id}')" title="แก้ไขข้อมูลทั่วไป"><span class="material-icons-round text-base text-yellow-700">edit</span></button>
+                    <button class="bg-red-100 hover:bg-red-200 p-2 rounded-full" onclick="deleteRecord('${item.id}')" title="ลบ"><span class="material-icons-round text-base text-red-700">delete</span></button>
                 </div>
             </td>`;
         tbody.appendChild(tr);
@@ -437,10 +566,25 @@ function toggleDetails(id, btn) {
                 <div><strong>ราคา:</strong> ${item.roomPrice || '-'} บาท</div>
                 <div><strong>จำนวนคน:</strong> ${item.numGuests || '-'}</div>
                 <div><strong>เบอร์ติดต่อ:</strong> ${item.phone}</div>
-                <div><strong>การชำระเงิน:</strong> ${item.payment}</div>
-                <div><strong>เช็คอิน:</strong> ${formatDateTime(item.checkInTime) || 'ยังไม่เช็คอิน'}</div>
-                <div><strong>เช็คเอาท์:</strong> ${formatDateTime(item.checkOutTime) || 'ยังไม่เช็คเอาท์'}</div>
+                <div class="font-semibold"><strong>การชำระเงิน:</strong> ${item.payment}</div>
+                <div><strong>เวลาเช็คอิน:</strong> ${formatDateTime(item.checkInTime) || 'ยังไม่เช็คอิน'}</div>
+                <div><strong>เวลาเช็คเอาท์:</strong> ${formatDateTime(item.checkOutTime) || 'ยังไม่เช็คเอาท์'}</div>
                 <div class="col-span-full"><strong>บันทึกเพิ่มเติม:</strong> ${item.additionalNotes || '-'}</div>
+                
+                <!-- ส่วนของ Action สำหรับส่ง LINE -->
+                <div class="col-span-full border-t pt-3 mt-2">
+                    <h4 class="font-bold mb-2">Actions (ส่งการแจ้งเตือน LINE)</h4>
+                    <div class="flex space-x-2">
+                         <button onclick="openCheckinModal('${item.id}')" class="flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white text-xs font-bold py-2 px-3 rounded-md">
+                            <span class="material-icons-round text-sm">how_to_reg</span>
+                            <span>ยืนยันเข้าพัก</span>
+                         </button>
+                         <button onclick="openCheckoutModal('${item.id}')" class="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold py-2 px-3 rounded-md">
+                            <span class="material-icons-round text-sm">exit_to_app</span>
+                            <span>ยืนยันออก</span>
+                         </button>
+                    </div>
+                </div>
             </div>
         </td>`;
     currentRow.after(detailsRow);
@@ -449,7 +593,7 @@ function toggleDetails(id, btn) {
 function renderAppointmentCards() {
     const cardsContainer = document.getElementById('cards-container');
     if (!cardsContainer) return;
-    const filtered = appointmentTableData.filter(item => item.status !== 'เสร็จสิ้น' && item.status !== 'ยกเลิก');
+    const filtered = appointmentTableData.filter(item => item.status !== 'เสร็จสิ้น' && item.status !== 'ยกเลิก').sort((a,b) => new Date(a.checkinDate.split('-').reverse().join('-')) - new Date(b.checkinDate.split('-').reverse().join('-')));
     cardsContainer.innerHTML = '';
     const visibleItems = filtered.slice(0, cardVisibleCount);
     visibleItems.forEach(item => {
@@ -489,7 +633,7 @@ window.showMoreCards = function() {
     const filtered = appointmentTableData.filter(item => item.status !== 'เสร็จสิ้น' && item.status !== 'ยกเลิก');
     cardVisibleCount = filtered.length;
     renderAppointmentCards();
-}
+};
 
 // Appointment Modal Functions
 window.openPaymentModal = (id) => { const item = appointmentTableData.find(x => x.id === id); if (!item) return; $('#payment-update-id').val(item.id); $('#update-payment-select').val(item.payment || 'รอการชำระเงิน'); $('#update-payment-modal').removeClass('hidden'); };
@@ -502,10 +646,68 @@ window.openEditModal = (id) => { const item = appointmentTableData.find(x => x.i
 window.closeEditModal = () => $('#edit-modal').addClass('hidden');
 
 // Appointment Form Submissions
-$('#update-payment-form').on('submit', function(e) { e.preventDefault(); startLoading(); const data = { module: 'appointment', method: 'updatePaymentData', id: $('#payment-update-id').val(), payment: $('#update-payment-select').val() }; $.post(WEB_APP_URL, data).done(() => { Swal.fire({ icon: 'success', title: 'อัพเดทสำเร็จ', timer: 1500, showConfirmButton: false }); fetchAppointmentData(); closePaymentModal(); }).fail(() => Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด' })).always(stopLoading); });
-$('#update-checkin-form').on('submit', function(e) { e.preventDefault(); startLoading(); const data = { module: 'appointment', method: 'updateCheckInData', id: $('#checkin-update-id').val(), checkInTime: $('#update-checkin-time').val(), additionalNotes: $('#update-checkin-notes').val() }; $.post(WEB_APP_URL, data).done(() => { Swal.fire({ icon: 'success', title: 'อัพเดทสำเร็จ', timer: 1500, showConfirmButton: false }); fetchAppointmentData(); closeCheckinModal(); }).fail(() => Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด' })).always(stopLoading); });
-$('#update-checkout-form').on('submit', function(e) { e.preventDefault(); startLoading(); const data = { module: 'appointment', method: 'updateCheckOutData', id: $('#checkout-update-id').val(), checkOutTime: $('#update-checkout-time').val(), additionalNotes: $('#update-checkout-notes').val() }; $.post(WEB_APP_URL, data).done(() => { Swal.fire({ icon: 'success', title: 'อัพเดทสำเร็จ', timer: 1500, showConfirmButton: false }); fetchAppointmentData(); closeCheckoutModal(); }).fail(() => Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด' })).always(stopLoading); });
-$('#edit-form').on('submit', function(e) { e.preventDefault(); startLoading(); const data = { module: 'appointment', method: 'editAppointmentData', id: $('#edit-id').val(), roomName: $('#edit-roomName').val(), checkinDate: $('#edit-checkinDate').val(), checkoutDate: $('#edit-checkoutDate').val(), numGuests: $('#edit-numGuests').val(), bookerName: $('#edit-bookerName').val(), phone: $('#edit-phone').val() }; $.post(WEB_APP_URL, data).done(() => { Swal.fire({ icon: 'success', title: 'แก้ไขเรียบร้อย', timer: 1500, showConfirmButton: false }); fetchAppointmentData(); closeEditModal(); }).fail(() => Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด' })).always(stopLoading); });
+$('#add-booking-btn').on('click', async () => {
+    if (state.roomList.length === 0 && state.roomDataLoaded === false) { // Fetch only if not fetched
+        startLoading();
+        try {
+            const rooms = await $.get(`${WEB_APP_URL}?module=room&action=fetchData`);
+            state.roomList = rooms.filter(room => room['สถานะ'] === 'พร้อมบริการ');
+        } catch(e) {
+            Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถโหลดรายชื่อห้องพักได้', 'error');
+            stopLoading();
+            return;
+        } finally {
+            stopLoading();
+        }
+    }
+    
+    const select = $('#booking-room-select');
+    select.html('<option value="">-- กรุณาเลือกห้องพัก --</option>');
+    state.roomList.forEach(room => {
+        select.append(`<option value="${room['ไอดีห้อง']}|${room['ชื่อ']}|${room['ราคา']}">${room['ชื่อ']} (ราคา: ${room['ราคา']})</option>`);
+    });
+
+    $('#add-booking-form')[0].reset();
+    $('#add-booking-modal').removeClass('hidden');
+});
+
+$('#cancel-add-booking-btn').on('click', () => $('#add-booking-modal').addClass('hidden'));
+
+$('#add-booking-form').on('submit', function(e) {
+    e.preventDefault();
+    const submitBtn = $('#submit-add-booking-btn');
+    setButtonLoading(submitBtn, true);
+
+    const roomDataVal = $('#booking-room-select').val();
+    if (!roomDataVal) {
+        Swal.fire('ข้อมูลไม่ครบ', 'กรุณาเลือกห้องพัก', 'warning');
+        setButtonLoading(submitBtn, false);
+        return;
+    }
+    const roomData = roomDataVal.split('|');
+    const formData = {
+        module: 'appointment', method: 'insertAppointmentData', id: 'B' + Date.now(), 
+        roomId: roomData[0], roomName: roomData[1], price: roomData[2],
+        checkinDate: formatDateDMY($('#booking-checkin').val()),
+        checkoutDate: formatDateDMY($('#booking-checkout').val()),
+        numGuests: $('#booking-numGuests').val(), bookerName: $('#booking-bookerName').val(),
+        phone: $('#booking-phone').val(), status: 'จอง', payment: $('#booking-payment').val(),
+    };
+
+    $.post(WEB_APP_URL, formData)
+      .done(() => {
+        Swal.fire({ icon: 'success', title: 'เพิ่มการจองสำเร็จ!', timer: 1500, showConfirmButton: false });
+        fetchAppointmentData();
+        $('#add-booking-modal').addClass('hidden');
+      })
+      .fail(() => Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึกข้อมูลได้', 'error'))
+      .always(() => setButtonLoading(submitBtn, false));
+});
+
+$('#update-payment-form').on('submit', function(e) { e.preventDefault(); const btn = $(this).find('button[type="submit"]'); setButtonLoading(btn, true); const data = { module: 'appointment', method: 'updatePaymentData', id: $('#payment-update-id').val(), payment: $('#update-payment-select').val() }; $.post(WEB_APP_URL, data).done(() => { Swal.fire({ icon: 'success', title: 'อัพเดทสำเร็จ', timer: 1500, showConfirmButton: false }); fetchAppointmentData(); closePaymentModal(); }).fail(() => Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด' })).always(() => setButtonLoading(btn, false)); });
+$('#update-checkin-form').on('submit', function(e) { e.preventDefault(); const btn = $(this).find('button[type="submit"]'); setButtonLoading(btn, true); const data = { module: 'appointment', method: 'updateCheckInData', id: $('#checkin-update-id').val(), checkInTime: $('#update-checkin-time').val(), additionalNotes: $('#update-checkin-notes').val() }; $.post(WEB_APP_URL, data).done(() => { Swal.fire({ icon: 'success', title: 'อัพเดทสำเร็จ', timer: 1500, showConfirmButton: false }); fetchAppointmentData(); closeCheckinModal(); }).fail(() => Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด' })).always(() => setButtonLoading(btn, false)); });
+$('#update-checkout-form').on('submit', function(e) { e.preventDefault(); const btn = $(this).find('button[type="submit"]'); setButtonLoading(btn, true); const data = { module: 'appointment', method: 'updateCheckOutData', id: $('#checkout-update-id').val(), checkOutTime: $('#update-checkout-time').val(), additionalNotes: $('#update-checkout-notes').val() }; $.post(WEB_APP_URL, data).done(() => { Swal.fire({ icon: 'success', title: 'อัพเดทสำเร็จ', timer: 1500, showConfirmButton: false }); fetchAppointmentData(); closeCheckoutModal(); }).fail(() => Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด' })).always(() => setButtonLoading(btn, false)); });
+$('#edit-form').on('submit', function(e) { e.preventDefault(); const btn = $(this).find('button[type="submit"]'); setButtonLoading(btn, true); const data = { module: 'appointment', method: 'editAppointmentData', id: $('#edit-id').val(), roomName: $('#edit-roomName').val(), checkinDate: $('#edit-checkinDate').val(), checkoutDate: $('#edit-checkoutDate').val(), numGuests: $('#edit-numGuests').val(), bookerName: $('#edit-bookerName').val(), phone: $('#edit-phone').val() }; $.post(WEB_APP_URL, data).done(() => { Swal.fire({ icon: 'success', title: 'แก้ไขเรียบร้อย', timer: 1500, showConfirmButton: false }); fetchAppointmentData(); closeEditModal(); }).fail(() => Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด' })).always(() => setButtonLoading(btn, false)); });
 
 window.deleteRecord = (id) => {
     Swal.fire({ title: 'ยืนยันการลบ?', text: "คุณต้องการลบข้อมูลนี้ใช่หรือไม่?", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'ใช่, ลบเลย!', cancelButtonText: 'ยกเลิก' }).then((result) => {
@@ -515,7 +717,6 @@ window.deleteRecord = (id) => {
         }
     });
 };
-
 
 // =================================================================
 // 4. MEMBER MODULE
@@ -528,14 +729,12 @@ const memberRowsPerPage = 10;
 async function fetchMemberData() {
     startLoading();
     try {
-        const response = await fetch(`${WEB_APP_URL}?module=member`);
-        const data = await response.json();
+        const data = await $.get(`${WEB_APP_URL}?module=member`);
         memberTableData = data.slice(1);
         memberFilteredData = memberTableData.slice();
         displayMemberPage(memberCurrentPage);
         setupMemberPagination();
     } catch (error) {
-        console.error('Error fetching member data:', error);
         Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: 'ไม่สามารถโหลดข้อมูล Member ได้' });
     } finally {
         stopLoading();
@@ -546,58 +745,49 @@ function displayMemberPage(page) {
     const startIndex = (page - 1) * memberRowsPerPage;
     const endIndex = startIndex + memberRowsPerPage;
     const paginatedData = memberFilteredData.slice(startIndex, endIndex);
-    const tableBody = document.querySelector("#member-data-table tbody");
-    tableBody.innerHTML = "";
+    const tableBody = $("#member-data-table tbody");
+    tableBody.empty();
     paginatedData.forEach((row) => {
         if (row.every(cell => cell === "")) return;
-        const tr = document.createElement("tr");
-        tr.className = 'hover:bg-gray-50';
-        // row[0]: ไอดี, row[1]: ชื่อสกุล, row[2]: เบอร์ติดต่อ, row[5]: คะแนน
-        [row[0], row[1], row[2], row[5]].forEach(cellData => {
-            const td = document.createElement("td");
-            td.textContent = cellData;
-            td.className = "py-2 px-4";
-            tr.appendChild(td);
-        });
-        const actionTd = document.createElement("td");
-        actionTd.className = "py-2 px-4 text-center";
-        actionTd.innerHTML = `<div class="flex space-x-2 justify-center">
-            <button onclick="viewProfile('${row[0]}')" class="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-700 text-xs">ดู</button>
-            <button onclick="openMemberEditModal('${row[0]}')" class="bg-yellow-500 text-white py-1 px-3 rounded hover:bg-yellow-700 text-xs">แก้ไข</button>
-            <button onclick="confirmMemberDelete('${row[0]}')" class="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-700 text-xs">ลบ</button>
-        </div>`;
-        tr.appendChild(actionTd);
-        tableBody.appendChild(tr);
+        const tr = `<tr class="hover:bg-gray-50">
+            <td class="py-2 px-4">${row[0]}</td><td class="py-2 px-4">${row[1]}</td>
+            <td class="py-2 px-4">${row[2]}</td><td class="py-2 px-4">${row[5]}</td>
+            <td class="py-2 px-4 text-center"><div class="flex space-x-2 justify-center">
+                <button onclick="viewProfile('${row[0]}')" class="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-700 text-xs">ดู</button>
+                <button onclick="openMemberEditModal('${row[0]}')" class="bg-yellow-500 text-white py-1 px-3 rounded hover:bg-yellow-700 text-xs">แก้ไข</button>
+                <button onclick="confirmMemberDelete('${row[0]}')" class="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-700 text-xs">ลบ</button>
+            </div></td></tr>`;
+        tableBody.append(tr);
     });
 }
 
 function setupMemberPagination() {
     const pageCount = Math.ceil(memberFilteredData.length / memberRowsPerPage);
-    const pagination = document.getElementById("pagination");
-    pagination.innerHTML = "";
+    const pagination = $("#pagination");
+    pagination.empty();
     if (pageCount <= 1) return;
     for (let i = 1; i <= pageCount; i++) {
-        const pageButton = document.createElement("button");
-        pageButton.textContent = i;
-        pageButton.className = `py-1 px-3 text-sm rounded-md ${i === memberCurrentPage ? "bg-slate-500 text-white" : "bg-gray-300 text-slate-800 hover:bg-gray-400"}`;
-        pageButton.onclick = () => { memberCurrentPage = i; displayMemberPage(i); updateMemberPaginationButtons(); };
-        pagination.appendChild(pageButton);
+        const pageButton = $(`<button class="py-1 px-3 text-sm rounded-md">${i}</button>`);
+        pageButton.addClass(i === memberCurrentPage ? "bg-slate-500 text-white" : "bg-gray-300 text-slate-800 hover:bg-gray-400");
+        pageButton.on('click', () => { memberCurrentPage = i; displayMemberPage(i); updateMemberPaginationButtons(); });
+        pagination.append(pageButton);
     }
 }
 
 function updateMemberPaginationButtons() {
-    const pagination = document.getElementById("pagination");
-    pagination.querySelectorAll("button").forEach(button => {
-        button.className = `py-1 px-3 text-sm rounded-md ${parseInt(button.textContent) === memberCurrentPage ? "bg-slate-500 text-white" : "bg-gray-300 text-slate-800 hover:bg-gray-400"}`;
+    $("#pagination button").each(function() {
+        const btn = $(this);
+        btn.toggleClass("bg-slate-500 text-white", parseInt(btn.text()) === memberCurrentPage);
+        btn.toggleClass("bg-gray-300 text-slate-800 hover:bg-gray-400", parseInt(btn.text()) !== memberCurrentPage);
     });
 }
 
 function applyMemberFilters() {
-    const nameValue = document.getElementById("filter-name").value.toLowerCase();
-    const userlineValue = document.getElementById("filter-userline").value.toLowerCase();
+    const nameValue = $("#filter-name").val().toLowerCase();
+    const userlineValue = $("#filter-userline").val().toLowerCase();
     memberFilteredData = memberTableData.filter(row => {
-        const name = row[1] ? row[1].toLowerCase() : "";
-        const userline = row[4] ? row[4].toLowerCase() : "";
+        const name = (row[1] || '').toLowerCase();
+        const userline = (row[4] || '').toLowerCase();
         return name.includes(nameValue) && userline.includes(userlineValue);
     });
     memberCurrentPage = 1;
@@ -607,31 +797,15 @@ function applyMemberFilters() {
 
 $('#filter-name, #filter-userline').on('input', applyMemberFilters);
 
-window.viewProfile = (id) => {
-    const row = memberTableData.find(r => r[0] == id);
-    if (!row) return;
-    $('#profile-content').html(`<p><strong>ไอดี:</strong> ${row[0]}</p><p><strong>ชื่อสกุล:</strong> ${row[1]}</p><p><strong>เบอร์ติดต่อ:</strong> ${row[2]}</p><p><strong>อีเมล:</strong> ${row[3]}</p><p><strong>useridline:</strong> ${row[4]}</p><p><strong>คะแนน:</strong> ${row[5]}</p><p><strong>เวลาบันทึก:</strong> ${row[6]}</p>`);
-    $('#profile-modal').removeClass('hidden');
-};
+window.viewProfile = (id) => { const row = memberTableData.find(r => r[0] == id); if (!row) return; $('#profile-content').html(`<p><strong>ไอดี:</strong> ${row[0]}</p><p><strong>ชื่อสกุล:</strong> ${row[1]}</p><p><strong>เบอร์ติดต่อ:</strong> ${row[2]}</p><p><strong>อีเมล:</strong> ${row[3]}</p><p><strong>useridline:</strong> ${row[4]}</p><p><strong>คะแนน:</strong> ${row[5]}</p><p><strong>เวลาบันทึก:</strong> ${row[6]}</p>`); $('#profile-modal').removeClass('hidden'); };
 window.closeProfileModal = () => $('#profile-modal').addClass('hidden');
-
-window.openMemberEditModal = (id) => {
-    const row = memberTableData.find(r => r[0] == id);
-    if (!row) return;
-    $('#member-edit-id').val(row[0]);
-    $('#member-edit-name').val(row[1]);
-    $('#member-edit-phone').val(row[2]);
-    $('#member-edit-email').val(row[3]);
-    $('#member-edit-userline').val(row[4]);
-    $('#member-edit-score').val(row[5]);
-    $('#member-edit-timestamp').val(row[6]);
-    $('#member-edit-modal').removeClass('hidden');
-};
+window.openMemberEditModal = (id) => { const row = memberTableData.find(r => r[0] == id); if (!row) return; $('#member-edit-id').val(row[0]); $('#member-edit-name').val(row[1]); $('#member-edit-phone').val(row[2]); $('#member-edit-email').val(row[3]); $('#member-edit-userline').val(row[4]); $('#member-edit-score').val(row[5]); $('#member-edit-timestamp').val(row[6]); $('#member-edit-modal').removeClass('hidden'); };
 window.closeMemberEditModal = () => $('#member-edit-modal').addClass('hidden');
 
 $('#member-edit-form').on('submit', async function(e) {
     e.preventDefault();
-    startLoading();
+    const btn = $(this).find('button[type="submit"]');
+    setButtonLoading(btn, true);
     const data = `module=member&method=updateData&id=${$('#member-edit-id').val()}&nameId=${encodeURIComponent($('#member-edit-name').val())}&phone=${encodeURIComponent($('#member-edit-phone').val())}&email=${encodeURIComponent($('#member-edit-email').val())}&userlineId=${encodeURIComponent($('#member-edit-userline').val())}&score=${$('#member-edit-score').val()}×tamp=${encodeURIComponent($('#member-edit-timestamp').val())}`;
     try {
         await fetch(WEB_APP_URL, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: data });
@@ -641,7 +815,7 @@ $('#member-edit-form').on('submit', async function(e) {
     } catch (error) {
         Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด' });
     } finally {
-        stopLoading();
+        setButtonLoading(btn, false);
     }
 });
 
@@ -662,15 +836,9 @@ window.confirmMemberDelete = (id) => {
     });
 };
 
-
 // =================================================================
 // 5. ROOM MODULE
 // =================================================================
-// (This entire section is self-contained and will be initialized by loadDataForView)
-// No changes needed from the full version provided in the previous answer.
-// Just copy and paste the entire ROOM MODULE javascript code here.
-// For brevity, I will show the starting functions.
-
 function setupPreview(fileInputId, previewImgId) {
     const input = document.getElementById(fileInputId);
     if(input) input.addEventListener('change', function() {
@@ -713,8 +881,9 @@ function processFilePromise(inputId, oldFieldId, base64Key, mimeKey, actualField
 async function loadRooms() {
     startLoading();
     try {
-        const response = await fetch(`${WEB_APP_URL}?module=room&action=fetchData`);
-        const rooms = await response.json();
+        const rooms = await $.get(`${WEB_APP_URL}?module=room&action=fetchData`);
+        state.roomList = rooms; // Update room cache
+        state.roomDataLoaded = true;
         let html = `<table class="min-w-full text-sm">
             <thead class="bg-slate-50"><tr class="text-slate-600">
             <th class="py-3 px-3 text-left">รูปปก</th><th class="py-3 px-3 text-left">ไอดีห้อง</th>
@@ -743,79 +912,147 @@ async function loadRooms() {
     }
 }
 
-$('#roomForm').on('submit', async function (e) {
+window.showAddForm = () => {
+    let formContainer = $("#formSection");
+    if(formContainer.html() === '') {
+        formContainer.html(`
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-2xl font-semibold text-gray-700" id="formTitle"></h2>
+              <button class="text-red-500 hover:text-red-700" onclick="hideForm()"><span class="material-icons-round">close</span></button>
+            </div>
+            <form id="roomForm" class="space-y-4">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div><label class="block text-sm font-medium">ไอดีห้อง</label><input type="text" name="ไอดีห้อง" class="mt-1 block w-full input-field" placeholder="เว้นว่างเพื่อสร้างอัตโนมัติ"></div>
+                <div class="md:col-span-2"><label class="block text-sm font-medium">ชื่อห้อง*</label><input type="text" name="ชื่อ" required class="mt-1 block w-full input-field"></div>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div><label class="block text-sm font-medium">หมวดหมู่*</label><input type="text" name="หมวดหมู่" required class="mt-1 block w-full input-field"></div>
+                <div><label class="block text-sm font-medium">สถานะ</label>
+                    <select name="สถานะ" class="mt-1 block w-full input-field">
+                        <option value="พร้อมบริการ">พร้อมบริการ</option><option value="ไม่พร้อมบริการ">ไม่พร้อมบริการ</option><option value="ซ่อมแซม">ซ่อมแซม</option>
+                    </select>
+                </div>
+              </div>
+              <div><label class="block text-sm font-medium mb-2">สิ่งอำนวยความสะดวก</label><div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="Wi‑Fi" class="checkbox-field"><span>Wi‑Fi</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="ห้องอาหาร" class="checkbox-field"><span>ห้องอาหาร</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="สระว่ายน้ำ" class="checkbox-field"><span>สระว่ายน้ำ</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="ที่จอดรถ" class="checkbox-field"><span>ที่จอดรถ</span></label>
+                    <label class="flex items-center space-x-2"><input type="checkbox" name="นวด" class="checkbox-field"><span>นวด</span></label>
+              </div></div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div><label class="block text-sm font-medium">ราคา*</label><input type="number" name="ราคา" required class="mt-1 block w-full input-field"></div>
+                <div><label class="block text-sm font-medium">ราคาลด</label><input type="number" name="ราคาลด" class="mt-1 block w-full input-field"></div>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div><label class="block text-sm font-medium">รูปปกห้อง</label><input type="file" id="coverInput" class="mt-1 file-input"><img id="coverPreview" class="mt-2 preview-img"><input type="hidden" id="รูปภาพOLD"></div>
+                <div><label class="block text-sm font-medium">รูปประกอบ 1</label><input type="file" id="image1Input" class="mt-1 file-input"><img id="image1Preview" class="mt-2 preview-img"><input type="hidden" id="รูปประกอบ-1OLD"></div>
+                <div><label class="block text-sm font-medium">รูปประกอบ 2</label><input type="file" id="image2Input" class="mt-1 file-input"><img id="image2Preview" class="mt-2 preview-img"><input type="hidden" id="รูปประกอบ-2OLD"></div>
+                <div><label class="block text-sm font-medium">รูปประกอบ 3</label><input type="file" id="image3Input" class="mt-1 file-input"><img id="image3Preview" class="mt-2 preview-img"><input type="hidden" id="รูปประกอบ-3OLD"></div>
+              </div>
+              <div><label class="block text-sm font-medium">รายละเอียด</label><textarea name="รายละเอียด" rows="3" class="mt-1 block w-full input-field"></textarea></div>
+              <div><label class="block text-sm font-medium">รายละเอียด-2</label><textarea name="รายละเอียด-2" rows="3" class="mt-1 block w-full input-field"></textarea></div>
+              <div><button type="submit" id="submit-room-btn" class="w-full bg-slate-700 hover:bg-slate-600 text-white py-2 px-4 rounded-md text-lg flex items-center justify-center min-h-[44px]">
+                  <span class="btn-text">บันทึกข้อมูล</span></button></div>
+            </form>
+            <style>.input-field{border:1px solid #d1d5db;border-radius:0.375rem;padding:0.5rem 0.75rem}.checkbox-field{height:1rem;width:1rem;text-indigo-600;border-gray-300;border-radius:0.25rem}.file-input{block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100}.preview-img{hidden w-full h-24 object-cover border rounded mt-2}</style>
+        `);
+        $('#roomForm').on('submit', handleRoomFormSubmit);
+        setupPreview('coverInput', 'coverPreview');
+        setupPreview('image1Input', 'image1Preview');
+        setupPreview('image2Input', 'image2Preview');
+        setupPreview('image3Input', 'image3Preview');
+    }
+    
+    let formElement = document.getElementById("roomForm");
+    formElement.reset();
+    $('.preview-img').addClass('hidden').attr('src', '');
+    if (formElement.elements["ไอดีห้อง"]) formElement.elements["ไอดีห้อง"].readOnly = false;
+    $("#formTitle").text("บันทึกข้อมูลห้องพัก");
+    formContainer.removeClass("hidden");
+    window.scrollTo(0, 0);
+};
+
+window.hideForm = () => { $("#formSection").addClass("hidden"); };
+
+async function handleRoomFormSubmit(e) {
     e.preventDefault();
-    startLoading();
+    const submitBtn = $('#submit-room-btn');
+    setButtonLoading(submitBtn, true);
+    
     let room = {};
     const checkboxFields = ["Wi‑Fi", "ห้องอาหาร", "สระว่ายน้ำ", "ที่จอดรถ", "นวด"];
     checkboxFields.forEach(field => {
         const checkbox = this.elements[field];
         if (checkbox) room[field] = checkbox.checked ? "TRUE" : "FALSE";
     });
+    
     try {
         await Promise.all([
             processFilePromise("coverInput", "รูปภาพOLD", "รูปภาพBase64", "รูปภาพMimeType", "รูปภาพ", room),
             processFilePromise("image1Input", "รูปประกอบ-1OLD", "รูปประกอบ-1Base64", "รูปประกอบ-1MimeType", "รูปประกอบ-1", room),
             processFilePromise("image2Input", "รูปประกอบ-2OLD", "รูปประกอบ-2Base64", "รูปประกอบ-2MimeType", "รูปประกอบ-2", room),
-            processFilePromise("image3Input", "รูปประกอบ-3OLD", "รูปประกอบ-3Base64", "รูปประกอบ-3MimeType", "รูปประกอบ-3", room),
-            processFilePromise("image4Input", "รูปประกอบ-4OLD", "รูปประกอบ-4Base64", "รูปประกอบ-4MimeType", "รูปประกอบ-4", room)
+            processFilePromise("image3Input", "รูปประกอบ-3OLD", "รูปประกอบ-3Base64", "รูปประกอบ-3MimeType", "รูปประกอบ-3", room)
         ]);
+        
         let formData = new FormData(this);
         formData.forEach((value, key) => {
             if (!checkboxFields.includes(key) && !key.includes('OLD') && !key.startsWith('รูป')) {
                 room[key] = value;
             }
         });
+        
         const response = await fetch(WEB_APP_URL, { method: "POST", body: JSON.stringify({ module: "room", action: "insertOrUpdate", data: room }) });
         const result = await response.json();
         if (result.status === "success") {
             Swal.fire({ icon: "success", title: "บันทึกสำเร็จ!", showConfirmButton: false, timer: 1500 });
-            this.reset();
             hideForm();
             loadRooms();
         } else { throw new Error(result.message); }
     } catch(e) {
         Swal.fire({ icon: "error", title: "เกิดข้อผิดพลาด", text: e.message });
     } finally {
-        stopLoading();
+        setButtonLoading(submitBtn, false);
     }
-});
+}
 
 window.showRoomDetails = async (id) => {
     startLoading();
     try {
-        const res = await fetch(`${WEB_APP_URL}?module=room&action=fetchData`);
-        const rooms = await res.json();
-        const roomData = rooms.find(r => r["ไอดีห้อง"] == id);
+        const roomData = state.roomList.find(r => r["ไอดีห้อง"] == id);
         if (roomData) {
             let mainImageUrl = roomData["รูปภาพ"] || "https://via.placeholder.com/400x300.png?text=No+Image";
-            let thumbnails = [ "รูปภาพ", "รูปประกอบ-1", "รูปประกอบ-2", "รูปประกอบ-3", "รูปประกอบ-4" ]
-                .filter(key => roomData[key])
-                .map(key => `<img src="${roomData[key]}" class="w-16 h-16 object-cover border-2 border-transparent hover:border-blue-500 rounded cursor-pointer" onclick="document.getElementById('swalMainImage').src='${roomData[key]}'">`)
-                .join('');
-            let checkboxHtml = ["Wi‑Fi", "ห้องอาหาร", "สระว่ายน้ำ", "ที่จอดรถ", "นวด"]
-                .filter(field => String(roomData[field]).toUpperCase() === "TRUE")
-                .map(field => `<span class="inline-block bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">${field}</span>`)
-                .join('');
-            let htmlContent = `...`; // Full HTML content for Swal
+            let thumbnails = [ "รูปภาพ", "รูปประกอบ-1", "รูปประกอบ-2", "รูปประกอบ-3", "รูปประกอบ-4" ].filter(key => roomData[key]).map(key => `<img src="${roomData[key]}" alt="Thumbnail" class="w-16 h-16 object-cover border-2 border-transparent hover:border-blue-500 rounded cursor-pointer" onclick="document.getElementById('swalMainImage').src='${roomData[key]}'">`).join('');
+            let checkboxHtml = ["Wi‑Fi", "ห้องอาหาร", "สระว่ายน้ำ", "ที่จอดรถ", "นวด"].filter(field => String(roomData[field]).toUpperCase() === "TRUE").map(field => `<span class="inline-block bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full">${field}</span>`).join('');
+            let htmlContent = `
+              <div class="p-4 text-left"><div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <div class="mb-4"><img id="swalMainImage" src="${mainImageUrl}" alt="Main" class="w-full h-64 object-cover rounded-lg shadow-lg"></div>
+                  ${thumbnails ? `<div class="flex space-x-2 justify-center flex-wrap gap-2">${thumbnails}</div>` : ""}
+                </div>
+                <div class="text-sm space-y-2">
+                  <h3 class="text-xl font-bold text-gray-800">${roomData["ชื่อ"]}</h3>
+                  <p><strong>หมวดหมู่:</strong> ${roomData["หมวดหมู่"]}</p>
+                  <p><strong>ราคา:</strong> <span class="text-lg font-semibold text-red-600">${roomData["ราคา"]} บาท</span></p>
+                  ${roomData["ราคาลด"] ? `<p><strong>ราคาลด:</strong> <span class="text-lg font-semibold text-green-600">${roomData["ราคาลด"]} บาท</span></p>` : ''}
+                  <div class="pt-2"><strong>สิ่งอำนวยความสะดวก:</strong><div class="mt-1 flex flex-wrap gap-2">${checkboxHtml || 'ไม่มี'}</div></div>
+                  <p class="pt-2"><strong>สถานะ:</strong> ${roomData["สถานะ"] || ""}</p>
+                  <div class="pt-2"><strong>รายละเอียด:</strong><p class="whitespace-pre-wrap text-gray-600">${roomData["รายละเอียด"] || ""}</p></div>
+                  <div class="pt-2"><strong>รายละเอียด-2:</strong><p class="whitespace-pre-wrap text-gray-600">${roomData["รายละเอียด-2"] || ""}</p></div>
+                </div></div></div>`;
             Swal.fire({ title: "รายละเอียดห้องพัก", html: htmlContent, width: "800px", showCloseButton: true, showConfirmButton: false });
         }
-    } catch(e) {
-        console.error("Error in showRoomDetails:", e);
-    } finally {
-        stopLoading();
-    }
+    } catch(e) { console.error("Error in showRoomDetails:", e); } 
+    finally { stopLoading(); }
 };
 
 window.editRoom = async (id) => {
     startLoading();
     try {
-        const res = await fetch(`${WEB_APP_URL}?module=room&action=fetchData`);
-        const rooms = await res.json();
-        const roomData = rooms.find(r => r["ไอดีห้อง"] == id);
+        const roomData = state.roomList.find(r => r["ไอดีห้อง"] == id);
         if (roomData) {
+            await showAddForm(); // Use showAddForm to build the form if not exists
             let form = document.getElementById("roomForm");
-            form.reset();
             for (let key in roomData) {
                 if (form.elements[key] && form.elements[key].type !== "file" && form.elements[key].type !== "checkbox") {
                     form.elements[key].value = roomData[key];
@@ -826,15 +1063,22 @@ window.editRoom = async (id) => {
                 if(checkbox) checkbox.checked = (String(roomData[field]).toUpperCase() === "TRUE");
             });
             if (form.elements["สถานะ"]) form.elements["สถานะ"].value = roomData["สถานะ"] || "";
+            // Set OLD image values to keep them if not changed
+            $("#รูปภาพOLD").val(roomData["รูปภาพ"] || "");
+            $("#รูปประกอบ-1OLD").val(roomData["รูปประกอบ-1"] || "");
+            $("#รูปประกอบ-2OLD").val(roomData["รูปประกอบ-2"] || "");
+            $("#รูปประกอบ-3OLD").val(roomData["รูปประกอบ-3"] || "");
+            // Display existing image previews
+            if(roomData["รูปภาพ"]) { $("#coverPreview").attr('src', roomData["รูปภาพ"]).removeClass('hidden'); }
+            if(roomData["รูปประกอบ-1"]) { $("#image1Preview").attr('src', roomData["รูปประกอบ-1"]).removeClass('hidden'); }
+            if(roomData["รูปประกอบ-2"]) { $("#image2Preview").attr('src', roomData["รูปประกอบ-2"]).removeClass('hidden'); }
+            if(roomData["รูปประกอบ-3"]) { $("#image3Preview").attr('src', roomData["รูปประกอบ-3"]).removeClass('hidden'); }
+
             if (form.elements["ไอดีห้อง"]) form.elements["ไอดีห้อง"].readOnly = true;
-            showAddForm(); // Re-use show form logic
-            document.getElementById("formTitle").textContent = "แก้ไขข้อมูลห้องพัก";
+            $("#formTitle").text("แก้ไขข้อมูลห้องพัก");
         }
-    } catch(e) {
-        console.error("Error in editRoom:", e);
-    } finally {
-        stopLoading();
-    }
+    } catch(e) { console.error("Error in editRoom:", e); } 
+    finally { stopLoading(); }
 };
 
 window.deleteRoom = (id) => {
@@ -856,43 +1100,6 @@ window.deleteRoom = (id) => {
         }
     });
 };
-
-window.showAddForm = () => {
-    let form = document.getElementById("formSection");
-    if(form.innerHTML === '') { // Lazy load form content
-        form.innerHTML = `
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-2xl font-semibold text-gray-700" id="formTitle">บันทึกข้อมูลห้องพัก</h2>
-          <button class="text-red-500 hover:text-red-700" onclick="hideForm()"><span class="material-icons-round">close</span></button>
-        </div>
-        <form id="roomForm" class="space-y-4">
-          <!-- (คัดลอกเนื้อหา form ทั้งหมดจาก room.html เดิมมาวางที่นี่) -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div><label class="block text-sm font-medium text-gray-600">ไอดีห้อง</label><input type="text" name="ไอดีห้อง" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm" placeholder="เว้นว่างเพื่อสร้างอัตโนมัติ"></div>
-              <div class="md:col-span-2"><label class="block text-sm font-medium text-gray-600">ชื่อห้อง</label><input type="text" name="ชื่อ" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm text-sm"></div>
-          </div>
-          <!-- More fields... -->
-          <div><button type="submit" class="w-full bg-slate-700 hover:bg-slate-600 text-white py-2 px-4 rounded-md text-lg">บันทึกข้อมูล</button></div>
-        </form>
-        `;
-        // Re-attach event listener for the new form
-        $('#roomForm').on('submit', async function(e) { /* ... Same submit logic ... */ });
-        // Re-setup previews
-        setupPreview('coverInput', 'coverPreview');
-        setupPreview('image1Input', 'image1Preview');
-        // ... etc
-    }
-    
-    let formElement = document.getElementById("roomForm");
-    formElement.reset();
-    if (formElement.elements["ไอดีห้อง"]) formElement.elements["ไอดีห้อง"].readOnly = false;
-    document.getElementById("formTitle").textContent = "บันทึกข้อมูลห้องพัก";
-    document.getElementById("formSection").classList.remove("hidden");
-    window.scrollTo(0, 0);
-};
-
-window.hideForm = () => document.getElementById("formSection").classList.add("hidden");
-
 
   </script>
 </body>
