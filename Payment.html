@@ -8,6 +8,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+      <!-- Include config.js สำหรับ CONFIG.GAS_URL -->
+    <script src="Config.js"></script>
+
 </head>
 
 <body style="font-family: Noto Sans Thai;">
@@ -197,7 +200,7 @@
                 }
             });
 
-            let response = await fetch(url, {
+            let response = await fetch(CONFIG.GAS_URL_PAYMENT, {
                 method: "POST",
                 body: JSON.stringify(obj)
             });
