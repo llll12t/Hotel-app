@@ -66,6 +66,8 @@
   <!-- (Modal อื่น ๆ สามารถเพิ่มหรือปรับปรุงได้ตามที่ต้องการ) -->
 
   <script>
+    // START: จุดที่ 1 - ประกาศตัวแปร URL โดยดึงค่าจาก Config.js
+    const GAS_URL_ADMIN_HISTORY = CONFIG.GAS_URL_ADMIN_HISTORY;
 
     // ตัวแปรสำหรับเก็บ userId จาก LIFF
     let currentUserId = null;
@@ -123,7 +125,7 @@
       try {
         // START: จุดที่ 2 - เพิ่ม parameter เข้าไปใน URL เพื่อบอกให้ GAS รู้ว่าต้องการทำอะไร
         // คุณอาจจะต้องเปลี่ยน 'action=getHistory' ให้ตรงกับที่กำหนดไว้ใน Code.gs ของคุณ
-        const url = `${CONFIG.GAS_URL_ADMIN_HISTORY}?action=getHistory`; 
+        const url = `${GAS_URL_ADMIN_HISTORY}?action=getHistory`; 
         
         const response = await fetch(url);
         
@@ -290,7 +292,7 @@
       startLoading();
       const id = document.getElementById('payment-update-id').value;
       const payment = document.getElementById('update-payment-select').value;
-      $.post(CONFIG.GAS_URL_ADMIN_HISTORY, { method: 'updatePaymentData', id: id, payment: payment }, function(response) {
+      $.post(GAS_URL_ADMIN_HISTORY, { method: 'updatePaymentData', id: id, payment: payment }, function(response) {
         Swal.fire({ icon: 'success', title: 'อัพเดทการชำระเงินเรียบร้อย', text: response });
         fetchData();
         closePaymentModal();
