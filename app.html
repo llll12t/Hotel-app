@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
   <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/th.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <!-- Include config.js สำหรับ API_URL -->
+  <!-- Include config.js สำหรับ CONFIG.GAS_URL -->
   <script src="config.js"></script>
   <!-- LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
@@ -84,7 +84,7 @@
   <div id="step2" class="hidden p-4 max-w-md mx-auto">
     <button id="backToStep1"
       class="bg-[#071d4a] py-2 px-4 rounded-2xl text-sm text-white mb-2 flex items-center space-x-1">
-      <span>&larr;</span><span>กลับ</span>
+      <span>←</span><span>กลับ</span>
     </button>
     <div>
       <img id="detailMainImg" src="" alt="Room" class="w-full h-48 object-cover rounded-2xl mb-4" />
@@ -115,7 +115,7 @@
   <div id="step3" class="hidden p-4 max-w-md mx-auto">
     <button id="backToStep2"
       class="bg-[#071d4a] py-2 px-4 rounded-2xl text-sm text-white mb-2 flex items-center space-x-1">
-      <span>&larr;</span><span>กลับ</span>
+      <span>←</span><span>กลับ</span>
     </button>
     <div class="bg-white p-4 rounded-2xl ">
       <form id="bookingForm">
@@ -186,6 +186,8 @@
   </div>
 
   <script>
+
+
     // Global state
     let roomsData = [];
     let selectedRoom = null;
@@ -196,7 +198,9 @@
     // LIFF initialization
     async function initLiffGlobal() {
       try {
-        await liff.init({ liffId: "2007106715-87nBmwNL" });
+        // START: จุดที่ 2 - เปลี่ยนมาใช้ LIFF ID จาก Config
+        await liff.init({ liffId: CONFIG.LIFF_ID });
+        
         if (!liff.isLoggedIn()) {
           liff.login();
         } else {
@@ -237,7 +241,7 @@
     async function fetchAllRooms() {
       showLoading();
       try {
-        const response = await fetch(API_URL);
+        const response = await fetch(CONFIG.GAS_URL);
         const data = await response.json();
         if (!Array.isArray(data)) {
           console.error("Data received is not an array:", data);
@@ -254,7 +258,7 @@
     async function fetchRooms(checkIn, checkOut) {
       showLoading();
       try {
-        const response = await fetch(`${API_URL}?checkIn=${checkIn}&checkOut=${checkOut}`);
+        const response = await fetch(`${CONFIG.GAS_URL}?checkIn=${checkIn}&checkOut=${checkOut}`);
         const data = await response.json();
         if (!Array.isArray(data)) {
           console.error("Data received is not an array:", data);
@@ -448,7 +452,7 @@
 
     // โหลดรีวิวทั้งหมดจากชีต "Reviwe" แล้วกรองด้วย "ห้องพัก" = ชื่อห้อง
     function loadReviews(roomName) {
-      fetch(API_URL + "?action=getAllReviews")
+      fetch(CONFIG.GAS_URL + "?action=getAllReviews")
         .then(response => response.json())
         .then(allReviews => {
           // กรองรีวิวที่ "ห้องพัก" ตรงกับชื่อห้อง (เช่น "ห้อง A")
@@ -759,7 +763,7 @@
         userLineId: userLineId.value.trim(),
       };
 
-      fetch(API_URL, {
+      fetch(CONFIG.GAS_URL, {
         method: "POST",
         body: JSON.stringify(bookingData),
       })
