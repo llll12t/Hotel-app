@@ -158,8 +158,6 @@
 </div>
 
 <script>
-  // ไม่ต้องการแสดง debugLog => เอา div#debugLog ออก, หรือสามารถซ่อนด้วย display:none ก็ได้
-
   // ดึง query parameters จาก URL และกำหนดให้กับฟิลด์ที่ซ่อนอยู่
   const urlParams = new URLSearchParams(window.location.search);
   document.getElementById("bookerName").value = urlParams.get("bookerName") || "";
