@@ -69,12 +69,11 @@
     // ตัวแปรสำหรับเก็บข้อมูลตาราง
     let tableData = [];
     // URL ของ Web App (Google Apps Script)
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyPljZ05WrGsoQK08sjgbt3MRD9TO1s12jVrTO5Py_3-WhyyHjIsdiOA0nDhdD34tCV/exec';
 
     // ฟังก์ชันสำหรับเริ่มต้น LIFF (รวม login) โดยใช้ LIFF ID ที่ถูกต้อง
     async function initLIFF() {
       try {
-        await liff.init({ liffId: "2007106715-OYJEx946" });
+        await liff.init({ liffId: CONFIG.LIFF_HISTORY });
         console.log("LIFF init success");
         // ตรวจสอบสถานะการเข้าสู่ระบบ ถ้าไม่ได้เข้าสู่ระบบให้ redirect ไป login
         if (!liff.isLoggedIn()) {
@@ -120,7 +119,7 @@
     async function fetchData() {
       startLoading();
       try {
-        const response = await fetch(WEB_APP_URL);
+        const response = await fetch(GAS_URL_ADMIN_HISTORY);
         const data = await response.json();
         tableData = processData(data);
         renderTable(tableData);
@@ -251,7 +250,7 @@
       startLoading();
       const id = document.getElementById('payment-update-id').value;
       const payment = document.getElementById('update-payment-select').value;
-      $.post(WEB_APP_URL, { method: 'updatePaymentData', id: id, payment: payment }, function(response) {
+      $.post(GAS_URL_ADMIN_HISTORY, { method: 'updatePaymentData', id: id, payment: payment }, function(response) {
         Swal.fire({ icon: 'success', title: 'อัพเดทการชำระเงินเรียบร้อย', text: response });
         fetchData();
         closePaymentModal();
