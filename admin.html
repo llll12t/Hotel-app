@@ -252,7 +252,7 @@
       startLoading();
       const id = document.getElementById('payment-update-id').value;
       const payment = document.getElementById('update-payment-select').value;
-      $.post(GAS_URL_ADMIN_HISTORY, { method: 'updatePaymentData', id: id, payment: payment }, function(response) {
+      $.post(CONFIG.GAS_URL_ADMIN_HISTORY, { method: 'updatePaymentData', id: id, payment: payment }, function(response) {
         Swal.fire({ icon: 'success', title: 'อัพเดทการชำระเงินเรียบร้อย', text: response });
         fetchData();
         closePaymentModal();
