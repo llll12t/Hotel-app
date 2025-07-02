@@ -66,11 +66,13 @@
   <!-- (Modal อื่น ๆ สามารถเพิ่มหรือปรับปรุงได้ตามที่ต้องการ) -->
 
   <script>
+    // START: จุดที่ 1 - ประกาศตัวแปร URL โดยดึงค่าจาก Config.js
+    const GAS_URL_ADMIN_HISTORY = CONFIG.GAS_URL_ADMIN_HISTORY;
+
     // ตัวแปรสำหรับเก็บ userId จาก LIFF
     let currentUserId = null;
     // ตัวแปรสำหรับเก็บข้อมูลตาราง
     let tableData = [];
-    // URL ของ Web App (Google Apps Script)
 
     // ฟังก์ชันสำหรับเริ่มต้น LIFF (รวม login) โดยใช้ LIFF ID ที่ถูกต้อง
     async function initLIFF() {
@@ -121,7 +123,18 @@
     async function fetchData() {
       startLoading();
       try {
-        const response = await fetch(CONFIG.GAS_URL_ADMIN_HISTORY);
+        // START: จุดที่ 2 - เพิ่ม parameter เข้าไปใน URL เพื่อบอกให้ GAS รู้ว่าต้องการทำอะไร
+        // คุณอาจจะต้องเปลี่ยน 'action=getHistory' ให้ตรงกับที่กำหนดไว้ใน Code.gs ของคุณ
+        const url = `${GAS_URL_ADMIN_HISTORY}?action=getHistory`; 
+        
+        const response = await fetch(url);
+        
+        // ตรวจสอบว่า response สำเร็จหรือไม่
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Server responded with ${response.status}: ${errorText}`);
+        }
+
         const data = await response.json();
         tableData = processData(data);
         renderTable(tableData);
@@ -130,7 +143,7 @@
         Swal.fire({
           icon: 'error',
           title: 'เกิดข้อผิดพลาด',
-          text: 'ไม่สามารถโหลดข้อมูลได้'
+          text: `ไม่สามารถโหลดข้อมูลได้: ${error.message}`
         });
       } finally {
         stopLoading();
@@ -139,21 +152,38 @@
 
     // แปลงข้อมูลจากชีต (ไม่รวม header) โดยเพิ่ม property useridline (สมมุติว่าอยู่ที่ index 17)
     function processData(data) {
+      // ตรวจสอบว่า data[0] คือ header หรือไม่ ถ้าใช่ให้ใช้ headers จาก data[0]
+      const headers = data[0];
+      const idIndex = headers.indexOf("ไอดี");
+      const roomNameIndex = headers.indexOf("ชื่อห้องพัก");
+      const roomPriceIndex = headers.indexOf("ราคา");
+      const checkinDateIndex = headers.indexOf("วันที่เข้าพัก");
+      const checkoutDateIndex = headers.indexOf("วันที่ออก");
+      const numGuestsIndex = headers.indexOf("จำนวนคนพัก");
+      const bookerNameIndex = headers.indexOf("ชื่อผู้จอง");
+      const phoneIndex = headers.indexOf("เบอร์ติดต่อ");
+      const statusIndex = headers.indexOf("สถานะ");
+      const paymentIndex = headers.indexOf("การชำระเงิน");
+      const checkInTimeIndex = headers.indexOf("เช็คอิน");
+      const checkOutTimeIndex = headers.indexOf("เช็คเอาท์");
+      const additionalNotesIndex = headers.indexOf("บันทึกเพิ่มเติม");
+      const useridlineIndex = headers.indexOf("Useridline");
+
       return data.slice(1).map(row => ({
-        id: String(row[0]),
-        roomName: row[2],
-        roomPrice: row[4],
-        checkinDate: row[5],
-        checkoutDate: row[6],
-        numGuests: row[7],
-        bookerName: row[8],
-        phone: row[9],
-        status: row[12],
-        payment: row[13],
-        checkInTime: row[14],
-        checkOutTime: row[15],
-        additionalNotes: row[16],
-        useridline: row[17]  // คอลัมน์ useridline ในข้อมูล
+        id: String(row[idIndex]),
+        roomName: row[roomNameIndex],
+        roomPrice: row[roomPriceIndex],
+        checkinDate: row[checkinDateIndex],
+        checkoutDate: row[checkoutDateIndex],
+        numGuests: row[numGuestsIndex],
+        bookerName: row[bookerNameIndex],
+        phone: row[phoneIndex],
+        status: row[statusIndex],
+        payment: row[paymentIndex],
+        checkInTime: row[checkInTimeIndex],
+        checkOutTime: row[checkOutTimeIndex],
+        additionalNotes: row[additionalNotesIndex],
+        useridline: row[useridlineIndex]
       }));
     }
 
@@ -206,18 +236,28 @@
     // ฟังก์ชัน toggleDetailsMobile สำหรับมือถือ (ใช้ colspan=4) เพื่อแสดงรายละเอียดเพิ่มเติม
     function toggleDetailsMobile(id, btn) {
       const currentRow = btn.closest('tr');
+      const icon = btn.querySelector('.material-icons-round');
+      
+      // ตรวจสอบว่าแถวถัดไปเป็นแถวรายละเอียดหรือไม่
       if (currentRow.nextElementSibling && currentRow.nextElementSibling.classList.contains('details-row')) {
+        // ถ้าใช่ ให้ลบออกและเปลี่ยนไอคอนกลับ
         currentRow.parentNode.removeChild(currentRow.nextElementSibling);
+        icon.textContent = 'expand_more';
         return;
       }
+      
       const item = tableData.find(x => String(x.id) === String(id));
       if (!item) return;
+
+      // เปลี่ยนไอคอน
+      icon.textContent = 'expand_less';
+
       const detailsRow = document.createElement('tr');
-      detailsRow.classList.add('details-row');
+      detailsRow.classList.add('details-row', 'bg-slate-100');
       const detailsCell = document.createElement('td');
       detailsCell.setAttribute('colspan', '4');
       detailsCell.innerHTML = `
-        <div class="p-2 border-t">
+        <div class="p-2 border-t text-left">
           <div><strong>ชื่อห้องพัก:</strong> ${item.roomName}</div>
           <div><strong>ราคา:</strong> ${item.roomPrice}</div>
           <div><strong>วันที่เข้าพัก:</strong> ${item.checkinDate}</div>
@@ -227,9 +267,9 @@
           <div><strong>เบอร์ติดต่อ:</strong> ${item.phone}</div>
           <div><strong>สถานะ:</strong> ${getStatusBadge(item.status)}</div>
           <div><strong>การชำระเงิน:</strong> ${item.payment}</div>
-          <div><strong>เช็คอิน:</strong> ${item.checkInTime}</div>
-          <div><strong>เช็คเอาท์:</strong> ${item.checkOutTime}</div>
-          <div><strong>บันทึกเพิ่มเติม:</strong> ${item.additionalNotes || ''}</div>
+          <div><strong>เช็คอิน:</strong> ${item.checkInTime || '-'}</div>
+          <div><strong>เช็คเอาท์:</strong> ${item.checkOutTime || '-'}</div>
+          <div><strong>บันทึกเพิ่มเติม:</strong> ${item.additionalNotes || '-'}</div>
         </div>
       `;
       detailsRow.appendChild(detailsCell);
