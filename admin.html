@@ -19,73 +19,76 @@
 
   <!-- Loading Overlay -->
   <div id="loading-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <span class="text-white text-xl">Loading...</span>
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+    <span class="text-white text-xl ml-4">Loading...</span>
   </div>
 
   <!-- ตารางสำหรับมือถือ -->
   <div class="max-w-md mx-auto mt-2">
-    <div class="p-4 bg-[#071D4A] my-2 rounded-2xl">
-    <p class="text-md text-gray-100 text-center font-bold">ประวัติเข้าพัก</p>
+    <div class="p-4 bg-[#071D4A] my-2 rounded-2xl shadow-lg">
+      <p class="text-md text-gray-100 text-center font-bold">ประวัติเข้าพัก</p>
     </div>
-    <table id="data-table" class="min-w-full bg-white rounded-2xl text-sm">
-      <thead>
-        <tr class="text-slate-800">
-          <th class="py-2 px-4 border">ชื่อห้องพัก</th>
-          <th class="py-2 px-4 border">ราคา</th>
-          <th class="py-2 px-4 border">ชื่อผู้เช่า</th>
-          <th class="py-2 px-4 border">เพิ่มเติม</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- ข้อมูลจะแสดงที่นี่โดย JS -->
-      </tbody>
-    </table>
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+      <table id="data-table" class="min-w-full text-sm">
+        <thead class="bg-slate-100">
+          <tr class="text-slate-700">
+            <th class="py-3 px-4 text-left font-semibold">ชื่อห้องพัก</th>
+            <th class="py-3 px-4 text-left font-semibold">ราคา</th>
+            <th class="py-3 px-4 text-left font-semibold">ผู้จอง</th>
+            <th class="py-3 px-4 text-center font-semibold">เพิ่มเติม</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-200">
+          <!-- ข้อมูลจะแสดงที่นี่โดย JS -->
+        </tbody>
+      </table>
+    </div>
   </div>
 
-  <!-- Modal ตัวอย่าง: อัพเดทการชำระเงิน -->
-  <div id="update-payment-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white p-4 rounded-xl w-11/12 max-w-md">
+  <!-- Modal สำหรับอัพเดทการชำระเงิน ถูกซ่อนไว้ -->
+  <div id="update-payment-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-[60]">
+    <div class="bg-white p-6 rounded-xl w-11/12 max-w-md transform transition-all">
       <h2 class="text-lg font-bold mb-4">อัพเดทการชำระเงิน</h2>
       <form id="update-payment-form">
         <input type="hidden" id="payment-update-id">
-        <div class="mb-2">
-          <label class="block text-sm">การชำระเงิน</label>
-          <select id="update-payment-select" class="w-full border px-2 py-1 rounded">
+        <div class="mb-4">
+          <label for="update-payment-select" class="block text-sm font-medium text-gray-700">การชำระเงิน</label>
+          <select id="update-payment-select" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
             <option value="ชำระเงินสำเร็จ">ชำระเงินสำเร็จ</option>
             <option value="จ่ายหน้าเค้าเตอร์">จ่ายหน้าเค้าเตอร์</option>
             <option value="ยกเลิก">ยกเลิก</option>
           </select>
         </div>
-        <div class="flex justify-end">
-          <button type="button" onclick="closePaymentModal()" class="bg-gray-500 text-white py-1 px-3 rounded mr-2">ยกเลิก</button>
-          <button type="submit" class="bg-blue-500 text-white py-1 px-3 rounded">บันทึก</button>
+        <div class="flex justify-end space-x-3">
+          <button type="button" onclick="closePaymentModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-md">ยกเลิก</button>
+          <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-md">บันทึก</button>
         </div>
       </form>
     </div>
   </div>
-  <!-- (Modal อื่น ๆ สามารถเพิ่มหรือปรับปรุงได้ตามที่ต้องการ) -->
+
 
   <script>
-    // ตัวแปรสำหรับเก็บ userId จาก LIFF
-    let currentUserId = null;
-    // ตัวแปรสำหรับเก็บข้อมูลตาราง
-    let tableData = [];
-    // URL ของ Web App (Google Apps Script)
+    // START: จุดที่ 1 - ประกาศตัวแปร URL โดยดึงค่าจาก Config.js
+    const GAS_URL_ADMIN_HISTORY = CONFIG.GAS_URL_ADMIN_HISTORY;
 
-    // ฟังก์ชันสำหรับเริ่มต้น LIFF (รวม login) โดยใช้ LIFF ID ที่ถูกต้อง
+    // ตัวแปรสำหรับเก็บ userId จาก LIFF และข้อมูลตาราง
+    let currentUserId = null;
+    let tableData = [];
+
+    // ฟังก์ชันสำหรับเริ่มต้น LIFF
     async function initLIFF() {
       try {
         await liff.init({ liffId: CONFIG.LIFF_HISTORY });
         console.log("LIFF init success");
-        // ตรวจสอบสถานะการเข้าสู่ระบบ ถ้าไม่ได้เข้าสู่ระบบให้ redirect ไป login
+
         if (!liff.isLoggedIn()) {
           console.log("ยังไม่ได้เข้าสู่ระบบ, redirecting to login...");
-          liff.login(); // redirect ไปยังหน้า login ของ LINE
+          liff.login({ redirectUri: window.location.href });
         } else {
           const profile = await liff.getProfile();
           currentUserId = profile.userId;
           console.log("ผู้ใช้เข้าสู่ระบบ, userId:", currentUserId);
-          // หลังจากได้ userId แล้ว เรียกใช้งานดึงข้อมูล
           fetchData();
         }
       } catch (error) {
@@ -100,28 +103,35 @@
 
     // ฟังก์ชันสำหรับแสดง/ซ่อน Loading
     function startLoading() {
-      document.getElementById('loading-overlay').classList.remove('hidden');
+      $('#loading-overlay').removeClass('hidden');
     }
     function stopLoading() {
-      document.getElementById('loading-overlay').classList.add('hidden');
+      $('#loading-overlay').addClass('hidden');
     }
 
     // ฟังก์ชันสำหรับสร้าง badge ของสถานะ
     function getStatusBadge(status) {
-      if (status === 'เสร็จสิ้น') {
-        return `<span class="px-2 py-1 bg-green-100 text-green-800 rounded">${status}</span>`;
-      } else if (status === 'ยกเลิก') {
-        return `<span class="px-2 py-1 bg-red-100 text-red-800 rounded">${status}</span>`;
-      } else {
-        return `<span class="px-2 py-1 bg-blue-100 text-blue-800 rounded">${status}</span>`;
-      }
+      const baseStyle = "px-2.5 py-1 text-xs font-semibold rounded-full";
+      if (status === 'เสร็จสิ้น') return `<span class="${baseStyle} bg-green-100 text-green-800">${status}</span>`;
+      if (status === 'ยกเลิก') return `<span class="${baseStyle} bg-red-100 text-red-800">${status}</span>`;
+      if (status === 'เข้าพัก') return `<span class="${baseStyle} bg-blue-100 text-blue-800">${status}</span>`;
+      return `<span class="${baseStyle} bg-yellow-100 text-yellow-800">${status || 'จอง'}</span>`;
     }
 
     // ดึงข้อมูลจาก Server (Google Apps Script)
     async function fetchData() {
       startLoading();
       try {
-        const response = await fetch(CONFIG.GAS_URL_ADMIN_HISTORY);
+        // START: จุดที่ 2 - เพิ่ม parameter เข้าไปใน URL เพื่อบอกให้ GAS รู้ว่าต้องการทำอะไร
+        const url = `${GAS_URL_ADMIN_HISTORY}?action=getHistory`;
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Server responded with ${response.status}: ${errorText}`);
+        }
+
         const data = await response.json();
         tableData = processData(data);
         renderTable(tableData);
@@ -130,143 +140,148 @@
         Swal.fire({
           icon: 'error',
           title: 'เกิดข้อผิดพลาด',
-          text: 'ไม่สามารถโหลดข้อมูลได้'
+          text: `ไม่สามารถโหลดข้อมูลได้: ${error.message}`
         });
       } finally {
         stopLoading();
       }
     }
 
-    // แปลงข้อมูลจากชีต (ไม่รวม header) โดยเพิ่ม property useridline (สมมุติว่าอยู่ที่ index 17)
+    // แปลงข้อมูลจากชีตให้เป็น Object ที่อ่านง่ายและยืดหยุ่น
     function processData(data) {
-      return data.slice(1).map(row => ({
-        id: String(row[0]),
-        roomName: row[2],
-        roomPrice: row[4],
-        checkinDate: row[5],
-        checkoutDate: row[6],
-        numGuests: row[7],
-        bookerName: row[8],
-        phone: row[9],
-        status: row[12],
-        payment: row[13],
-        checkInTime: row[14],
-        checkOutTime: row[15],
-        additionalNotes: row[16],
-        useridline: row[17]  // คอลัมน์ useridline ในข้อมูล
-      }));
-    }
+        if (!Array.isArray(data) || data.length < 2) return [];
+        const headers = data[0];
+        // หา index ของแต่ละคอลัมน์จาก header
+        const mapHeaderToIndex = (headerName) => headers.indexOf(headerName);
+        
+        const indices = {
+            id: mapHeaderToIndex("ไอดี"),
+            roomName: mapHeaderToIndex("ชื่อห้องพัก"),
+            roomPrice: mapHeaderToIndex("ราคา"),
+            checkinDate: mapHeaderToIndex("วันที่เข้าพัก"),
+            checkoutDate: mapHeaderToIndex("วันที่ออก"),
+            numGuests: mapHeaderToIndex("จำนวนคนพัก"),
+            bookerName: mapHeaderToIndex("ชื่อผู้จอง"),
+            phone: mapHeaderToIndex("เบอร์ติดต่อ"),
+            status: mapHeaderToIndex("สถานะ"),
+            payment: mapHeaderToIndex("การชำระเงิน"),
+            checkInTime: mapHeaderToIndex("เช็คอิน"),
+            checkOutTime: mapHeaderToIndex("เช็คเอาท์"),
+            additionalNotes: mapHeaderToIndex("บันทึกเพิ่มเติม"),
+            useridline: mapHeaderToIndex("Useridline")
+        };
 
-    // ฟังก์ชันแปลงวันที่ให้อยู่ในรูปแบบ DD-MM-YYYY
-    function formatDateDMY(dateStr) {
-      if (!dateStr) return '';
-      if (dateStr.indexOf('T') !== -1) {
-        const date = new Date(dateStr);
-        const options = { timeZone: 'Asia/Bangkok', day: '2-digit', month: '2-digit', year: 'numeric' };
-        const formatted = new Intl.DateTimeFormat('en-GB', options).format(date);
-        return formatted.replace(/\//g, '-');
-      }
-      return dateStr;
+        return data.slice(1).map(row => ({
+            id: row[indices.id] ? String(row[indices.id]) : '',
+            roomName: row[indices.roomName] || '',
+            roomPrice: row[indices.roomPrice] || '0',
+            checkinDate: row[indices.checkinDate] || '',
+            checkoutDate: row[indices.checkoutDate] || '',
+            numGuests: row[indices.numGuests] || '1',
+            bookerName: row[indices.bookerName] || '',
+            phone: row[indices.phone] || '',
+            status: row[indices.status] || '',
+            payment: row[indices.payment] || '',
+            checkInTime: formatDateTime(row[indices.checkInTime]),
+            checkOutTime: formatDateTime(row[indices.checkOutTime]),
+            additionalNotes: row[indices.additionalNotes] || '',
+            useridline: row[indices.useridline] || ''
+        }));
     }
 
     // ฟังก์ชันแปลงวันที่และเวลาให้อยู่ในรูปแบบ DD-MM-YYYY HH:mm
     function formatDateTime(dateStr) {
       if (!dateStr) return '';
       const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return ''; // ถ้าวันที่ไม่ถูกต้อง ให้ return ค่าว่าง
       const options = { timeZone: 'Asia/Bangkok', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
       let formatted = new Intl.DateTimeFormat('en-GB', options).format(date);
       return formatted.replace(/\//g, '-').replace(',', '').trim();
     }
 
-    // แสดงข้อมูลในตารางสำหรับมือถือ โดยกรองข้อมูลตาม useridline (ถ้ามี)
+    // แสดงข้อมูลในตาราง
     function renderTable(data) {
-      const tbody = document.querySelector('#data-table tbody');
-      tbody.innerHTML = '';
-      // หาก currentUserId มีค่า ให้กรองข้อมูลเฉพาะรายการที่ตรงกับ
+      const tbody = $('#data-table tbody');
+      tbody.html(''); // Clear existing rows
+      
       const filteredData = currentUserId 
         ? data.filter(item => item.useridline === currentUserId)
-        : data;
-      filteredData.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.setAttribute('data-id', item.id);
-        tr.innerHTML = `
-          <td class="py-2 px-4 border">${item.roomName}</td>
-          <td class="py-2 px-4 border">${item.roomPrice}</td>
-          <td class="py-2 px-4 border">${item.bookerName}</td>
-          <td class="py-2 px-4 border">
-            <button class="bg-[#071D4A]  hover:bg-gray-300 py-2 px-3 rounded-2xl" onclick="toggleDetailsMobile('${item.id}', this)" title="แสดงรายละเอียด">
-              <span class="material-icons-round text-base text-gray-100">expand_more</span>
-            </button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    }
+        : []; // ถ้าไม่มี userId ให้แสดงตารางว่าง
 
-    // ฟังก์ชัน toggleDetailsMobile สำหรับมือถือ (ใช้ colspan=4) เพื่อแสดงรายละเอียดเพิ่มเติม
-    function toggleDetailsMobile(id, btn) {
-      const currentRow = btn.closest('tr');
-      if (currentRow.nextElementSibling && currentRow.nextElementSibling.classList.contains('details-row')) {
-        currentRow.parentNode.removeChild(currentRow.nextElementSibling);
+      if (filteredData.length === 0) {
+        tbody.append('<tr><td colspan="4" class="text-center py-4 text-gray-500">ไม่มีประวัติการเข้าพัก</td></tr>');
         return;
       }
-      const item = tableData.find(x => String(x.id) === String(id));
-      if (!item) return;
-      const detailsRow = document.createElement('tr');
-      detailsRow.classList.add('details-row');
-      const detailsCell = document.createElement('td');
-      detailsCell.setAttribute('colspan', '4');
-      detailsCell.innerHTML = `
-        <div class="p-2 border-t">
-          <div><strong>ชื่อห้องพัก:</strong> ${item.roomName}</div>
-          <div><strong>ราคา:</strong> ${item.roomPrice}</div>
-          <div><strong>วันที่เข้าพัก:</strong> ${item.checkinDate}</div>
-          <div><strong>วันที่ออก:</strong> ${item.checkoutDate}</div>
-          <div><strong>จำนวนคน:</strong> ${item.numGuests}</div>
-          <div><strong>ชื่อผู้เช่า:</strong> ${item.bookerName}</div>
-          <div><strong>เบอร์ติดต่อ:</strong> ${item.phone}</div>
-          <div><strong>สถานะ:</strong> ${getStatusBadge(item.status)}</div>
-          <div><strong>การชำระเงิน:</strong> ${item.payment}</div>
-          <div><strong>เช็คอิน:</strong> ${item.checkInTime}</div>
-          <div><strong>เช็คเอาท์:</strong> ${item.checkOutTime}</div>
-          <div><strong>บันทึกเพิ่มเติม:</strong> ${item.additionalNotes || ''}</div>
-        </div>
-      `;
-      detailsRow.appendChild(detailsCell);
-      currentRow.parentNode.insertBefore(detailsRow, currentRow.nextSibling);
+
+      filteredData.forEach(item => {
+        const tr = `
+          <tr class="hover:bg-slate-50" data-id="${item.id}">
+            <td class="py-3 px-4">${item.roomName}</td>
+            <td class="py-3 px-4">${item.roomPrice}</td>
+            <td class="py-3 px-4">${item.bookerName}</td>
+            <td class="py-3 px-4 text-center">
+              <button class="bg-[#071D4A] hover:bg-gray-600 p-2 rounded-full" onclick="toggleDetailsMobile('${item.id}', this)" title="แสดงรายละเอียด">
+                <span class="material-icons-round text-base text-white leading-none align-middle">expand_more</span>
+              </button>
+            </td>
+          </tr>
+        `;
+        tbody.append(tr);
+      });
     }
 
-    // ตัวอย่างฟังก์ชันสำหรับ Modal (ตัวอย่างนี้ใช้สำหรับอัพเดทการชำระเงิน)
-    function openPaymentModal(id) {
-      const item = tableData.find(x => String(x.id) === String(id));
+    // ฟังก์ชันเปิด/ปิดรายละเอียด
+    function toggleDetailsMobile(id, btn) {
+      const $currentRow = $(btn).closest('tr');
+      const $icon = $(btn).find('.material-icons-round');
+
+      if ($currentRow.next().hasClass('details-row')) {
+        $currentRow.next().remove();
+        $icon.text('expand_more');
+        return;
+      }
+      
+      const item = tableData.find(x => x.id === id);
       if (!item) return;
-      document.getElementById('payment-update-id').value = item.id;
-      document.getElementById('update-payment-select').value = item.payment || 'รอการชำระเงิน';
-      document.getElementById('update-payment-modal').classList.remove('hidden');
+
+      $('.details-row').remove();
+      $('#data-table .material-icons-round').text('expand_more');
+      $icon.text('expand_less');
+
+      const detailsHtml = `
+        <tr class="details-row bg-slate-100">
+          <td colspan="4" class="p-4 text-left">
+            <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+              <div><strong>ชื่อห้องพัก:</strong> ${item.roomName}</div>
+              <div><strong>ราคา:</strong> ${item.roomPrice}</div>
+              <div><strong>วันที่เข้าพัก:</strong> ${item.checkinDate}</div>
+              <div><strong>วันที่ออก:</strong> ${item.checkoutDate}</div>
+              <div><strong>จำนวนคน:</strong> ${item.numGuests}</div>
+              <div><strong>เบอร์ติดต่อ:</strong> ${item.phone}</div>
+              <div class="col-span-2"><strong>สถานะ:</strong> ${getStatusBadge(item.status)}</div>
+              <div class="col-span-2"><strong>การชำระเงิน:</strong> ${item.payment}</div>
+              <div class="col-span-2"><strong>เช็คอิน:</strong> ${item.checkInTime || '-'}</div>
+              <div class="col-span-2"><strong>เช็คเอาท์:</strong> ${item.checkOutTime || '-'}</div>
+              <div class="col-span-2"><strong>บันทึกเพิ่มเติม:</strong> ${item.additionalNotes || '-'}</div>
+            </div>
+          </td>
+        </tr>
+      `;
+      $currentRow.after(detailsHtml);
+    }
+
+    // ฟังก์ชันสำหรับ Modal (ตัวอย่างนี้ใช้สำหรับอัพเดทการชำระเงิน)
+    function openPaymentModal(id) {
+        // โค้ดสำหรับเปิด modal (หากจำเป็นต้องใช้ในอนาคต)
     }
     function closePaymentModal() {
-      document.getElementById('update-payment-modal').classList.add('hidden');
+        $('#update-payment-modal').addClass('hidden');
     }
-    document.getElementById('update-payment-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      startLoading();
-      const id = document.getElementById('payment-update-id').value;
-      const payment = document.getElementById('update-payment-select').value;
-      $.post(CONFIG.GAS_URL_ADMIN_HISTORY, { method: 'updatePaymentData', id: id, payment: payment }, function(response) {
-        Swal.fire({ icon: 'success', title: 'อัพเดทการชำระเงินเรียบร้อย', text: response });
-        fetchData();
-        closePaymentModal();
-        stopLoading();
-      }).fail(function(error) {
-        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: 'ไม่สามารถอัพเดทการชำระเงินได้' });
-        stopLoading();
-      });
-    });
 
-    // เมื่อหน้าโหลด ให้เริ่มต้น LIFF (ถ้ายังไม่ได้เข้าสู่ระบบจะ redirect ไปที่หน้า login)
-    window.onload = function() {
+    // เมื่อหน้าโหลด ให้เริ่มต้น LIFF
+    $(document).ready(function() {
       initLIFF();
-    };
+    });
   </script>
 </body>
 </html>
