@@ -5,13 +5,18 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Admin</title>
+  <title>ประวัติเข้าพัก</title>
+  <!-- LIFF SDK -->
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Include config.js สำหรับ CONFIG.GAS_URL -->
+  <script src="Config.js"></script>
 </head>
 <body class="bg-slate-50 p-4 relative">
+
   <!-- Loading Overlay -->
   <div id="loading-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <span class="text-white text-xl">Loading...</span>
@@ -20,9 +25,9 @@
   <!-- ตารางสำหรับมือถือ -->
   <div class="max-w-md mx-auto mt-2">
     <div class="p-4 bg-[#071D4A] my-2 rounded-2xl">
-    <p class="text-md text-gray-100 text-center font-bold">จัดการการเข้าพัก</p>
+    <p class="text-md text-gray-100 text-center font-bold">ประวัติเข้าพัก</p>
     </div>
-    <table id="data-table" class="min-w-full bg-white rounded-xl text-sm">
+    <table id="data-table" class="min-w-full bg-white rounded-2xl text-sm">
       <thead>
         <tr class="text-slate-800">
           <th class="py-2 px-4 border">ชื่อห้องพัก</th>
@@ -32,12 +37,12 @@
         </tr>
       </thead>
       <tbody>
-        <!-- ข้อมูลจะแสดงที่นี่โดย JavaScript -->
+        <!-- ข้อมูลจะแสดงที่นี่โดย JS -->
       </tbody>
     </table>
   </div>
 
-  <!-- Modal: อัพเดทการชำระเงิน -->
+  <!-- Modal ตัวอย่าง: อัพเดทการชำระเงิน -->
   <div id="update-payment-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
     <div class="bg-white p-4 rounded-xl w-11/12 max-w-md">
       <h2 class="text-lg font-bold mb-4">อัพเดทการชำระเงิน</h2>
@@ -58,90 +63,41 @@
       </form>
     </div>
   </div>
-
-  <!-- Modal: อัพเดทข้อมูลเข้าพัก (Check-In) -->
-  <div id="update-checkin-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white p-4 rounded-xl w-11/12 max-w-md">
-      <h2 class="text-lg font-bold mb-4">อัพเดทข้อมูลเข้าพัก</h2>
-      <form id="update-checkin-form">
-        <input type="hidden" id="checkin-update-id">
-        <div class="mb-2">
-          <label class="block text-sm">เวลาเช็คอิน</label>
-          <input type="datetime-local" id="update-checkin-time" class="w-full border px-2 py-1 rounded">
-        </div>
-        <div class="mb-2">
-          <label class="block text-sm">บันทึกเพิ่มเติม</label>
-          <textarea id="update-checkin-notes" class="w-full border px-2 py-1 rounded" placeholder="บันทึกเพิ่มเติม"></textarea>
-        </div>
-        <div class="flex justify-end">
-          <button type="button" onclick="closeCheckinModal()" class="bg-gray-500 text-white py-1 px-3 rounded mr-2">ยกเลิก</button>
-          <button type="submit" class="bg-blue-500 text-white py-1 px-3 rounded">บันทึก</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal: อัพเดทข้อมูลเสร็จสิ้น (Check-Out) -->
-  <div id="update-checkout-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white p-4 rounded-xl w-11/12 max-w-md">
-      <h2 class="text-lg font-bold mb-4">อัพเดทข้อมูลเสร็จสิ้น</h2>
-      <form id="update-checkout-form">
-        <input type="hidden" id="checkout-update-id">
-        <div class="mb-2">
-          <label class="block text-sm">เวลาเช็คเอาท์</label>
-          <input type="datetime-local" id="update-checkout-time" class="w-full border px-2 py-1 rounded">
-        </div>
-        <div class="mb-2">
-          <label class="block text-sm">บันทึกเพิ่มเติม</label>
-          <textarea id="update-checkout-notes" class="w-full border px-2 py-1 rounded" placeholder="บันทึกเพิ่มเติม"></textarea>
-        </div>
-        <div class="flex justify-end">
-          <button type="button" onclick="closeCheckoutModal()" class="bg-gray-500 text-white py-1 px-3 rounded mr-2">ยกเลิก</button>
-          <button type="submit" class="bg-blue-500 text-white py-1 px-3 rounded">บันทึก</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal: แก้ไขข้อมูล Appointment -->
-  <div id="edit-modal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-    <div class="bg-white p-4 rounded-xl w-11/12 max-w-md">
-      <h2 class="text-lg font-bold mb-4">แก้ไขข้อมูล Appointment</h2>
-      <form id="edit-form">
-        <input type="hidden" id="edit-id">
-        <div class="mb-2">
-          <label class="block text-sm">ชื่อห้องพัก</label>
-          <input type="text" id="edit-roomName" class="w-full border px-2 py-1 rounded" placeholder="ชื่อห้องพัก">
-        </div>
-        <div class="mb-2">
-          <label class="block text-sm">วันที่เข้าพัก (DD-MM-YYYY)</label>
-          <input type="text" id="edit-checkinDate" class="w-full border px-2 py-1 rounded" placeholder="วันที่เข้าพัก">
-        </div>
-        <div class="mb-2">
-          <label class="block text-sm">วันที่ออก (DD-MM-YYYY)</label>
-          <input type="text" id="edit-checkoutDate" class="w-full border px-2 py-1 rounded" placeholder="วันที่ออก">
-        </div>
-        <div class="mb-2">
-          <label class="block text-sm">จำนวนคน</label>
-          <input type="number" id="edit-numGuests" class="w-full border px-2 py-1 rounded" placeholder="จำนวนคน">
-        </div>
-        <div class="mb-2">
-          <label class="block text-sm">ชื่อผู้เช่า</label>
-          <input type="text" id="edit-bookerName" class="w-full border px-2 py-1 rounded" placeholder="ชื่อผู้เช่า">
-        </div>
-        <div class="mb-2">
-          <label class="block text-sm">เบอร์ติดต่อ</label>
-          <input type="text" id="edit-phone" class="w-full border px-2 py-1 rounded" placeholder="เบอร์ติดต่อ">
-        </div>
-        <div class="flex justify-end">
-          <button type="button" onclick="closeEditModal()" class="bg-gray-500 text-white py-1 px-3 rounded mr-2">ยกเลิก</button>
-          <button type="submit" class="bg-blue-500 text-white py-1 px-3 rounded">บันทึก</button>
-        </div>
-      </form>
-    </div>
-  </div>
+  <!-- (Modal อื่น ๆ สามารถเพิ่มหรือปรับปรุงได้ตามที่ต้องการ) -->
 
   <script>
+    // ตัวแปรสำหรับเก็บ userId จาก LIFF
+    let currentUserId = null;
+    // ตัวแปรสำหรับเก็บข้อมูลตาราง
+    let tableData = [];
+    // URL ของ Web App (Google Apps Script)
+
+    // ฟังก์ชันสำหรับเริ่มต้น LIFF (รวม login) โดยใช้ LIFF ID ที่ถูกต้อง
+    async function initLIFF() {
+      try {
+        await liff.init({ liffId: CONFIG.LIFF_HISTORY });
+        console.log("LIFF init success");
+        // ตรวจสอบสถานะการเข้าสู่ระบบ ถ้าไม่ได้เข้าสู่ระบบให้ redirect ไป login
+        if (!liff.isLoggedIn()) {
+          console.log("ยังไม่ได้เข้าสู่ระบบ, redirecting to login...");
+          liff.login(); // redirect ไปยังหน้า login ของ LINE
+        } else {
+          const profile = await liff.getProfile();
+          currentUserId = profile.userId;
+          console.log("ผู้ใช้เข้าสู่ระบบ, userId:", currentUserId);
+          // หลังจากได้ userId แล้ว เรียกใช้งานดึงข้อมูล
+          fetchData();
+        }
+      } catch (error) {
+        console.error("LIFF initialization error:", error);
+        Swal.fire({
+          icon: 'error',
+          title: 'เกิดข้อผิดพลาดในการเชื่อมต่อ LIFF',
+          text: error.message
+        });
+      }
+    }
+
     // ฟังก์ชันสำหรับแสดง/ซ่อน Loading
     function startLoading() {
       document.getElementById('loading-overlay').classList.remove('hidden');
@@ -150,7 +106,7 @@
       document.getElementById('loading-overlay').classList.add('hidden');
     }
 
-    // ฟังก์ชันสำหรับแสดง badge ของสถานะ
+    // ฟังก์ชันสำหรับสร้าง badge ของสถานะ
     function getStatusBadge(status) {
       if (status === 'เสร็จสิ้น') {
         return `<span class="px-2 py-1 bg-green-100 text-green-800 rounded">${status}</span>`;
@@ -161,15 +117,11 @@
       }
     }
 
-    // URL ของ Web App (Google Apps Script)
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyPljZ05WrGsoQK08sjgbt3MRD9TO1s12jVrTO5Py_3-WhyyHjIsdiOA0nDhdD34tCV/exec';
-    let tableData = [];
-
-    // ดึงข้อมูลจาก Server พร้อม Loading
+    // ดึงข้อมูลจาก Server (Google Apps Script)
     async function fetchData() {
       startLoading();
       try {
-        const response = await fetch(WEB_APP_URL);
+        const response = await fetch(GAS_URL_ADMIN_HISTORY);
         const data = await response.json();
         tableData = processData(data);
         renderTable(tableData);
@@ -185,7 +137,7 @@
       }
     }
 
-    // แปลงข้อมูลจากชีต (ไม่รวม header) ให้ id เป็น string
+    // แปลงข้อมูลจากชีต (ไม่รวม header) โดยเพิ่ม property useridline (สมมุติว่าอยู่ที่ index 17)
     function processData(data) {
       return data.slice(1).map(row => ({
         id: String(row[0]),
@@ -200,7 +152,8 @@
         payment: row[13],
         checkInTime: row[14],
         checkOutTime: row[15],
-        additionalNotes: row[16]
+        additionalNotes: row[16],
+        useridline: row[17]  // คอลัมน์ useridline ในข้อมูล
       }));
     }
 
@@ -225,11 +178,15 @@
       return formatted.replace(/\//g, '-').replace(',', '').trim();
     }
 
-    // แสดงข้อมูลในตารางสำหรับมือถือ (แสดงทุก appointment)
+    // แสดงข้อมูลในตารางสำหรับมือถือ โดยกรองข้อมูลตาม useridline (ถ้ามี)
     function renderTable(data) {
       const tbody = document.querySelector('#data-table tbody');
       tbody.innerHTML = '';
-      data.forEach(item => {
+      // หาก currentUserId มีค่า ให้กรองข้อมูลเฉพาะรายการที่ตรงกับ
+      const filteredData = currentUserId 
+        ? data.filter(item => item.useridline === currentUserId)
+        : data;
+      filteredData.forEach(item => {
         const tr = document.createElement('tr');
         tr.setAttribute('data-id', item.id);
         tr.innerHTML = `
@@ -246,8 +203,7 @@
       });
     }
 
-    // ฟังก์ชัน toggleDetailsMobile สำหรับมือถือ (ใช้ colspan=4)
-    // แสดงรายละเอียดพร้อมปุ่มชำระเงิน, เช็คอิน, เช็คเอาท์, แก้ไข และลบ
+    // ฟังก์ชัน toggleDetailsMobile สำหรับมือถือ (ใช้ colspan=4) เพื่อแสดงรายละเอียดเพิ่มเติม
     function toggleDetailsMobile(id, btn) {
       const currentRow = btn.closest('tr');
       if (currentRow.nextElementSibling && currentRow.nextElementSibling.classList.contains('details-row')) {
@@ -264,8 +220,8 @@
         <div class="p-2 border-t">
           <div><strong>ชื่อห้องพัก:</strong> ${item.roomName}</div>
           <div><strong>ราคา:</strong> ${item.roomPrice}</div>
-          <div><strong>วันที่เข้าพัก:</strong> ${formatDateDMY(item.checkinDate)}</div>
-          <div><strong>วันที่ออก:</strong> ${formatDateDMY(item.checkoutDate)}</div>
+          <div><strong>วันที่เข้าพัก:</strong> ${item.checkinDate}</div>
+          <div><strong>วันที่ออก:</strong> ${item.checkoutDate}</div>
           <div><strong>จำนวนคน:</strong> ${item.numGuests}</div>
           <div><strong>ชื่อผู้เช่า:</strong> ${item.bookerName}</div>
           <div><strong>เบอร์ติดต่อ:</strong> ${item.phone}</div>
@@ -274,20 +230,13 @@
           <div><strong>เช็คอิน:</strong> ${item.checkInTime}</div>
           <div><strong>เช็คเอาท์:</strong> ${item.checkOutTime}</div>
           <div><strong>บันทึกเพิ่มเติม:</strong> ${item.additionalNotes || ''}</div>
-          <div class="mt-2 flex flex-wrap gap-2">
-            <button class="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded" onclick="openPaymentModal('${item.id}')">ชำระเงิน</button>
-            <button class="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded" onclick="openCheckinModal('${item.id}')">เช็คอิน</button>
-            <button class="bg-orange-500 hover:bg-orange-600 text-white py-1 px-3 rounded" onclick="openCheckoutModal('${item.id}')">เช็คเอาท์</button>
-            <button class="bg-yellow-500 hover:bg-yellow-600 text-white py-1 px-3 rounded" onclick="openEditModal('${item.id}')">แก้ไข</button>
-            <button class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded" onclick="deleteRecord('${item.id}')">ลบ</button>
-          </div>
         </div>
       `;
       detailsRow.appendChild(detailsCell);
       currentRow.parentNode.insertBefore(detailsRow, currentRow.nextSibling);
     }
 
-    // ฟังก์ชันสำหรับ Modal: ชำระเงิน
+    // ตัวอย่างฟังก์ชันสำหรับ Modal (ตัวอย่างนี้ใช้สำหรับอัพเดทการชำระเงิน)
     function openPaymentModal(id) {
       const item = tableData.find(x => String(x.id) === String(id));
       if (!item) return;
@@ -303,7 +252,7 @@
       startLoading();
       const id = document.getElementById('payment-update-id').value;
       const payment = document.getElementById('update-payment-select').value;
-      $.post(WEB_APP_URL, { method: 'updatePaymentData', id: id, payment: payment }, function(response) {
+      $.post(GAS_URL_ADMIN_HISTORY, { method: 'updatePaymentData', id: id, payment: payment }, function(response) {
         Swal.fire({ icon: 'success', title: 'อัพเดทการชำระเงินเรียบร้อย', text: response });
         fetchData();
         closePaymentModal();
@@ -314,131 +263,10 @@
       });
     });
 
-    // ฟังก์ชันสำหรับ Modal: เช็คอิน
-    function openCheckinModal(id) {
-      const item = tableData.find(x => String(x.id) === String(id));
-      if (!item) return;
-      document.getElementById('checkin-update-id').value = item.id;
-      document.getElementById('update-checkin-time').value = item.checkInTime ? item.checkInTime : '';
-      document.getElementById('update-checkin-notes').value = item.additionalNotes || '';
-      document.getElementById('update-checkin-modal').classList.remove('hidden');
-    }
-    function closeCheckinModal() {
-      document.getElementById('update-checkin-modal').classList.add('hidden');
-    }
-    document.getElementById('update-checkin-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      startLoading();
-      const id = document.getElementById('checkin-update-id').value;
-      const checkInTime = document.getElementById('update-checkin-time').value;
-      const notes = document.getElementById('update-checkin-notes').value;
-      $.post(WEB_APP_URL, { method: 'updateCheckInData', id: id, checkInTime: checkInTime, additionalNotes: notes }, function(response) {
-        Swal.fire({ icon: 'success', title: 'อัพเดทข้อมูลเข้าพักเรียบร้อย', text: response });
-        fetchData();
-        closeCheckinModal();
-        stopLoading();
-      }).fail(function(error) {
-        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: 'ไม่สามารถอัพเดทข้อมูลเข้าพักได้' });
-        stopLoading();
-      });
-    });
-
-    // ฟังก์ชันสำหรับ Modal: เช็คเอาท์
-    function openCheckoutModal(id) {
-      const item = tableData.find(x => String(x.id) === String(id));
-      if (!item) return;
-      document.getElementById('checkout-update-id').value = item.id;
-      document.getElementById('update-checkout-time').value = item.checkOutTime ? item.checkOutTime : '';
-      document.getElementById('update-checkout-notes').value = item.additionalNotes || '';
-      document.getElementById('update-checkout-modal').classList.remove('hidden');
-    }
-    function closeCheckoutModal() {
-      document.getElementById('update-checkout-modal').classList.add('hidden');
-    }
-    document.getElementById('update-checkout-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      startLoading();
-      const id = document.getElementById('checkout-update-id').value;
-      const checkOutTime = document.getElementById('update-checkout-time').value;
-      const notes = document.getElementById('update-checkout-notes').value;
-      $.post(WEB_APP_URL, { method: 'updateCheckOutData', id: id, checkOutTime: checkOutTime, additionalNotes: notes }, function(response) {
-        Swal.fire({ icon: 'success', title: 'อัพเดทข้อมูลเสร็จสิ้นเรียบร้อย', text: response });
-        fetchData();
-        closeCheckoutModal();
-        stopLoading();
-      }).fail(function(error) {
-        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: 'ไม่สามารถอัพเดทข้อมูลเสร็จสิ้นได้' });
-        stopLoading();
-      });
-    });
-
-    // ฟังก์ชันสำหรับ Modal: แก้ไขข้อมูล Appointment
-    function openEditModal(id) {
-      const item = tableData.find(x => String(x.id) === String(id));
-      if (!item) return;
-      document.getElementById('edit-id').value = item.id;
-      document.getElementById('edit-roomName').value = item.roomName;
-      document.getElementById('edit-checkinDate').value = formatDateDMY(item.checkinDate);
-      document.getElementById('edit-checkoutDate').value = formatDateDMY(item.checkoutDate);
-      document.getElementById('edit-numGuests').value = item.numGuests;
-      document.getElementById('edit-bookerName').value = item.bookerName;
-      document.getElementById('edit-phone').value = item.phone;
-      document.getElementById('edit-modal').classList.remove('hidden');
-    }
-    function closeEditModal() {
-      document.getElementById('edit-modal').classList.add('hidden');
-    }
-    document.getElementById('edit-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      startLoading();
-      const id = document.getElementById('edit-id').value;
-      const updatedData = {
-        id: id,
-        roomName: document.getElementById('edit-roomName').value,
-        checkinDate: document.getElementById('edit-checkinDate').value,
-        checkoutDate: document.getElementById('edit-checkoutDate').value,
-        numGuests: document.getElementById('edit-numGuests').value,
-        bookerName: document.getElementById('edit-bookerName').value,
-        phone: document.getElementById('edit-phone').value
-      };
-      $.post(WEB_APP_URL, { method: 'editAppointmentData', ...updatedData }, function(response) {
-        Swal.fire({ icon: 'success', title: 'แก้ไขเรียบร้อย', text: response });
-        fetchData();
-        closeEditModal();
-        stopLoading();
-      }).fail(function(error) {
-        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: 'ไม่สามารถแก้ไขข้อมูลได้' });
-        stopLoading();
-      });
-    });
-
-    // ฟังก์ชันสำหรับลบข้อมูล
-    function deleteRecord(id) {
-      Swal.fire({
-        title: 'ยืนยันการลบ?',
-        text: "คุณต้องการลบข้อมูลนี้หรือไม่?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'ลบ',
-        cancelButtonText: 'ยกเลิก'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          startLoading();
-          $.post(WEB_APP_URL, { method: 'deleteAppointmentData', id: id }, function(response) {
-            Swal.fire({ icon: 'success', title: 'ลบเรียบร้อย', text: response });
-            fetchData();
-            stopLoading();
-          }).fail(function(error) {
-            Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: 'ไม่สามารถลบข้อมูลได้' });
-            stopLoading();
-          });
-        }
-      });
-    }
-
-    window.onload = fetchData;
+    // เมื่อหน้าโหลด ให้เริ่มต้น LIFF (ถ้ายังไม่ได้เข้าสู่ระบบจะ redirect ไปที่หน้า login)
+    window.onload = function() {
+      initLIFF();
+    };
   </script>
 </body>
 </html>
