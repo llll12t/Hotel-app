@@ -121,7 +121,7 @@
     async function fetchData() {
       startLoading();
       try {
-        const response = await fetch(GAS_URL_ADMIN_HISTORY);
+        const response = await fetch(CONFIG.GAS_URL_ADMIN_HISTORY);
         const data = await response.json();
         tableData = processData(data);
         renderTable(tableData);
